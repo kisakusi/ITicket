@@ -1,0 +1,147 @@
+﻿@using prjITicket.Models
+@model Orders
+@{
+    ViewBag.Title = "付款成功";
+}
+<script>
+    function showQRCode(orderDetailId) {
+        $.ajax({
+            type: "post",
+            url: "@Url.Action("ShowQRCode")",
+            data: { orderDetailId: orderDetailId },
+            success: function (result) {
+                let content = "";
+                let qrCodes = JSON.parse(result);
+                for (let qrCode of qrCodes.QRCodes) {
+                    let showStr = '<div class="row justify-content-center">'+
+                        '<div class="col-md-10 text-center">' +
+                        `<img src="data:img/png;base64,${qrCode}">`+
+                        `<h3>${qrCodes.ActivityName}</h3>`+
+                        `<p>${qrCodes.TicketCategoryName} ${qrCodes.Time}</p>`+
+                        '</div>'+
+                        '</div>';
+                    content += showStr;
+                }
+                $("#dialogContent").html(content);
+            }
+        })
+    }
+</script>
+<div class="container mt-5">
+    <div class="h1 text-center">
+        <strong>ITicket購票網 訂單完成</strong>
+    </div>
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-10 text-center">
+            <div class="alert alert-success alert-rounded " role="alert">3.訂單完成</div>
+            <div class="h4">購買資訊</div>
+            <table class="table table-sm my-4">
+                <thead>
+                    <tr>
+                        <th width="100"></th>
+                        <th>QRCode</th>
+                        <th>商品名稱</th>
+                        <th>票種</th>
+                        <th>場次</th>
+                        <th>數量</th>
+                        <th class="text-center" width="120">小計</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int totalPrice = 0;
+                        foreach (Order_Detail od in Model.Order_Detail)
+                        {
+                            int subTotal = (int)Math.Round(od.Tickets.Price * (1 - od.Discount), 0) * od.Quantity;
+                            totalPrice += subTotal;
+                            <tr>
+                                <td class="align-middle">
+                                    <div class="card p-1 card-bottom">
+                                        <img src="@Url.Content("~/images/Activity/"+od.Tickets.Activity.Picture)" alt="..." width="80">
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <a onclick="showQRCode(@od.OrderDetailID)" class="fas fa-qrcode" data-toggle="modal" data-target="#exampleModal" style="font-size:35px" href="javascript:;"></a>
+                                </td>
+                                <td class="align-middle ">@od.Tickets.Activity.ActivityName</td>
+                                <td class="align-middle ">@od.Tickets.TicketCategory.TicketCategoryName</td>
+                                <td class="align-middle ">@od.Tickets.TicketTimes.TicketTime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                <td class="align-middle">@od.Quantity 件</td>
+                                <td class="align-middle text-right">$@subTotal</td>
+                            </tr>
+                        }
+                    }
+                    <tr class="text-right">
+                        <td colspan="6">
+                            <strong>運費</strong>
+                        </td>
+                        <td>
+                            <strong>$ 0</strong>
+                        </td>
+                    </tr>
+                    <tr class="text-right">
+                        <td colspan="6">
+                            <strong>合計</strong>
+                        </td>
+                        <td>
+                            <strong>$ @totalPrice</strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="h4 mt-5">個人資料</div>
+            <table class="table  mt-3 text-left">
+                <tbody>
+                    <tr>
+                        <th width="200">Email</th>
+                        <td>@Model.Email</td>
+                    </tr>
+                    <tr>
+                        <th>姓名</th>
+                        <td>@Model.Name</td>
+                    </tr>
+                    <tr>
+                        <th>會員電話</th>
+                        <td>@Model.Member.Phone</td>
+                    </tr>
+                    <tr>
+                        <th>地址</th>
+                        <td>
+                            @Model.Address
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center mt-4 my-4">
+                <a href="@Url.Action("ActivityList","Activity")" class="btn btn-primary px-5">回首頁</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 彈框 -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">QRCode</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="dialogContent" class="modal-body">
+                @*<div class="row justify-content-center">
+                        <div class="col-md-10 text-center">
+                            <img style="width:200px" src="data:image/png;base64,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">
+                            <h3>台北電玩展</h3>
+                            <p>普通票 2020/11/25 19:00</p>
+                        </div>
+                    </div>*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

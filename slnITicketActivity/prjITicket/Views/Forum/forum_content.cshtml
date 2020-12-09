@@ -1,0 +1,312 @@
+﻿@using prjITicket.Models;
+@using prjITicket.ViewModel
+@model VMReport
+@{
+    ViewBag.Title = "forum_content";
+    int count = 0;
+    Member member = Session[CDictionary.SK_Logined_Member] as Member;
+
+}
+
+<link href="~/Content/Forum_use/forumcontent.css" rel="stylesheet" />
+<link href="~/Content/Forum_use/css/styles.css" rel="stylesheet" />
+<div class="container">
+    <div class="row">
+        <!-- Post Content Column -->
+        <div class="col-lg-9">
+            <!-- Title -->
+
+            <h1 class="mt-4">@Model.Article.ArticleTitle</h1>
+            <!-- Author -->
+            <p class="lead">
+                by
+                <a href="#">@Model.Article.Member.Name</a>
+            </p>
+            <hr>
+            <!-- Date/Time -->
+            <p>Posted on @Model.Article.Date</p>
+            <hr>
+            <!-- Post Content -->
+
+            <div id="content" style="width:auto; height:auto;">
+
+
+
+            </div>
+
+            <hr />
+            <div class="col-xs-2">
+                @if (member != null && Model.Article.Article_Emotion.Where(n => n.ActionId == 1 && n.MemberId == member.MemberID && n.ArticleId == Model.Article.ArticleID).Any())
+                {
+                    <button class="gpclick" id="actionlike_a" onclick="likeBtn_a()">👍</button>
+                }
+                else
+                {
+                    <button class="gp" id="actionlike_a" onclick="likeBtn_a()">👍</button>
+                }
+                <label style="margin-right:20px" id="goodpoint">@Model.Article.Article_Emotion.Where(n => n.ActionId == 1 && n.ArticleId == Model.Article.ArticleID).Count()</label>
+
+                @if (member != null && Model.Article.Article_Emotion.Where(n => n.ActionId == 2 && n.MemberId == member.MemberID && n.ArticleId == Model.Article.ArticleID).Any())
+                {
+                    <button class="bpclick" id="actiondislike_a" onclick="dislikeBtn_a()">👎</button>
+                }
+                else
+                {
+                    <button class="bp" id="actiondislike_a" onclick="dislikeBtn_a()">👎</button>
+                }
+                <label style="margin-right:20px" id="badpoint">@Model.Article.Article_Emotion.Where(n => n.ArticleId == 2 && n.ArticleId == Model.Article.ArticleID).Count()</label>
+                <div style="float:right;right:0px">
+                    <button class="w3-button w3-black" onclick="document.getElementById('Modal').style.display = 'block';">檢舉</button>
+                </div>
+            </div>
+
+            <hr />
+            <!--檢舉按鈕跳出浮動視窗⬇⬇⬇-->
+            <div style="display:none" id="Modal" class="w3-modal w3-animate-opacity">
+                <div class="w3-modal-content">
+                    <header class="w3-container w3-teal">
+                        <span onclick="document.getElementById('Modal').style.display = 'none';" class="w3-button w3-display-topright">&times;</span>
+                        <h3>檢舉留言</h3>
+                    </header>
+                    <div class="w3-container">
+                        <br />
+                        <span>請選擇檢舉理由：</span>
+                        <select id="articleReportReason">
+                            <option value="#">請選擇理由</option>
+                            @foreach (var q in Model.Report)
+                            {
+
+                                <option value="@q.ReportId">@q.ReportReason</option>
+
+                            }
+                        </select>
+                        <p style=" margin-top:3px;font-size:12px;color:darkgray">
+                            人身攻擊、侵犯個人隱私、著作權限當事人檢舉。
+                            惡意檢舉，經查證屬實將依站規處分。.
+                        </p>
+                    </div>
+                    <footer class="w3-container w3-teal">
+                        <div style="margin:5px 0px;" class="float-right">
+                            <button class="w3-button w3-black" type="button" onclick="document.getElementById('Modal').style.display = 'none';">取消</button>
+                            <button class="w3-button w3-pale-green" type="button" onclick="reportReason_article()">確定</button>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+            <!-- Comments Form -->
+            <div class="card my-4">
+                <h5 class="card-header">留言區:</h5>
+                <div class="card-body">
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" id="replycontent"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="replysql">Submit</button>
+                </div>
+            </div>
+            <div id="ajaxdemoshow">
+
+            </div>
+        </div>
+        <!-- Sidebar Widgets Column -->
+        <div class="col-md-3">
+            <!-- Search Widget -->
+            <div class="card my-3">
+                <h5 class="card-header">Search</h5>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for...">
+                        <span class="input-group-append">
+                            <button class="btn btn-secondary" type="button">Go!</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- Categories Widget -->
+            <div class="card my-3">
+                <h5 class="card-header">Categories</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ul class="list-unstyled mb-0">
+                                <li>
+                                    <a href="#">Web Design</a>
+                                </li>
+                                <li>
+                                    <a href="#">HTML</a>
+                                </li>
+                                <li>
+                                    <a href="#">Freebies</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <ul class="list-unstyled mb-0">
+                                <li>
+                                    <a href="#">JavaScript</a>
+                                </li>
+                                <li>
+                                    <a href="#">CSS</a>
+                                </li>
+                                <li>
+                                    <a href="#">Tutorials</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Side Widget -->
+            <div class="card my-3">
+                <h5 class="card-header" style="background-color:coral">管理員/發文者才能看到的文章操作區</h5>
+                <div class="card-body">
+                    @Html.ActionLink("編輯", "before_Edit_article", "Forum", new { articleID = Model.Article.ArticleID }, null)
+                    @Html.ActionLink("刪除", "Delete", "Forum", new { articleID = Model.Article.ArticleID }, null)
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+</div>
+<script>
+    refreshTime()
+    function refreshTime() {
+        $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID")
+    }
+    setInterval("refreshTime()", 300000);
+
+    $("#content").html(`@Html.Raw(Model.Article.ArticleContent)`);
+
+     $("#replysql").click(function () {
+        let rpcontent = $("#replycontent").val();
+        let articleID = @Model.Article.ArticleID;
+         if (rpcontent == "") {
+             alert("請輸入留言");
+         }
+         else {
+             $.ajax({
+                 type: "post",
+                 url: "@Url.Action("forum_content")",
+                 data: { content: rpcontent, articleID: articleID },
+                 success: function (data) {
+                     if (data != "成功") {
+                         alert(data);
+                         window.location.href = 'http://localhost:49949/Login/Login';
+                     }
+                     else {
+                         alert(data);
+                         $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID");
+                         $("#replycontent").val("");
+                     }
+                 }
+             });
+         }
+
+    });
+
+    function reportReason_article() {
+        let reportId = $('#articleReportReason').val();
+
+        if (reportId === '#') {
+
+            alert("社會再走，理由要有");
+        }
+        else {
+         $.ajax({
+            type: "post",
+             url: "@Url.Action("Article_Report")",
+             data: {
+                 ReportID: reportId, ArticleID: @Model.Article.ArticleID},
+             success: function (data) {
+                 if (data != "成功") {
+                     alert(data);
+                     window.location.href = 'http://localhost:49949/Login/Login';
+                 } else{
+                     alert("檢舉" + data);
+                 }
+        }
+      });
+    }
+    }
+
+    function likeBtn_a()
+    {
+        let likebtn = document.getElementById('actionlike_a');
+        let dislikebtn = document.getElementById('actiondislike_a');
+        let ActionId = 1;
+        console.log("like");
+        if (dislikebtn.className == 'bpclick') {
+            alert("此篇留言你已點了不喜歡。");
+        }
+        else {
+            if (likebtn.className == 'gp') {
+                likebtn.className = 'gpclick';
+
+                $.ajax({
+                 type: "post",
+                    url: "@Url.Action("Article_EmotionAction")",
+                    data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
+                    success: function (data) {
+                        if (data != "成功") {
+                            alert(data);
+                            window.location.href = 'http://localhost:49949/Login/Login';
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+            else {
+                likebtn.className = 'gp';
+                $.ajax({
+                 type: "post",
+                    url: "@Url.Action("Article_EmotionAction_Cancel")",
+                    data: { ArticleID: @Model.Article.ArticleID},
+                    success: function (data) {
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        }
+    }
+    function dislikeBtn_a() {
+        let likebtn = document.getElementById('actionlike_a');
+        let dislikebtn = document.getElementById('actiondislike_a');
+        let ActionId = 2;
+        console.log("dislike");
+        if (likebtn.className == 'gpclick') {
+            alert("此篇留言你已點了喜歡。");
+        }
+        else {
+            if (dislikebtn.className == 'bp') {
+                dislikebtn.className = 'bpclick';
+
+                $.ajax({
+                 type: "post",
+                    url: "@Url.Action("Article_EmotionAction")",
+                    data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
+                    success: function (data) {
+                        if (data != "成功") {
+                            alert(data);
+                            window.location.href = 'http://localhost:49949/Login/Login';
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+            else {
+                dislikebtn.className = 'bp';
+                $.ajax({
+                 type: "post",
+                    url: "@Url.Action("Article_EmotionAction_Cancel")",
+                    data: { ArticleID: @Model.Article.ArticleID},
+                    success: function (data) {
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        }
+    }
+</script>

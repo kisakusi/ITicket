@@ -1,0 +1,166 @@
+﻿@{
+    Layout = "~/Views/Shared/_BackEndLayoutPage.cshtml";
+    ViewBag.Title = "會員管理";
+}
+
+<!-- #region 標題 -->
+<h1 class="mt-4">會員管理</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="#">後台</a></li>
+    <li class="breadcrumb-item active">會員管理</li>
+</ol>
+<!-- #endregion -->
+
+<!-- #region 操作 -->
+<div id="ctrlBtn" class="mb-4 pt-2 pl-4 sticky-top" style="z-index: 1500; max-height: 46px;">
+    <button type="button" id="ctrlBtn1" class="btn btn-primary mr-2"><i class="far fa-bell"></i> 發送系統通知</button>
+    <div class="dropdown d-inline-block mr-2">
+        <button class="btn btn-warning dropdown-toggle" type="button" id="ctrlBtn2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user-cog"></i> 設定查詢條件
+        </button>
+        <div class="dropdown-menu mt-3" aria-labelledby="ctrlBtn2">
+            <label class="dropdown-item pl-2" style="cursor: pointer">
+                <input id="ctrlBtn2a" type="checkbox">
+                <span class="d-inline-block" style="width: 28px"><i class="fas fa-user-friends ml-2"></i></span> 查詢所有會員
+            </label>
+            <label class="dropdown-item pl-2" style="cursor: pointer">
+                <input id="ctrlBtn2b" type="checkbox">
+                <span class="d-inline-block" style="width: 28px"><i class="fas fa-store ml-2"></i></span> 只查詢商家
+            </label>
+            <label class="dropdown-item pl-2" style="cursor: pointer">
+                <input id="ctrlBtn2c" type="checkbox">
+                <span class="d-inline-block" style="width: 28px"><i class="fas fa-user-shield ml-2"></i></span> 只查詢普通會員
+            </label>
+            <label class="dropdown-item pl-2" style="cursor: pointer">
+                <input id="ctrlBtn2d" type="checkbox">
+                <span class="d-inline-block" style="width: 28px"><i class="fas fa-user-minus ml-2"></i></span> 只查詢未驗證會員
+            </label>
+            <label class="dropdown-item pl-2" style="cursor: pointer">
+                <input id="ctrlBtn2e" type="checkbox">
+                <span class="d-inline-block" style="width: 28px"><i class="fas fa-user-times ml-2"></i></span> 只查詢停權會員
+            </label>
+        </div>
+    </div>
+    <button type="button" id="ctrlBtn3" class="btn btn-danger mr-2"><i class="fas fa-ban"></i> 停權會員</button>
+    <form id="ctrlForm" class="form-inline d-inline">
+        <input type="search" id="ctrlSearch" class="form-control mr-sm-2" placeholder="關鍵字搜尋" aria-label="Search">
+        <button type="button" id="ctrlSubmit" class="btn btn-outline-success my-2 my-sm-0 mr-2"><i class="fas fa-search"></i> 搜尋</button>
+        <button type="button" id="ctrlReset" class="btn btn-outline-secondary my-2 my-sm-0 mr-2"><i class="fas fa-power-off"></i> 重設</button>
+        <input type="hidden" id="fPageCurrent" name="PageCurrent" value="1">
+        <input type="hidden" id="fPageSize" name="PageSize" value="10">
+        <input type="hidden" id="fKeyword" name="Keyword" value="">
+        <input type="hidden" id="fSortRule" name="SortRule" value="0">
+        <input type="hidden" id="fMemberRoleInfo" name="MemberRoleInfo" value="0">
+        <input type="hidden" id="fMemberRoleIsBan" name="MemberRoleIsBan" value="false">
+    </form>
+</div>
+<!-- #endregion -->
+
+<!-- #region 卡片 -->
+<div class="card">
+    <div id="cardHeader" class="card-header sticky-top" style="z-index: 500; top: 55px; background-color: #f7f7f7;">
+        <i class="fas fa-address-card mr-1"></i>會員權限管理 - 
+        <span id="ctrlHint0" class="mr-2">查詢所有會員</span>
+        <span id="ctrlHint1" class="mr-2" style="color: orange"></span>
+        <span id="ctrlHint2" class="text-success"></span>
+    </div>
+    <div id="cardBody" class="card-body">
+        <div class="row mb-1">
+            <div class="col">
+                每頁顯示
+                <select id="ctrlSelect" class="custom-select-sm" style="cursor: pointer">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select> 筆資料
+            </div>
+            <div class="col">
+                <nav class="float-right" aria-label="...">
+                    <ul id="ctrlPage1" class="pagination">
+                        <li class="default page-item">
+                            <a class="page-link" href="javascript:" onclick="thePrev()">Prev</a>
+                        </li>
+                        <li class="default page-item">
+                            <a class="page-link" href="javascript:" onclick="theNext()">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <table class="table table-bordered" cellspacing="0" style="font-size: 95%; width: 100%; table-layout: fixed">
+            <thead id="ListHead">
+                <tr>
+                    <th id="ListHead0" class="sticky-top py-2" style="z-index: 300; top: 103px; width: 4%;  background-color: #eee; cursor: pointer">
+                        &#x2610;
+                    </th>
+                    <th id="ListHead1" class="sticky-top py-2" style="z-index: 300; top: 103px; width: 18%; background-color: #eee; cursor: pointer">
+                        <i class="fas fa-envelope"></i> Email <span class="float-right"><i class="fas fa-sort"></i></span>
+                    </th>
+                    <th id="ListHead2" class="sticky-top py-2" style="z-index: 300; top: 103px; width: 12%; background-color: #eee; cursor: pointer">
+                        <i class="fas fa-user-edit"></i> 暱稱 <span class="float-right"><i class="fas fa-sort"></i></span>
+                    </th>
+                    <th id="ListHead3" class="sticky-top py-2" style="z-index: 300; top: 103px; width: 8%;  background-color: #eee; cursor: pointer">
+                        姓名 <span class="float-right"><i class="fas fa-sort"></i></span>
+                    </th>
+                    <th id="ListHead4" class="sticky-top py-2" style="z-index: 300; top: 103px; width: 12%; background-color: #eee; cursor: pointer">
+                        <i class="fas fa-mobile-alt"></i> 電話 <span class="float-right"><i class="fas fa-sort"></i></span>
+                    </th>
+                    <th id="ListHead5" class="sticky-top py-2" style="z-index: 300; top: 103px; width: 16%; background-color: #eee; cursor: pointer">
+                        <i class="fas fa-user-shield"></i> 會員權限 <span class="float-right"><i class="fas fa-sort"></i></span>
+                    </th>
+                    <th class="sticky-top py-2" style="z-index: 300; top: 103px; width: 30%; background-color: #eee;">
+                        <i class="fas fa-user-cog"></i> 會員權限設定
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="ListBody">
+            </tbody>
+        </table>
+
+        <div class="row mt-1">
+            <div id="ctrlPage0" class="col">
+
+            </div>
+            <div class="col">
+                <nav class="float-right" aria-label="...">
+                    <ul id="ctrlPage2" class="pagination">
+                        <li class="default page-item">
+                            <a class="page-link" href="javascript:" onclick="thePrev()">Prev</a>
+                        </li>
+                        <li class="default page-item">
+                            <a class="page-link" href="javascript:" onclick="theNext()">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- #endregion -->
+
+<!-- #region 共用模組 -->
+<div id="AjaxBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="AjaxBox" aria-hidden="true" style="z-index: 1600;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-dark">
+                <h5 id="AjaxBoxTitle" class="modal-title"></h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                </button>
+            </div>
+            <div id="AjaxBoxBody" class="modal-body text-white bg-dark">
+
+            </div>
+            <div class="modal-footer text-white bg-dark">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button id="OK" type="button" class="btn btn-primary">確認</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- #endregion -->
+
+<script src="~/Content/BackEnd/js/BackEndMember01.js"></script>
+<script src="~/Content/BackEnd/js/BackEndMember02.js"></script>

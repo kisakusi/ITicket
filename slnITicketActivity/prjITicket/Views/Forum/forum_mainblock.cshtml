@@ -1,0 +1,107 @@
+﻿@model prjITicket.ViewModel.VMforum_mainblock
+@using prjITicket.Models
+
+
+@{
+    int Page = 0;
+    string blockTitle = "所有文章列表";
+    if (Model.Article.GroupBy(n => n.ArticleCategoryID).Distinct().Count() == 1)
+    {
+        blockTitle = Model.Article.FirstOrDefault().ArticleCategories.ArticleCategoryName;
+    }
+    Member member = Session[CDictionary.SK_Logined_Member] as Member;
+    @functions{
+        public static string RemoveHtml(String html)
+        {
+            string text = System.Text.RegularExpressions.Regex.Replace(html, "<[^>]+>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, "&[^;]+;", "");
+            return text;
+        }
+        int count = 0;
+    }
+    ViewBag.Title = "forum_mainblock";
+}
+<link href="~/Content/Forum_use/Forum.css" rel="stylesheet" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-2 col-md-3 col-sm-12 sidebar">
+
+            <div style="text-overflow: ellipsis;">
+                @Html.ActionLink("所有文章的列表", "forum_mainblock", "Forum", null, null)
+            </div>
+            @foreach (var item in @Model.ArticleCategories)
+            {
+                <div style="text-overflow: ellipsis;">
+                    <a id="@(item.ArticleCategoryID)" href="#" onclick="category(this)">@item.ArticleCategoryName</a>
+                    @*@Html.ActionLink(item.ArticleCategoryName, "SearchArticle", "Forum", new { ArticleCategoryID = @item.ArticleCategoryID }, null)*@
+                </div>
+            }
+
+
+            <div class="navbar-fixed-bottom" style="bottom:100px;">
+                <a href="~/Forum/before_Add_article" class="btn btn-info btn-lg" style="font-size:8vmin;position:fixed; bottom:50px;">
+                    <span class="glyphicon"></span> 發文
+                </a>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-3"></div>
+        <div class=" col-md-9 col-sm-12">
+            <!-- Page Content -->
+            <!-- Page Heading -->
+            <div class="form-group col-6 my-4">
+                <input type="text" id="searchWord" class="form-control" placeholder="搜索文章" style="font-size:20px;" />
+            </div>
+            <div class="form-check col-6 my-4">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="2" id="Editor" />
+                    <label class="form-check-label" for="Editor">作者</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="3" id="Title" />
+                    <label class="form-check-label" for="Title">標題</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="5" id="Content" />
+                    <label class="form-check-label" for="Content">內文</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- Project One -->
+        <div class="col-xl-2 col-md-3"></div>
+        <div class=" col-md-9 col-sm-12" id="contentList">
+
+        </div>
+        <!-- Pagination -->
+    </div>
+</div>
+
+<script>
+        $(function () {
+        $.ajax({
+            type: "post",
+            url: "@Url.Action("SearchArticle")",
+            success: function (result) {
+             $("#contentList").empty().html(result)
+             }
+            })
+    })
+        function category(ID) {
+        var CategoryID = ID.id;
+        var searchText = $("#searchWord").val();
+        var Page = null;
+        $.ajax({
+            type: "post",
+            url: "@Url.Action("SearchArticle")",
+            data: { searchText: searchText, Page: Page, CategoryID: CategoryID },
+            success: function (result) {
+             $("#contentList").empty().html(result)
+             }
+            })
+    }
+    
+</script>

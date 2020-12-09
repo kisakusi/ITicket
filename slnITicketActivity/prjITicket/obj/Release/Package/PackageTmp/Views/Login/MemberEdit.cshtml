@@ -1,0 +1,282 @@
+﻿@model prjITicket.Models.Member
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+@{
+    ViewBag.Title = "MemberEidit";
+}
+<script>
+    $(function () {
+        $("#formset").removeClass("container")
+    });
+
+</script>
+<div>
+    <div class="row " style="float:left;margin-left:60px ">
+        <div class="col-md-3">
+            <div class="form-horizontal rounded border p-4" style="width:230px;">
+                <img src="~/images/Layout/login_icon.jpg" id="loadimg" style="border:1px; width:180px; height:120px;" />
+                <p></p>
+                <label class="btn btn-info">
+                    <input id="upload_img" style="display:none;" type="file" accept="image/*"><i class="fa fa-photo"></i> 上傳照片
+                </label>
+                <div id="oldImg" style="display:none;"></div>
+                <div id="newImg"></div>
+                <button id="btnSubmit" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal rounded border p-4 container" style="margin-top:20px">
+
+        <div class="h1 text-center"><strong>會員資料修改</strong></div>
+        <div class="row mt-3">
+            <div class="col-12 col-md">
+                <div style="cursor:pointer" class="alert alert-success alert-rounded text-center" role="alert" id="butport1">基本資料</div>
+            </div>
+            <div class="col-12 col-md">
+                <div style="cursor:pointer" class="alert alert-light alert-rounded text-center" role="alert" id="butport2">會員密碼修改</div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 2fr; min-height:300px; @*height:500px*@ " id="port1">
+
+            <div class="form-group">
+                <label class="control-label col-md-2">姓名:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">身分證號碼:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.IDentityNumber, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.IDentityNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">護照號碼:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Passport, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Passport, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">暱稱:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.NickName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.NickName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">生日:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.BirthDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.BirthDate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">電話號碼:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">地址:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="control-label col-md-2">性別:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Sex, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Sex, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="確認送出" class="btn btn-secondary" />
+                </div>
+            </div>
+
+        </div>
+        <div style="height:500px" class="invisible position-absolute" id="port2">
+            <div class="form-group">
+                <label class="control-label col-md-2">輸入原密碼</label>
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">輸入新密碼</label>
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">再確認密碼</label>
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="確認送出" class="btn btn-secondary" />
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+}
+
+
+<script>
+    $("#butport2").click(function () {
+        $("#butport2").addClass("alert-success").removeClass("alert-light");
+        $("#butport1").removeClass("alert-success").addClass("alert-light");
+        $("#port1").addClass("invisible").addClass("position-absolute");
+        $("#port2").removeClass("invisible").removeClass("position-absolute");
+    });
+    $("#butport1").click(function () {
+        $("#butport1").addClass("alert-success").removeClass("alert-light");
+        $("#butport2").removeClass("alert-success").addClass("alert-light");
+        $("#port2").addClass("invisible").addClass("position-absolute");
+        $("#port1").removeClass("invisible").removeClass("position-absolute");
+    });
+</script>
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.css" rel="stylesheet" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+<script>
+    (function ($) {
+        var width_crop = 700, // 圖片裁切寬度 px 值
+            height_crop = 400, // 圖片裁切高度 px 值
+            type_crop = "square", // 裁切形狀: square 為方形, circle 為圓形
+            width_preview = 800, // 預覽區塊寬度 px 值
+            height_preview = 500, // 預覽區塊高度 px 值
+            compress_ratio = 0.85, // 圖片壓縮比例 0~1
+            type_img = "jpg", // 圖檔格式 jpeg png webp
+            oldImg = new Image(),
+            myCrop, file, oldImgDataUrl;
+
+        // 裁切初始參數設定
+        myCrop = $("#oldImg").croppie({
+            viewport: { // 裁切區塊
+                width: width_crop,
+                height: height_crop,
+                type: type_crop
+            },
+            boundary: { // 預覽區塊
+                width: width_preview,
+                height: height_preview
+            }
+        });
+
+        function readFile(input) {
+            if (input.files && input.files[0]) {
+                file = input.files[0];
+            } else {
+                return;
+            }
+
+            if (file.type.indexOf("image") == 0) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    oldImgDataUrl = e.target.result;
+                    oldImg.src = oldImgDataUrl; // 載入 oldImg 取得圖片資訊
+                    myCrop.croppie("bind", {
+                        url: oldImgDataUrl
+                    });
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("您上傳的不是圖檔！");
+            }
+        }
+
+        function displayCropImg(src) {
+            //var html = "<img src='" + src + "' />";
+            //$("#newImg").html(html);
+            $("#loadimg").attr("src", src);
+        }
+
+        $("#upload_img").on("change", function () {
+            if (this.files[0] == null) return;
+            readFile(this);  //把圖片塞入編輯框
+            initWindowPosition(); //彈出對話方塊供編輯
+        });
+        function initWindowPosition() {
+            $("#oldImg").dialog({
+                modal: true,
+                //設定對話方塊有一個按鈕叫做裁剪圖片
+                buttons: {
+                    "裁剪圖片": function () {
+                        myCrop.croppie("result", {
+                            type: "base64",
+                            quality: compress_ratio
+                        }).then(function (src) {
+                            //src的結果會是base64字串,"data:image/png;base64,......"
+                            //可直接當url給img標籤,也可供上傳伺服器供儲存成檔案
+                            displayCropImg(src); //show出新裁剪好的圖片
+                        });
+                        $(this).dialog("close");
+                    }
+                },
+                width: 1000,
+                close: function () {
+                    let uploadimg = document.getElementById("upload_img");
+                    //對話方塊關閉時,把input[type="file"]標籤的內容清空
+                    //否則下次選擇相同圖片時不會觸法onchange事件然後出bug壞掉
+                    uploadimg.value = "";
+                }
+            });
+        }
+        //按保存就上傳base64字串給服務器
+        $("#btnSubmit").click(function () {
+            let base64code = $("#loadimg").attr("src");
+            if (!base64code) return;
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("CreateImage")",
+                data: { input: base64code },
+                success: function () {
+                    alert("success");
+                }
+            })
+        });
+    })(jQuery);
+</script>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.validate.unobtrusive.js"
+        type="text/javascript"></script>
+
+

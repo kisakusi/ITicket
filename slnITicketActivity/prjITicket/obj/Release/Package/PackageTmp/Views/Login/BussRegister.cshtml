@@ -1,0 +1,77 @@
+﻿@model prjITicket.ViewModel.CSeller
+<script src="~/Content/js/main.js"></script>
+<link rel="stylesheet" href="~/Content/Login/fonts/material-icon/css/material-design-iconic-font.min.css">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="~/Content/Login/css_login/style.css">
+@{
+    ViewBag.Title = "BussRegister";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="main">
+
+        <!-- Sign up form -->
+        <section class="signup">
+            <div class="container_login">
+                <div class="signup-content">
+                    <div class="signup-form">
+                        <h2 class="form-title">企業註冊</h2>
+                        <form method="POST" class="register-form" id="register-form">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                            <div class="form-group">
+                                <label for="email"><i class="zmdi zmdi-email"></i></label>
+                                <input type="email" name="email" id="email" placeholder="Your Email" />
+                            </div>
+                            <div class="form-group">
+                                <label for="pass"><i class="zmdi zmdi-lock"></i></label>
+                                <input type="password" name="pass" id="pass" placeholder="密碼" />
+                            </div>
+                            <div class="form-group">
+                                <label for="repass"><i class="zmdi zmdi-lock"></i></label>
+                                <input type="password" name="repass" id="repass" placeholder="再確認密碼" />
+                            </div>
+                            <div class="form-group">
+                                <label for="companyName"><i class="zmdi zmdi-lock-outline"></i></label>
+                                <input type="text" name="companyName" id="companyName" placeholder="公司名" />
+                            </div>
+                            <div class="form-group">
+                                <label for="taxIdNumber"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                <input type="text" name="taxIdNumber" id="taxIdNumber" required placeholder="統編" />
+                            </div>
+                            <div class="form-group">
+                                <label for="sellerPhone"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                <input type="text" name="sellerPhone" id="sellerPhone" placeholder="手機號碼" />
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" />
+                                <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all statements in  <a href="#" class="term-service">Terms of service</a></label>
+                            </div>
+                            <div class="form-group form-button">
+                                <input type="submit" name="signup" id="signup" class="form-submit" value="註冊" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="signup-image">
+                        <figure><img src="~/Content/Login/images/signup-image.jpg" alt="sing up image"></figure>
+                        @*<a href="#" class="signup-image-link">I am already member</a>*@
+                        @Html.ActionLink("會員登入", "Login", new { @class = "signup-image-link" })
+                        @Html.ActionLink("一般會員註冊", "Register")
+                    </div>
+                </div>
+                <span></span>
+            </div>
+        </section>
+
+
+
+    </div>
+
+}
+
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

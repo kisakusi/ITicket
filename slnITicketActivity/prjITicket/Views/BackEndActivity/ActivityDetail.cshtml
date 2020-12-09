@@ -1,0 +1,254 @@
+﻿@using BackEnd
+@using BackEnd.ViewModel
+@model BackEnd.ViewModel.CBackEndActivity
+
+@{
+    Layout = "~/Views/Shared/_BackEndLayoutPage.cshtml";
+
+    ViewBag.Title = "ActivityDetail";
+}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+<h1 class="mt-4">活動審核</h1>
+<input id="hiddenActivityID" type="hidden" value="@Html.DisplayFor(model => model.ActivityID)">
+<input id="hiddenStatusID" type="hidden" value="@Html.DisplayFor(model => model.StatusID)">
+
+<div class="container-fluid">
+    <h1 class="mt-4">@*活動審核*@</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item">
+            後台
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="@Url.Action("ActivityMaintain", "BackEndActivity")">活動列表</a>
+        </li>
+        <li class="breadcrumb-item active">活動審核</li>
+
+    </ol>
+    <div class="card mb-4">
+
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+
+            <table class="table table-bordered" id="ActivityDetailTable" style="width:100%" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td>活動代碼</td>
+                        <td style="width:80%" id="idActivityID">
+                            @Html.DisplayFor(model => model.ActivityID)
+                        </td>
+                    </tr>
+                    <tr id="idCompanyName">
+                        <td>商家名稱</td>
+                        <td style="width:80%">
+                            @Html.DisplayFor(model => model.CompanyName)
+                        </td>
+                    </tr>
+                    <tr id="idActivityName">
+                        <td>活動名稱</td>
+                        <td style="width:80%">
+                            @Html.DisplayFor(model => model.ActivityName)
+
+                        </td>
+                    </tr>
+                    <tr id="idActivityAddress">
+                        <td>活動地點</td>
+                        <td style="width:80%">
+                            @Html.DisplayFor(model => model.ActivityAddress)
+                        </td>
+                    </tr>
+                    @*<tr id="idActivityTicketTime">
+                        <td>活動場次時間</td>
+                        <td style="width:80%">
+                            @Html.DisplayFor(model => model.TicketTime)
+                        </td>
+                    </tr>*@
+                    <tr id="idActivityDescription">
+                        <td>活動描述</td>
+                        <td style="width:80%">
+                            @Html.DisplayFor(model => model.ActivityDescription)
+                        </td>
+                    </tr>
+                    <tr id="idActivirtyInfo">
+                        <td>活動資訊</td>
+                        <td style="width:80%">
+                            <div style="word-break:normal;">  @Html.Raw(@Model.ActivityInfo) </div>
+                        </td>
+                    </tr>
+                    <tr id="idActivityHostword">
+                        <td>活動簡介</td>
+                        <td style="width:80%">
+                            @Html.DisplayFor(model => model.ActivityHost)
+                        </td>
+                    </tr>
+                    @{
+                        if (!string.IsNullOrEmpty(Model.ActivityPicture))
+                        {
+
+                            <tr id="idActivityPicture">
+                                <td> 活動圖片 </td>
+                                <td style="width:80%">
+                                    <img src="~/images/Activity/@Html.DisplayFor(model => model.ActivityPicture)" />
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                    @{
+                        if (Model.StatusID == 0)
+                        {
+                            <tr>
+                                <td>活動狀態</td>
+                                <td style="width:80%">
+                                    @Model.StatusName
+                                    <div class="mid">
+                                        <label class="rocker rocker-small">
+                                            <input type="checkbox" id="switcher" checked>
+                                            <span class="switch-left">Yes</span>
+                                            <span class="switch-right">No</span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>活動狀態</td>
+                                <td style="width:80%">
+                                    @Model.StatusName
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <div>
+                <center>
+                    @{
+                        if (Model.StatusID == 0)
+                        {
+                            <a class="btn btn-secondary" href="/BackEndActivity/ActivityMaintain">返回</a>
+                            <button class="btn btn-info" onclick="EditData()">送出</button>
+                        }
+                        else
+                        {
+                            <a class="btn btn-secondary" href="/BackEndActivity/ActivityMaintain">返回</a>
+                        }
+                    }
+
+                </center>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    function EditData() {
+        const btnCheck = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        })
+        if ($("#switcher").prop("checked")) {
+            btnCheck.fire({
+                title: '是否確定要審核通過?',
+                text: "提醒：審核通過活動即上架",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '是',
+                cancelButtonText: '再想想',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //點擊"是"的BUTTON
+                    $.ajax({
+                        url: `/api/WebApi/updateActivtyStatus`,
+                        type: "PUT",
+                        data: {
+                            ActivityID: $("#hiddenActivityID").val(),
+                            StatusID: $("#switcher").prop("checked") ? 1 : 0
+                        },
+                        success: function (data) {
+                            //跳出是否確認要修改的訊息
+                            btnCheck.fire(
+                                '審核通過',
+                                '活動已審核通過並上架',
+                                'success'
+                            ).then((result2) => {
+                                if (result2.isConfirmed) {
+                                    location.href = "/BackEndActivity/ActivityMaintain";
+                                }
+                            });
+                        },
+                        error: function (xhr) {
+                            //alert(xhr);
+                            btnCheck.fire(
+                                'Error',
+                                xhr,
+                                'error'
+                            )
+                        }
+                    });
+
+                } /*else if (result.dismiss === Swal.DismissReason.cancel) { }*/
+            })
+        }
+        else {
+            //審核未通過
+            btnCheck.fire({
+                title: '是否確定審核未通過?',
+                text: "提醒：審核未通過活動不會上架",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '是',
+                cancelButtonText: '再想想',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //點擊"是"的BUTTON
+                    $.ajax({
+                        url: `/api/WebApi/updateActivtyStatus`,
+                        type: "PUT",
+                        data: {
+                            ActivityID: $("#hiddenActivityID").val(),
+                            StatusID: $("#switcher").prop("checked") ? 1 : 0
+                        },
+                        success: function (data) {
+                            //跳出是否確認要修改的訊息
+                            btnCheck.fire(
+                                '審核未通過',
+                                '活動審核未通過並已通知商家',
+                                'success'
+                            ).then((result2) => {
+                                if (result2.isConfirmed) {
+                                    location.href = "/BackEndActivity/ActivityMaintain";
+                                }
+                            });
+                        },
+                        error: function (xhr) {
+                            //alert(xhr);
+                            btnCheck.fire(
+                                'Error',
+                                xhr,
+                                'error'
+                            )
+                        }
+                    });
+
+                } /*else if (result.dismiss === Swal.DismissReason.cancel) { }*/
+            })
+
+            
+        }
+    }
+
+
+    
+
+</script>
+

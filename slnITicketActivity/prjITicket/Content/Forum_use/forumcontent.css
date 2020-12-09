@@ -1,0 +1,112 @@
+﻿
+#content .image img{
+    max-width:700px;
+}
+.emotion {
+    border: none;
+    background-color: inherit;
+    padding: 8px 28px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 25% 25%;
+    cursor: pointer;
+    display: inline-block;
+    /*float: left;*/
+}
+
+.emotion:hover {
+        background: #eee;
+    }
+
+.success {
+    color: green;
+}
+
+.info {
+    color: dodgerblue;
+}
+
+.warning {
+    color: orange;
+}
+
+.danger {
+    color: red;
+}
+
+.default {
+    color: black;
+}
+
+.gp {
+    border: solid 2px orange;
+    height: 40px;
+    width: 40px;
+    background-color: inherit;
+    margin-right:10px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 50% 50%;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.5s;
+    color: orange;
+    background-color: white;
+}
+    .gp:hover {
+        color: white;
+        background-color: orange;
+    }
+
+.gpclick {
+    border: solid 2px orange;
+    height: 40px;
+    width: 40px;
+    background-color: inherit;
+    margin-right: 10px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 50% 50%;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.5s;
+    color: white;
+    background-color: orange;
+}
+
+.bp {
+    border: solid 2px gray;
+    height: 40px;
+    width: 40px;
+    background-color: inherit;
+    margin-right: 10px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 50% 50%;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.5s;
+    color: gray;
+    background-color: white;
+}
+
+    .bp:hover {
+        color: white;
+        background-color: gray;
+    }
+
+.bpclick {
+    border: solid 2px gray;
+    height: 40px;
+    width: 40px;
+    background-color: inherit;
+    margin-right: 10px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 50% 50%;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.5s;
+    color: white;
+    background-color: gray;
+}

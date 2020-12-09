@@ -1,0 +1,85 @@
+﻿@using prjITicket.Models;
+@using PagedList;
+@using PagedList.Mvc;
+@model IPagedList<prjITicket.Models.Orders>
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+
+@if (Model.Count() == 0)
+{<div class="row">
+        <div style="margin:0px auto">
+            <h3><strong>目前暫無訂單</strong></h3>
+        </div>
+    </div>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <th>
+                會員姓名
+            </th>
+            <th>
+                會員地址
+            </th>
+            <th>
+                訂單狀態
+            </th>
+            <th>
+                訂單號碼
+            </th>
+            <th>
+                訂單日期
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Address
+                </td>
+                <td>
+                    @if (item.OrderStatus == true)
+                    {
+                        @:<p>已付款</p>
+                    }
+                    else
+                    {
+                        @:<p style="color:red">未付款</p>
+
+
+                    }
+                </td>
+                <td>
+                    @item.OrderGuid
+                </td>
+                <td>
+                    @item.OrderDate.ToString("yyyy-MM-dd")
+                </td>
+                <td>
+                    @if (item.OrderStatus == false)
+                    {
+                        @:<a href="@Url.Action("OrderDetailByOrderId","Activity",new { orderId=item.OrderID})" class="btn btn-danger">前往付款</a>
+                    }
+
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+
+@*會員訂單管理Ajax*@
+@Html.PagedListPager(Model, page=>Url.Action("getOrderbyEmail", new {Email=ViewBag.Email, page = page}),
+    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
+        new AjaxOptions()
+        {
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = "form1div"
+        }
+        ))
