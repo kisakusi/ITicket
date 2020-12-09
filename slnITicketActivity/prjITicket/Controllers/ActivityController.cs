@@ -320,8 +320,25 @@ namespace prjITicket.Controllers
         }
         //從套票點付款會進來的controller,show出套票訂單
         public ActionResult OrderDetailByTicketGroup(COrderDetailByTicketGroup input)
-        {         
-            return View();
+        {
+            if (Session[CDictionary.SK_Logined_Member] == null)
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            List<Tickets> tickets = new List<Tickets>();
+            foreach(TicketDesc desc in input.Tickets)
+            {
+                tickets.Add(db.Tickets.FirstOrDefault(t => t.TicketCategoryId == desc.TicketCategoryId && t.TicketTimeId == desc.TicketTimeId));
+            }
+            int maxPoint = (Session[CDictionary.SK_Logined_Member] as Member).Point;
+            VMOrderDetailByTicketGroup vm = new VMOrderDetailByTicketGroup()
+            {
+                Tickets = tickets,
+                MaxPoint = maxPoint,
+                Quantity = input.Quantity,
+                Discount = input.Discount
+            };
+            return View(vm);
         }
         //顯示購物完成的頁面
         public ActionResult FinishPay()

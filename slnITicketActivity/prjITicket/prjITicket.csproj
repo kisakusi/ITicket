@@ -746,6 +746,7 @@
     <Compile Include="ViewModel\QMember.cs" />
     <Compile Include="ViewModel\VMActivityDetail.cs" />
     <Compile Include="ViewModel\VMActivityList.cs" />
+    <Compile Include="ViewModel\VMOrderDetailByTicketGroup.cs" />
     <Compile Include="ViewModel\VMReport.cs" />
     <Compile Include="ViewModel\VMTicketGroupsDetail.cs" />
     <Compile Include="ViewModel\VMTicketGroupsList.cs" />
@@ -806,6 +807,7 @@
     <Content Include="Views\Login\getOrderbyEmail.cshtml" />
     <Content Include="Views\Login\getShortMassageByMemberId.cshtml" />
     <Content Include="Views\Login\PasswordValidate.cshtml" />
+    <Content Include="Views\Activity\OrderDetailByTicketGroup.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

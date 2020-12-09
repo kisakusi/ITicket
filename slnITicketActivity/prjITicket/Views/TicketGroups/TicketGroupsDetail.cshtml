@@ -19,7 +19,31 @@
             let ticketTimeId = this.value;
             getPrice(ticketCategoryId, ticketTimeId, this,count);           
         });
+        //按下付款要執行的動作
+        $("#btnGoToPay").click(function () {
+            let tickets = [];
+            $("#shoppingCartDetail tr").each(function (i, e) {
+                let ticketCategoryId = $(e).find(".selTicketCategory").val();
+                let ticketTimeId = $(e).find(".selTicketTime").val();
+                tickets.push(new Ticket(ticketCategoryId, ticketTimeId));
+            });
+            let discount = @Model.ticketGroupDetails[0].TicketGroups.TicketGroupDiscount;
+            let quantity = count;
+            $.ajax({
+                url: "@Url.Action("OrderDetailByTicketGroup","Activity")",
+                data: { Discount: discount, Quantity: quantity, Tickets: tickets },
+                type: "post",
+                success: function (result) {
+                    $("body").html(result);
+                }
+            });
+        });
     });
+    //ticket物件
+    function Ticket(ticketCategoryId, ticketTimeId) {
+        this.TicketCategoryId = ticketCategoryId;
+        this.TicketTimeId = ticketTimeId;
+    }
     //票種和場次更改時會用到的方法
     function getPrice(ticketCategoryId, ticketTimeId, element,quantity=1) {        
         $.ajax({
@@ -123,7 +147,7 @@
                     </tbody>
                 </table>
                 <div class="mt-3 d-flex justify-content-end">                    
-                    <button id="btnAddToCar" class="btn btn-primary">購買</button>
+                    <button id="btnGoToPay" class="btn btn-primary">購買</button>
                 </div>
             </div>
         </div>

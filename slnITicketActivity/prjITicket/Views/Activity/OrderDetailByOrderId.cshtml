@@ -6,7 +6,7 @@
 <script>       
         $(function () {
             //沒有必要在訂單畫面再顯示小的購物車,所以關掉
-            $("#dropDownShoppingCart").remove();                      
+            $("#dropDownShoppingCart").remove();    
         });      
 </script>
 <div class="container mt-5">
@@ -33,7 +33,7 @@
                             顯示訂單細節
                         </button>
                         <div class="h3 d-inline-block mt-2">
-                            <strong id="totalPrice"><!--塞入總價格--></strong>
+                            <strong id="totalPrice"></strong>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,10 @@
                     </table>
                 </div>
             </div>
-
+            <script>
+                //表頭的總價格也要設定
+                $("#totalPrice").html("$ @totalPrice");
+            </script>
             <div class="card text-center my-5 border-0">
                 <div class="card-header border-0">
                     <div class="h3 mt-1"> 訂購人資訊 </div>
