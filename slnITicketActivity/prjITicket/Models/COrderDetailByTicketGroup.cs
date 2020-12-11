@@ -10,7 +10,7 @@ namespace prjITicket.Models
     {
         public decimal Discount { get; set; }
         public int Quantity { get; set; }
-        public List<TicketDesc> Tickets { get; set; }
+        public string Tickets { get; set; }
     }
     public class TicketDesc
     {

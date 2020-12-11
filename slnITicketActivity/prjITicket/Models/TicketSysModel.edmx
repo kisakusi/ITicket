@@ -22,6 +22,13 @@
           <Property Name="ActivityStatusID" Type="int" Nullable="false" />
           <Property Name="DistrictId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="ActivityFailedReason">
+          <Key>
+            <PropertyRef Name="ActivityFailedReasonID" />
+          </Key>
+          <Property Name="ActivityFailedReasonID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FailedReason" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
         <EntityType Name="ActivityFavourite">
           <Key>
             <PropertyRef Name="ActivityFavouriteId" />
@@ -228,6 +235,7 @@
           <Property Name="SellerDeccription" Type="nvarchar(max)" />
           <Property Name="MemberId" Type="int" Nullable="false" />
           <Property Name="fPass" Type="bit" />
+          <Property Name="fFileName" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ShoppingCart">
           <Key>
@@ -286,6 +294,7 @@
           <Property Name="TicketGroupId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TicketGroupName" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="TicketGroupDiscount" Type="numeric" Precision="3" Scale="2" Nullable="false" />
+          <Property Name="Status" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="TicketQRCodes">
           <Key>
@@ -893,6 +902,7 @@
         </Association>
         <EntityContainer Name="TicketSysModelStoreContainer">
           <EntitySet Name="Activity" EntityType="Self.Activity" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ActivityFailedReason" EntityType="Self.ActivityFailedReason" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ActivityFavourite" EntityType="Self.ActivityFavourite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ActivityStatus" EntityType="Self.ActivityStatus" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Article" EntityType="Self.Article" Schema="dbo" store:Type="Tables" />
@@ -1410,6 +1420,7 @@
           <NavigationProperty Name="Member" Relationship="Self.FK_Seller_Member" FromRole="Seller" ToRole="Member" />
           <NavigationProperty Name="Subscribes" Relationship="Self.FK_Subscribes_Seller" FromRole="Seller" ToRole="Subscribes" />
           <Property Name="fPass" Type="Boolean" />
+          <Property Name="fFileName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ShoppingCart">
           <Key>
@@ -1480,6 +1491,7 @@
           <Property Name="TicketGroupName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TicketGroupDiscount" Type="Decimal" Precision="3" Scale="2" Nullable="false" />
           <NavigationProperty Name="TicketGroupDetail" Relationship="Self.FK_TicketGroupDetail_TicketGroups" FromRole="TicketGroups" ToRole="TicketGroupDetail" />
+          <Property Name="Status" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="TicketQRCodes">
           <Key>
@@ -2294,6 +2306,7 @@
             <End Role="Member" EntitySet="Member" />
             <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
           </AssociationSet>
+          <EntitySet Name="ActivityFailedReason" EntityType="TicketSysModel.ActivityFailedReason" />
         </EntityContainer>
         <EntityType Name="ActivityFavourite">
           <Key>
@@ -2329,6 +2342,13 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ActivityFailedReason">
+          <Key>
+            <PropertyRef Name="ActivityFailedReasonID" />
+          </Key>
+          <Property Name="ActivityFailedReasonID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FailedReason" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2561,6 +2581,7 @@
           <EntitySetMapping Name="Seller">
             <EntityTypeMapping TypeName="TicketSysModel.Seller">
               <MappingFragment StoreEntitySet="Seller">
+                <ScalarProperty Name="fFileName" ColumnName="fFileName" />
                 <ScalarProperty Name="fPass" ColumnName="fPass" />
                 <ScalarProperty Name="SellerID" ColumnName="SellerID" />
                 <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
@@ -2631,6 +2652,7 @@
           <EntitySetMapping Name="TicketGroups">
             <EntityTypeMapping TypeName="TicketSysModel.TicketGroups">
               <MappingFragment StoreEntitySet="TicketGroups">
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="TicketGroupId" ColumnName="TicketGroupId" />
                 <ScalarProperty Name="TicketGroupName" ColumnName="TicketGroupName" />
                 <ScalarProperty Name="TicketGroupDiscount" ColumnName="TicketGroupDiscount" />
@@ -2674,6 +2696,14 @@
                 <ScalarProperty Name="ActivityId" ColumnName="ActivityId" />
                 <ScalarProperty Name="MemberId" ColumnName="MemberId" />
                 <ScalarProperty Name="ActivityFavouriteId" ColumnName="ActivityFavouriteId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ActivityFailedReason">
+            <EntityTypeMapping TypeName="TicketSysModel.ActivityFailedReason">
+              <MappingFragment StoreEntitySet="ActivityFailedReason">
+                <ScalarProperty Name="FailedReason" ColumnName="FailedReason" />
+                <ScalarProperty Name="ActivityFailedReasonID" ColumnName="ActivityFailedReasonID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

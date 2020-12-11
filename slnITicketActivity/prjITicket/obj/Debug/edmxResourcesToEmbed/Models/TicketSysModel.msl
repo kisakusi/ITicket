@@ -227,6 +227,7 @@
     <EntitySetMapping Name="Seller">
       <EntityTypeMapping TypeName="TicketSysModel.Seller">
         <MappingFragment StoreEntitySet="Seller">
+          <ScalarProperty Name="fFileName" ColumnName="fFileName" />
           <ScalarProperty Name="fPass" ColumnName="fPass" />
           <ScalarProperty Name="SellerID" ColumnName="SellerID" />
           <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
@@ -297,6 +298,7 @@
     <EntitySetMapping Name="TicketGroups">
       <EntityTypeMapping TypeName="TicketSysModel.TicketGroups">
         <MappingFragment StoreEntitySet="TicketGroups">
+          <ScalarProperty Name="Status" ColumnName="Status" />
           <ScalarProperty Name="TicketGroupId" ColumnName="TicketGroupId" />
           <ScalarProperty Name="TicketGroupName" ColumnName="TicketGroupName" />
           <ScalarProperty Name="TicketGroupDiscount" ColumnName="TicketGroupDiscount" />
@@ -340,6 +342,14 @@
           <ScalarProperty Name="ActivityId" ColumnName="ActivityId" />
           <ScalarProperty Name="MemberId" ColumnName="MemberId" />
           <ScalarProperty Name="ActivityFavouriteId" ColumnName="ActivityFavouriteId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ActivityFailedReason">
+      <EntityTypeMapping TypeName="TicketSysModel.ActivityFailedReason">
+        <MappingFragment StoreEntitySet="ActivityFailedReason">
+          <ScalarProperty Name="FailedReason" ColumnName="FailedReason" />
+          <ScalarProperty Name="ActivityFailedReasonID" ColumnName="ActivityFailedReasonID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

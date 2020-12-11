@@ -14,4 +14,11 @@ namespace prjITicket.Models
         public string address { get; set; }
         public int point { get; set; }
     }
+    //套票去歐服寳付款用來接收資料的類
+    public class CGoToPayTicketGroup : CGoToPay
+    {
+        public string ticketIds { get; set; }
+        public int quantity { get; set; }
+        public decimal discount { get; set; }
+    }
 }

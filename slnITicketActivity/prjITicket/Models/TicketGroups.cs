@@ -23,6 +23,7 @@ namespace prjITicket.Models
         public int TicketGroupId { get; set; }
         public string TicketGroupName { get; set; }
         public decimal TicketGroupDiscount { get; set; }
+        public bool Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TicketGroupDetail> TicketGroupDetail { get; set; }

@@ -134,6 +134,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Activity\ChatMember\Chat.css" />
+    <Content Include="Content\Activity\ChatSeller\ChatRoom.css" />
     <Content Include="Content\Activity\CommentStar.css" />
     <Content Include="Content\Activity\MultiRange\nouislider.min.css" />
     <Content Include="Content\Activity\MultiRange\nouislider.min.js" />
@@ -612,6 +614,9 @@
     <Compile Include="Models\Activity.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ActivityFailedReason.cs">
+      <DependentUpon>TicketSysModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ActivityFavourite.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
@@ -808,6 +813,10 @@
     <Content Include="Views\Login\getShortMassageByMemberId.cshtml" />
     <Content Include="Views\Login\PasswordValidate.cshtml" />
     <Content Include="Views\Activity\OrderDetailByTicketGroup.cshtml" />
+    <Content Include="Views\Activity\ProductNotFound.cshtml" />
+    <Content Include="Views\Activity\ZeroActivity.cshtml" />
+    <Content Include="Views\Activity\UploadTicketGroup.cshtml" />
+    <Content Include="Views\Activity\CustomerSupport.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

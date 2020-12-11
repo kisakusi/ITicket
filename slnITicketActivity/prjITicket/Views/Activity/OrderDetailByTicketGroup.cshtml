@@ -1,5 +1,6 @@
 ﻿@using prjITicket.ViewModel;
 @using prjITicket.Models;
+@using Newtonsoft.Json;
 @model VMOrderDetailByTicketGroup
 @{
     ViewBag.Title = "套票訂單";
@@ -83,7 +84,7 @@
                 $("#txtPoint").val(0);
             }
             $("#displayPoint").html(newPoint + "點");
-            $("#actualPrice").html(`$ ${totalPrice-point}`);
+            $("#actualPrice").html(`$ ${totalPrice-newPoint}`);
         }
 </script>
 <div class="container mt-5">
@@ -135,7 +136,7 @@
                                 {
                                     int subTotal = (int)Math.Round(ticket.Price * (1 - Model.Discount), 0) * Model.Quantity;
                                     totalPrice += subTotal;
-                                    <tr>
+                                    <tr data-ticketid="@ticket.TicketID">
                                         <td class="align-middle">
                                             <div class="card p-1 card-bottom">
                                                 <img src="@Url.Content("~/images/Activity/"+ticket.Activity.Picture)" style="width:90px">
@@ -184,7 +185,7 @@
                                     <strong>應付</strong>
                                 </td>
                                 <td>
-                                    <strong>$ @totalPrice</strong>
+                                    <strong id="actualPrice">$ @totalPrice</strong>
                                 </td>
                             </tr>
                         </tbody>
@@ -199,9 +200,12 @@
                 <div class="card-header border-0">
                     <div class="h3 mt-1"> 訂購人資訊 </div>
                 </div>
-                <form action="@Url.Action("GoToPay")" id="frmInfo" method="post" class="needs-validation" novalidate>
-                    <!--藏輸入的點數-->
+                <form action="@Url.Action("GoToPayTicketGroup")" id="frmInfo" method="post" class="needs-validation" novalidate>
+                    <!--藏輸入的點數,折扣,數量,票-->
                     <input type="hidden" id="txtSendPoint" name="point" value="0" />
+                    <input type="hidden" name="quantity" value="@Model.Quantity" />
+                    <input type="hidden" name="discount" value="@Model.Discount" />
+                    <input type="hidden" name="ticketIds" value="@JsonConvert.SerializeObject(Model.Tickets.Select(t=>t.TicketID).ToArray())" />
                     <div class="form-row text-left mt-3">
                         <div class="form-group col-md-6">
                             <label for="name">姓名</label>
@@ -238,7 +242,7 @@
                         <input name="address" type="text" class="form-control" id="address" placeholder="xxx路xxx號" required>
                     </div>
                     <div class="mt-3 d-flex justify-content-end">
-                        <a href="@Url.Action("ActivityList","Activity")" class="btn btn-secondary mr-2">繼續選購</a>
+                        <a href="@Url.Action("TicketGroupsList","TicketGroups")" class="btn btn-secondary mr-2">返回</a>
                         <button type="submit" class="btn btn-primary">確認付款</button>
                     </div>
                 </form>

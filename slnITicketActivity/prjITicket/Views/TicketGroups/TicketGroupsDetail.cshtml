@@ -20,7 +20,7 @@
             getPrice(ticketCategoryId, ticketTimeId, this,count);           
         });
         //按下付款要執行的動作
-        $("#btnGoToPay").click(function () {
+        $("#frmGoToPay").submit(function () {
             let tickets = [];
             $("#shoppingCartDetail tr").each(function (i, e) {
                 let ticketCategoryId = $(e).find(".selTicketCategory").val();
@@ -29,20 +29,16 @@
             });
             let discount = @Model.ticketGroupDetails[0].TicketGroups.TicketGroupDiscount;
             let quantity = count;
-            $.ajax({
-                url: "@Url.Action("OrderDetailByTicketGroup","Activity")",
-                data: { Discount: discount, Quantity: quantity, Tickets: tickets },
-                type: "post",
-                success: function (result) {
-                    $("body").html(result);
-                }
-            });
+            tickets = JSON.stringify(tickets);
+            $("input[name='Discount']").val(discount);
+            $("input[name='Quantity']").val(quantity);
+            $("input[name='Tickets']").val(tickets);
         });
     });
     //ticket物件
     function Ticket(ticketCategoryId, ticketTimeId) {
-        this.TicketCategoryId = ticketCategoryId;
-        this.TicketTimeId = ticketTimeId;
+        this.TicketCategoryId = ticketCategoryId||-1;
+        this.TicketTimeId = ticketTimeId||-1;
     }
     //票種和場次更改時會用到的方法
     function getPrice(ticketCategoryId, ticketTimeId, element,quantity=1) {        
@@ -146,8 +142,13 @@
                         }
                     </tbody>
                 </table>
-                <div class="mt-3 d-flex justify-content-end">                    
-                    <button id="btnGoToPay" class="btn btn-primary">購買</button>
+                <div class="mt-3 d-flex justify-content-end">   
+                    <form id="frmGoToPay" action="@Url.Action("OrderDetailByTicketGroup","Activity")" method="post">
+                        <input type="hidden" name="Discount"/>
+                        <input type="hidden" name="Quantity"/>
+                        <input type="hidden" name="Tickets"/>
+                        <input type="submit" class="btn btn-primary" value="購買">
+                    </form>
                 </div>
             </div>
         </div>

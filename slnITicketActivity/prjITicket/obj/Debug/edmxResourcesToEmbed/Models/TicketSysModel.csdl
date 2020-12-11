@@ -289,6 +289,7 @@
     <NavigationProperty Name="Member" Relationship="Self.FK_Seller_Member" FromRole="Seller" ToRole="Member" />
     <NavigationProperty Name="Subscribes" Relationship="Self.FK_Subscribes_Seller" FromRole="Seller" ToRole="Subscribes" />
     <Property Name="fPass" Type="Boolean" />
+    <Property Name="fFileName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
   </EntityType>
   <EntityType Name="ShoppingCart">
     <Key>
@@ -359,6 +360,7 @@
     <Property Name="TicketGroupName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
     <Property Name="TicketGroupDiscount" Type="Decimal" Precision="3" Scale="2" Nullable="false" />
     <NavigationProperty Name="TicketGroupDetail" Relationship="Self.FK_TicketGroupDetail_TicketGroups" FromRole="TicketGroups" ToRole="TicketGroupDetail" />
+    <Property Name="Status" Type="Boolean" Nullable="false" />
   </EntityType>
   <EntityType Name="TicketQRCodes">
     <Key>
@@ -1173,6 +1175,7 @@
       <End Role="Member" EntitySet="Member" />
       <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
     </AssociationSet>
+    <EntitySet Name="ActivityFailedReason" EntityType="TicketSysModel.ActivityFailedReason" />
   </EntityContainer>
   <EntityType Name="ActivityFavourite">
     <Key>
@@ -1208,4 +1211,11 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <EntityType Name="ActivityFailedReason">
+    <Key>
+      <PropertyRef Name="ActivityFailedReasonID" />
+    </Key>
+    <Property Name="ActivityFailedReasonID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FailedReason" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
 </Schema>

@@ -17,6 +17,13 @@
     <Property Name="ActivityStatusID" Type="int" Nullable="false" />
     <Property Name="DistrictId" Type="int" Nullable="false" />
   </EntityType>
+  <EntityType Name="ActivityFailedReason">
+    <Key>
+      <PropertyRef Name="ActivityFailedReasonID" />
+    </Key>
+    <Property Name="ActivityFailedReasonID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FailedReason" Type="nvarchar" MaxLength="50" Nullable="false" />
+  </EntityType>
   <EntityType Name="ActivityFavourite">
     <Key>
       <PropertyRef Name="ActivityFavouriteId" />
@@ -223,6 +230,7 @@
     <Property Name="SellerDeccription" Type="nvarchar(max)" />
     <Property Name="MemberId" Type="int" Nullable="false" />
     <Property Name="fPass" Type="bit" />
+    <Property Name="fFileName" Type="nvarchar" MaxLength="50" />
   </EntityType>
   <EntityType Name="ShoppingCart">
     <Key>
@@ -281,6 +289,7 @@
     <Property Name="TicketGroupId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TicketGroupName" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="TicketGroupDiscount" Type="numeric" Precision="3" Scale="2" Nullable="false" />
+    <Property Name="Status" Type="bit" Nullable="false" />
   </EntityType>
   <EntityType Name="TicketQRCodes">
     <Key>
@@ -888,6 +897,7 @@
   </Association>
   <EntityContainer Name="TicketSysModelStoreContainer">
     <EntitySet Name="Activity" EntityType="Self.Activity" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ActivityFailedReason" EntityType="Self.ActivityFailedReason" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ActivityFavourite" EntityType="Self.ActivityFavourite" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ActivityStatus" EntityType="Self.ActivityStatus" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Article" EntityType="Self.Article" Schema="dbo" store:Type="Tables" />

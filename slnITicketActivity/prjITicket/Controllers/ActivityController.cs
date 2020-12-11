@@ -17,6 +17,7 @@ using System.Net.Mail;
 using System.Net;
 using System.Text;
 using System.Net.Mime;
+using Newtonsoft.Json.Linq;
 
 namespace prjITicket.Controllers
 {
@@ -65,9 +66,10 @@ namespace prjITicket.Controllers
             if (activity == null)
             {
                 //todo回傳找不到活動的錯誤頁面
+                return View("ProductNotFound");
             }
             //找出所有與這個Activity相關的group
-            List<TicketGroups> groups = db.TicketGroups.Where(tg => tg.TicketGroupDetail.Select(tgd => tgd.ActivityId).Contains(activityId)).ToList();
+            List<TicketGroups> groups = db.TicketGroups.Where(tg =>tg.Status&&tg.TicketGroupDetail.Select(tgd => tgd.ActivityId).Contains(activityId)).ToList();
             //塞入ViewModel傳到前端
             VMActivityDetail vm = new VMActivityDetail() { Activity = activity, Groups = groups };
             return View(vm);
@@ -325,10 +327,14 @@ namespace prjITicket.Controllers
             {
                 return RedirectToAction("Login", "Login");
             }
-            List<Tickets> tickets = new List<Tickets>();
-            foreach(TicketDesc desc in input.Tickets)
+            var ticketsInput = (JArray)JsonConvert.DeserializeObject(input.Tickets);
+            List<TicketDesc> ticketDescs = ticketsInput.Select(j => new TicketDesc { TicketCategoryId = j.First.First.Value<int>(), TicketTimeId = j.Last.First.Value<int>() }).ToList();
+            List<Tickets> tickets = ticketDescs.Select(td => db.Tickets.FirstOrDefault(t => t.TicketCategoryId == td.TicketCategoryId && t.TicketTimeId == td.TicketTimeId)).ToList();           
+            //驗證選擇的套票是否合法
+            bool disAvailible = tickets.Any(t => t == null||t.UnitsInStock==0||input.Quantity>t.UnitsInStock);
+            if (disAvailible)
             {
-                tickets.Add(db.Tickets.FirstOrDefault(t => t.TicketCategoryId == desc.TicketCategoryId && t.TicketTimeId == desc.TicketTimeId));
+                return View("ProductNotFound");
             }
             int maxPoint = (Session[CDictionary.SK_Logined_Member] as Member).Point;
             VMOrderDetailByTicketGroup vm = new VMOrderDetailByTicketGroup()
@@ -339,6 +345,165 @@ namespace prjITicket.Controllers
                 Discount = input.Discount
             };
             return View(vm);
+            //////////////////////////////////////////////////
+            //***************添加到組長View的javascript代碼**************************/
+            /*
+             //按下付款要執行的動作
+        $("#frmGoToPay").submit(function () {
+            let tickets = [];
+            $("#shoppingCartDetail tr").each(function (i, e) {
+                let ticketCategoryId = $(e).find(".selTicketCategory").val();
+                let ticketTimeId = $(e).find(".selTicketTime").val();
+                tickets.push(new Ticket(ticketCategoryId, ticketTimeId));
+            });
+            let discount = @Model.ticketGroupDetails[0].TicketGroups.TicketGroupDiscount;
+            let quantity = count;
+            tickets = JSON.stringify(tickets);
+            $("input[name='Discount']").val(discount);
+            $("input[name='Quantity']").val(quantity);
+            $("input[name='Tickets']").val(tickets);
+        });
+        //ticket物件
+        function Ticket(ticketCategoryId, ticketTimeId) {
+            this.TicketCategoryId = ticketCategoryId||-1;
+            this.TicketTimeId = ticketTimeId||-1;
+        }
+        <div class="mt-3 d-flex justify-content-end">   
+                    <form id="frmGoToPay" action="@Url.Action("OrderDetailByTicketGroup","Activity")" method="post">
+                        <input type="hidden" name="Discount"/>
+                        <input type="hidden" name="Quantity"/>
+                        <input type="hidden" name="Tickets"/>
+                        <input type="submit" class="btn btn-primary" value="購買">
+                    </form>
+                </div>
+            /*************************************************/
+            ////////////////////////////////////////////////////
+        }
+        //套票去歐福寶付款
+        public string GoToPayTicketGroup(CGoToPayTicketGroup input)
+        {
+            Member member = Session[CDictionary.SK_Logined_Member] as Member;
+            if (member == null)
+            {
+                //todo 測試
+                return $"<script>alert('交易失敗,返回首頁');location.href='{Url.Action("Index","Home")}'</script>";
+            }
+            //找出所選擇的套票
+            int[] ticketIds = (int[])JsonConvert.DeserializeObject(input.ticketIds, typeof(int[]));
+            List<Tickets> tickets = ticketIds.Select(ti => db.Tickets.FirstOrDefault(t => t.TicketID == ti)).ToList();
+            //驗證套票庫存,上架狀態是否合法
+            foreach (Tickets ticket in tickets)
+            {
+                if (ticket.Activity.ActivityStatusID == 0)
+                {
+                    //todo 測試
+                    return $"<script>alert('{ticket.Activity.ActivityName}已經下架,交易失敗,返回首頁');location.href='{Url.Action("Index", "Home")}'</script>";
+                }
+                if (ticket.UnitsInStock == 0)
+                {
+                    //todo 測試
+                    return $"<script>alert('{ticket.Activity.ActivityName}{ticket.TicketCategory.TicketCategoryName}{ticket.TicketTimes.TicketTime.ToString("yyyy-MM-dd HH:mm")}已經售完,交易失敗,返回首頁');location.href='{Url.Action("Index", "Home")}'</script>";
+                }
+                if (input.quantity > ticket.UnitsInStock)
+                {
+                    //todo 測試
+                    return $"<script>alert('{ticket.Activity.ActivityName}{ticket.TicketCategory.TicketCategoryName}{ticket.TicketTimes.TicketTime.ToString("yyyy-MM-dd HH:mm")}庫存量不足,交易失敗,返回首頁');location.href='{Url.Action("Index", "Home")}'</script>";
+                }
+            }
+            //驗證通過,就產生訂單
+            int memberId = member.MemberID;
+            string orderGuid = String.Concat(Guid.NewGuid().ToString().Where(c => c != '-')).Substring(0, 20);
+            Orders order = new Orders()
+            {
+                Name = input.name,
+                Email = input.email,
+                DistrictId = input.districtId,
+                Address = input.address,
+                MemberID = memberId,
+                OrderDate = DateTime.Now,
+                OrderStatus = false,
+                OrderGuid = orderGuid,
+                PayPoint = input.point
+            };
+            db.Orders.Add(order);
+            db.SaveChanges();
+            int totalPrice = 0;
+            foreach (Tickets ticket in tickets)
+            {               
+                totalPrice = totalPrice + (int)Math.Round(ticket.Price * (1 - input.discount), 0) * input.quantity;
+                Order_Detail od = new Order_Detail()
+                {
+                    TicketId = ticket.TicketID,
+                    OrderID = order.OrderID,
+                    Quantity = input.quantity,
+                    Discount = input.discount
+                };
+                db.Order_Detail.Add(od);
+            }
+            db.SaveChanges();
+            //去歐福寶付款
+            //執行歐付寶程式碼
+            List<string> enErrors = new List<string>();
+            try
+            {
+                using (AllInOne oPayment = new AllInOne())
+                {
+                    /* 服務參數 */
+                    oPayment.ServiceMethod = HttpMethod.HttpPOST;
+                    oPayment.ServiceURL = "https://payment-stage.opay.tw/Cashier/AioCheckOut/V5";
+                    oPayment.HashKey = "5294y06JbISpM5x9";
+                    oPayment.HashIV = "v77hoKGq4kWxNNIS";
+                    oPayment.MerchantID = "2000132";
+                    /* 基本參數 */
+                    oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
+                    //oPayment.Send.ClientBackURL = "http://localhost:53238" + Url.Action("Index");
+                    oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
+                    oPayment.Send.MerchantTradeNo = orderGuid;
+                    oPayment.Send.MerchantTradeDate = DateTime.Now;
+                    oPayment.Send.TotalAmount = totalPrice - input.point;
+                    oPayment.Send.TradeDesc = "Itcket購票網";
+                    //oPayment.Send.ChoosePayment = PaymentMethod.ALL;
+                    oPayment.Send.Remark = $"點數折抵{input.point}元";
+                    //oPayment.Send.ChooseSubPayment = PaymentMethodItem.None;
+                    //oPayment.Send.NeedExtraPaidInfo = ExtraPaymentInfo.Yes;
+                    //oPayment.Send.HoldTrade = HoldTradeType.No;
+                    //oPayment.Send.DeviceSource = DeviceType.PC;
+                    //oPayment.Send.UseRedeem = UseRedeemFlag.Yes; //購物金/紅包折抵
+                    //oPayment.Send.IgnorePayment = "<<您不要顯示的付款方式>>"; // 例如財付通:Tenpay
+                    // 加入選購商品資料。
+                    foreach (Order_Detail od in db.Order_Detail.Where(od => od.OrderID == order.OrderID))
+                    {
+                        oPayment.Send.Items.Add(new Item()
+                        {
+                            Name = od.Tickets.Activity.ActivityName + od.Tickets.TicketCategory.TicketCategoryName + od.Tickets.TicketTimes.TicketTime.ToString("yyyy/MM/dd HH:mm:ss"),
+                            Price = Math.Round(od.Tickets.Price * (1 - od.Discount), 0) * od.Quantity,
+                            Currency = "台幣",
+                            Quantity = od.Quantity,
+                            URL = "test"
+                        });
+                    }
+                    /* 產生訂單 */
+                    enErrors.AddRange(oPayment.CheckOut());
+                    /* 產生產生訂單 Html Code 的方法 */
+                    string szHtml = String.Empty;
+                    enErrors.AddRange(oPayment.CheckOutString(ref szHtml));
+                    return szHtml;
+                }
+            }
+            catch (Exception ex)
+            {
+                // 例外錯誤處理。
+                enErrors.Add(ex.Message);
+                return String.Concat(enErrors);
+            }
+            finally
+            {
+                // 顯示錯誤訊息。
+                if (enErrors.Count() > 0)
+                {
+                    string szErrorMessage = String.Join("\\r\\n", enErrors);
+                }
+            }           
         }
         //顯示購物完成的頁面
         public ActionResult FinishPay()
@@ -426,6 +591,18 @@ namespace prjITicket.Controllers
             Activity activity = db.Activity.FirstOrDefault(a => a.ActivityID == activityId);
             return View(activity);
         }
+        //上傳套票的頁面
+        public ActionResult UploadTicketGroup()
+        {
+            //商家後臺layout連結填寫這裡
+            Member member = Session[CDictionary.SK_Logined_Member] as Member;
+            if (member == null || member.MemberRoleId != 3)
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            List<Activity> activities = member.Seller.FirstOrDefault().Activity.Where(a=>a.ActivityStatusID==1).ToList();
+            return View(activities);
+        }
         //在ActivityList頁面中Ajax調用這個方法取得活動分頁
         public ActionResult GetActivityPages(int currentPage = 1, string orderMode = "scoredown", int minPrice = 0, int maxPrice = int.MaxValue, int priceFilter = 0)
         {
@@ -447,6 +624,7 @@ namespace prjITicket.Controllers
             if (pages.Count() == 0)
             {
                 //todo回傳找不到產品的頁面
+                return PartialView("ZeroActivity");
             }
             return PartialView(pages);
         }
@@ -472,6 +650,7 @@ namespace prjITicket.Controllers
             if (pages.Count() == 0)
             {
                 //todo回傳找不到產品的頁面
+                return PartialView("ZeroActivity");
             }
             return PartialView("GetActivityPages", pages);
         }
@@ -497,6 +676,7 @@ namespace prjITicket.Controllers
             if (pages.Count() == 0)
             {
                 //todo回傳找不到產品的頁面
+                return PartialView("ZeroActivity");
             }
             return PartialView("GetActivityPages", pages);
         }
@@ -522,6 +702,7 @@ namespace prjITicket.Controllers
             if (pages.Count() == 0)
             {
                 //todo回傳找不到產品的頁面
+                return PartialView("ZeroActivity");
             }
             return PartialView("GetActivityPages", pages);
         }
@@ -556,6 +737,7 @@ namespace prjITicket.Controllers
             if (pages.Count() == 0)
             {
                 //todo回傳找不到產品的頁面
+                return PartialView("ZeroActivity");
             }
             return PartialView("GetActivityPages", pages);
         }
@@ -594,6 +776,7 @@ namespace prjITicket.Controllers
             if (activity == null)
             {
                 //todo 回傳活動是空值的錯誤頁面
+                return PartialView("ZeroActivity");
             }
             return PartialView("GetActivitySubDetailPage", activity);
         }
@@ -1197,6 +1380,47 @@ namespace prjITicket.Controllers
             {
 
             }
+        }
+        //前端調用驗證套票名稱是否可用
+        public string CheckTicketGroupNameAvailible(string ticketGroupName)
+        {
+            return db.TicketGroups.Any(tg => tg.TicketGroupName == ticketGroupName) ? "false" : "true";
+        }
+        //把套票資料塞入db的函數
+        public string AddTicketGroup(string ticketGroupName,decimal discount,int[] activityIds)
+        {
+            //todo正式版Status調成false供後台審核
+            TicketGroups ticketGroup = new TicketGroups()
+            {
+                TicketGroupName = ticketGroupName,
+                TicketGroupDiscount = discount,
+                Status = true
+            };
+            db.TicketGroups.Add(ticketGroup);
+            foreach(int activityId in activityIds)
+            {
+                TicketGroupDetail ticketGroupDetail = new TicketGroupDetail()
+                {
+                    TicketGroupId = ticketGroup.TicketGroupId,
+                    ActivityId = activityId
+                };
+                db.TicketGroupDetail.Add(ticketGroupDetail);
+            }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            return "OK";
+        }
+        public ActionResult CustomerSupport()
+        {
+            Member member = Session[CDictionary.SK_Logined_Member] as Member;
+            if (member == null || member.MemberRoleId != 3) return RedirectToAction("Login", "Login");
+            return View();
         }
     }
 }

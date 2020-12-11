@@ -1342,3 +1342,5 @@ D:\資策會\期末專題\slnTicket1110\合併會員中心\slnITicketActivity\pr
 D:\資策會\期末專題\slnTicket1110\合併會員中心\slnITicketActivity\prjITicket\obj\Debug\prjITicket.csproj.CopyComplete
 D:\LearnPrograming\資策會\期末專題\正在進行中的專案\slnITicketActivity\prjITicket\bin\GoogleRecaptcha.dll
 D:\LearnPrograming\資策會\期末專題\正在進行中的專案\slnITicketActivity\prjITicket\bin\GoogleRecaptchaMvc.dll
+D:\資策會\期末專題\slnTicket1110\正在進行中的專案\slnITicketActivity\prjITicket\bin\GoogleRecaptcha.dll
+D:\資策會\期末專題\slnTicket1110\正在進行中的專案\slnITicketActivity\prjITicket\bin\GoogleRecaptchaMvc.dll
