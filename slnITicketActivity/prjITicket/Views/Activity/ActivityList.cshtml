@@ -11,6 +11,7 @@
     #min, #max {
         width: 70px;
     }
+
     .addToFavourite {
         line-height: 25px;
         background-color: black;
@@ -21,7 +22,7 @@
         color: white;
         padding: 6px;
         font-size: 15px;
-        display:none;
+        display: none;
     }
 </style>
 <script>
@@ -463,7 +464,58 @@
 <style>
     .categoryHover:hover {
         background-color: #0094ff;
-        color: azure;
+        color: azure
+    }
+
+    .ranking {
+        list-style: none;
+        padding-left: 0
+    }
+
+    .ranking li {
+        margin-bottom: 5px
+    }
+
+    .ranking .rankItemName {
+        display: inline-block;
+        line-height: 20px;
+        height: 20px;
+        width: 60%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap
+    }
+
+    .ranking .rankNumber {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        margin-right: 15px;
+        color: #999;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap
+    }
+
+    .sellCount {
+        color: #999;
+        font-size: 10px;
+        float: right
+    }
+
+    .ranking li:nth-child(-n+3) .rankNumber {
+        background-color: #00a1d6;
+        color: white
+    }
+
+    .ranking a:hover {
+        text-decoration: none;
+        color: #0080FF
+    }
+    .ranking a{
+        color:black
     }
 </style>
 <!-- Page Content -->
@@ -473,14 +525,24 @@
     <div class="col-lg-3">
         <!-- Side Widget -->
         <div class="card my-4">
-            <h5 class="card-header">不知道寫甚麼</h5>
+            <h5 class="card-header" style="font-weight:bold">排行榜</h5>
             <div class="card-body">
-                垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊垃圾資訊
+                <ul class="ranking">
+                    @for (int i = 0; i < Model.Best10.Count(); i++)
+                    {
+                        int totalSell = Model.Best10[i].TotalSell;
+                        <li>
+                            <span class="rankNumber">@(i+1)</span>
+                            <span class="rankItemName"><a href="@Url.Action("ActivityDetail",new { activityId = Model.Best10[i].ActivityId})">@Model.Best10[i].ActivityName</a></span>
+                            <span class="sellCount">售出@(totalSell>999?"999":totalSell.ToString())</span>
+                        </li>
+                    }                   
+                </ul>
             </div>
         </div>
         <!-- Search Widget -->
         <div class="card my-4">
-            <h5 class="card-header">搜索</h5>
+            <h5 class="card-header" style="font-weight:bold">搜索</h5>
             <div class="card-body">
                 <div class="input-group">
                     <input id="txtKeyword" type="text" class="form-control" placeholder="搜尋關鍵字">
@@ -492,36 +554,36 @@
         </div>
         <!--城市地區篩選-->
         <div class="card my-4">
-            <h5 class="card-header">選擇活動城市地區</h5>
-            <div class="card-body">                
-                    <div class="form-group row">
-                        <label class="col-md-4 col-form-label text-right">城市</label>
-                        <div class="col-md-8">
-                            <select id="selCity" name="city" class="form-control">
-                                <option value="-1">請選擇</option>
-                                <!--塞入城市資訊-->
-                            </select>
-                        </div>
+            <h5 class="card-header" style="font-weight:bold">選擇活動城市地區</h5>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">城市</label>
+                    <div class="col-md-8">
+                        <select id="selCity" name="city" class="form-control">
+                            <option value="-1">請選擇</option>
+                            <!--塞入城市資訊-->
+                        </select>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-md-4 col-form-label text-right">區域</label>
-                        <div class="col-md-8">
-                            <select id="selDistrict" name="district" class="form-control">
-                                <option value="">請選擇</option>
-                                <!--塞入區域資訊-->
-                            </select>
-                        </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">區域</label>
+                    <div class="col-md-8">
+                        <select id="selDistrict" name="district" class="form-control">
+                            <option value="">請選擇</option>
+                            <!--塞入區域資訊-->
+                        </select>
                     </div>
-                    <div class="form-group row mb-0">
-                        <div class="col-md-offset-4 mx-auto">
-                            <button id="btnCityDis" class="btn btn-success">搜索</button>
-                        </div>                     
-                    </div>               
+                </div>
+                <div class="form-group row mb-0">
+                    <div class="col-md-offset-4 mx-auto">
+                        <button id="btnCityDis" class="btn btn-success">搜索</button>
+                    </div>
+                </div>
             </div>
         </div>
         <!--分類大項-->
         <div class="card my-4">
-            <h5 class="card-header">活動分類</h5>
+            <h5 class="card-header" style="font-weight:bold">活動分類</h5>
             <div class="list-group list-group-flush">
                 <div class="btn-group">
                     <button id="btnGetAll" type="button" class="btn btn-default categoryHover">
@@ -530,16 +592,22 @@
                 </div>
                 @foreach (Categories categories in Model.Categories)
                 {
+                    int categoryActivityCount = categories.SubCategories.Sum(sc => sc.Activity.Where(a=>a.ActivityStatusID==1).Count());
                     <!--循環顯示大類-->
                     <div class="btn-group dropright">
                         <button onclick="categoryClick(@categories.CategoryID)" type="button" class="btn btn-default dropdown-toggle categoryHover" aria-haspopup="true" aria-expanded="false">
                             @categories.CategoryName
+                            <span class="badge" style="font-size:5px;background-color:#84C1FF;color:white">@(categoryActivityCount>99?"99+":categoryActivityCount.ToString())</span>
                         </button>
                         <div class="dropdown-menu">
                             <!--循環顯示大類下面的子類,通過右邊滑出菜單展示-->
                             @foreach (SubCategories subCategories in categories.SubCategories)
                             {
-                                <a href="javascript:;" onclick="subCategoryClick(@subCategories.SubCategoryId)" class="dropdown-item">@subCategories.SubCategoryName</a>
+                                int subcategoryActivityCount = subCategories.Activity.Where(a=>a.ActivityStatusID==1).Count();
+                                <a href="javascript:;" onclick="subCategoryClick(@subCategories.SubCategoryId)" class="dropdown-item">
+                                    @subCategories.SubCategoryName
+                                    <span class="badge" style="font-size:5px;background-color:#84C1FF;color:white">@(subcategoryActivityCount>99?"99+":subcategoryActivityCount.ToString())</span>
+                                </a>
                             }
                         </div>
                     </div>
@@ -548,7 +616,7 @@
         </div>
         <!-- Categories Widget -->
         <div class="card my-4">
-            <h5 class="card-header">熱門搜索</h5>
+            <h5 class="card-header" style="font-weight:bold">熱門搜索</h5>
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-6">

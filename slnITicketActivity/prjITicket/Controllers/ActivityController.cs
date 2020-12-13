@@ -49,13 +49,21 @@ namespace prjITicket.Controllers
             List<SubCategories> hotSearch = db.SubCategories.OrderByDescending(sc => sc.SearchedTime).Take(6).ToList();
             //抓出每個活動最便宜的票,再取這當中的最大值,準備塞給價格篩選器的最大值
             int maxPriceAll = (int)db.Tickets.GroupBy(t => t.ActivityID).Max(g => g.Min(t => t.Price * (1 - t.Discount)));
+            //找出銷售量前10的活動塞入ViewModel
+            List<ActivitySell> best10Activity = db.Activity.AsEnumerable().Where(a=>a.ActivityStatusID==1).Select(a => new ActivitySell()
+            {
+                ActivityId = a.ActivityID,
+                ActivityName = a.ActivityName,
+                TotalSell = a.Tickets.Sum(t => t.Order_Detail.Sum(od => od.Quantity))
+            }).OrderByDescending(a => a.TotalSell).Take(10).ToList();
             //把資料塞進ViewModel
             VMActivityList vm = new VMActivityList()
             {
                 Categories = categories,
                 ScrollImgActivities = scrollActivities,
                 HotSubCategories = hotSearch,
-                MaxPriceAll = maxPriceAll
+                MaxPriceAll = maxPriceAll,
+                Best10 = best10Activity
             };
             return View(vm);
         }

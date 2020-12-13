@@ -172,7 +172,7 @@ namespace prjITicket.Controllers
                 return View();
             }
 
-            return RedirectToAction("ActivityList", "Activity");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -370,7 +370,7 @@ namespace prjITicket.Controllers
             //若member為null，表示會員未註冊
             if (bussmember == null)
             {
-                FileSave.SaveAs(@"C:\FileSave\" + FileSave.FileName);
+                //FileSave.SaveAs(@"C:\FileSave\" + FileSave.FileName);
                 Member m = new Member();
                 m.Email = formData.Email;
                 m.Password = formData.Password;
