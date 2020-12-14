@@ -10,6 +10,7 @@ namespace prjITicket.ViewModel
     {
         public Article Article { get; set; }
         public List<Report> Report { get; set; }
+        public List<Activity> Activities{ get; set; }
         
     }
     public class VMforum_mainblock
@@ -19,6 +20,7 @@ namespace prjITicket.ViewModel
         public string searchWord { get; set; }
         public int page { get; set; }
         public int ArticleCategoryID { get; set; }
+        public List<Activity> activities { set; get; }
     }
 
 }

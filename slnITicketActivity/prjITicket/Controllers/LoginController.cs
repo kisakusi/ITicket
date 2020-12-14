@@ -19,7 +19,7 @@ using prjITicket.ViewModel;
 
 namespace prjITicket.Controllers
 {
-    public class LoginController : Controller
+    public class LoginController : Controller,IDisposable
     {
         // GET: Login
         TicketSysEntities db = new TicketSysEntities();
@@ -158,14 +158,14 @@ namespace prjITicket.Controllers
                     return View();
                 }
 
-                if (member.MemberRole.MemberRoleName == "管理者")
-                {
-                    Session[CDictionary.SK_Admin_Logined_Member] = member;
-                }
-                else
-                {
+                //if (member.MemberRole.MemberRoleName == "管理者")
+                //{
+                //    Session[CDictionary.SK_Admin_Logined_Member] = member;
+                //}
+                //else
+                //{
                     Session[CDictionary.SK_Logined_Member] = member;
-                }
+                //}
             }
             else {
                 ViewBag.Message = "請勾選驗證機器人";
@@ -247,7 +247,7 @@ namespace prjITicket.Controllers
         public ActionResult Logout()
         {
             Session.Clear();  
-            return RedirectToAction("ActivityList", "Activity");
+            return RedirectToAction("Index", "Home");
         }
 
 
@@ -264,12 +264,19 @@ namespace prjITicket.Controllers
             //若模型沒有通過驗證則顯示目前的View
             if (ModelState.IsValid == false)
             {
+                ViewBag.Message = "請確認是否欄位輸入正確";
                 return View();
             }
             else if (formData.agreeterm == false)
             {
 
                 ViewBag.Message = "請勾選";
+                return View();
+            }
+            else if (formData.Password == null)
+            {
+
+                ViewBag.Message = "請輸入密碼";
                 return View();
             }
 
@@ -345,12 +352,19 @@ namespace prjITicket.Controllers
             {
                 return View();
             }
+            else if (formData.Password == null)
+            {
+
+                ViewBag.Message = "請輸入密碼";
+                return View();
+            }
             else if (formData.agreeterm == false)
             {
 
                 ViewBag.Message = "請勾選";
                 return View();
             }
+            
             else if (FileSave == null) 
             {
                 ViewBag.Message = "請上傳檔案";
@@ -370,7 +384,7 @@ namespace prjITicket.Controllers
             //若member為null，表示會員未註冊
             if (bussmember == null)
             {
-                //FileSave.SaveAs(@"C:\FileSave\" + FileSave.FileName);
+                FileSave.SaveAs(Server.MapPath("~/Content/Login/SellerImage")+"/" + FileSave.FileName);
                 Member m = new Member();
                 m.Email = formData.Email;
                 m.Password = formData.Password;
@@ -379,6 +393,7 @@ namespace prjITicket.Controllers
                 m.RegisterCheckCode = RegisterCheckCode;
                 m.MemberRoleId = 1;
                 m.Point = 0;
+                
                 db.Member.Add(m);
                 db.SaveChanges();
 
@@ -388,6 +403,7 @@ namespace prjITicket.Controllers
                 s.CompanyName = formData.CompanyName;
                 s.TaxIDNumber = formData.TaxIDNumber;
                 s.fPass = false;
+                s.fFileName = FileSave.FileName;
                 db.Seller.Add(s);
                 db.SaveChanges();
 
@@ -415,19 +431,18 @@ namespace prjITicket.Controllers
 
         //提供下載檔案
         public ActionResult DemoDownload()
-        {
-            //@"\DemoFile\企業合同確認書.docx"
-            FileInfo fl = new FileInfo(@"D:\DemoFile\企業合同確認書.docx");
-            var cd = new System.Net.Mime.ContentDisposition
-            {
-                FileName = fl.Name,
-                Inline = false,
-            };
-            Response.AppendHeader("Content -Disposition", cd.ToString());
-
-            var readStream = new FileStream(fl.FullName, FileMode.Open, FileAccess.Read);
-            string contentType = MimeMapping.GetMimeMapping(fl.FullName);
-            return File(readStream, contentType);
+        {           
+            //string path2 = Server.MapPath("~/Content/Login/DemoFile") + "\\" + "企業合同確認書.docx";
+            //string path = @"F:\slnITicketActivity\prjITicket\Content\Login\DemoFile\企業合同確認書.docx";          
+            //我要下載的檔案位置
+            string filepath = Server.MapPath("~/Content/Login/DemoFile/企業合同確認書.docx");
+            //取得檔案名稱
+            string filename = System.IO.Path.GetFileName(filepath);
+            //讀成串流
+            Stream iStream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            //回傳出檔案
+            return File(iStream, "application/msword", filename);
+            //contentType The content type (MIME type)副檔名
         }
         public ActionResult MemberEdit()
         {
@@ -485,19 +500,38 @@ namespace prjITicket.Controllers
             return "修改失敗";
 
         }
+        [HttpPost]
+        public string FileSave(HttpPostedFileBase FileSave)
+        {
+            int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+            Seller prod = db.Seller.FirstOrDefault(t => t.MemberId == id);
+            if (FileSave != null)
+            {
+                prod.fPass = null;
+                prod.fFileName = FileSave.FileName;
+                db.SaveChanges();
+                FileSave.SaveAs(Server.MapPath("~/Content/Login/SellerImage") + "/" + FileSave.FileName);               
+                return "上傳成功";
+            }
+            return "上傳失敗";
+        }
 
         public string BussMemberSave(QBussMember b)
         {
             int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
-            
+
             Seller prod = db.Seller.FirstOrDefault(t => t.MemberId == id);
             if (prod != null)
             {
+                if (b.CompanyName == null || b.TaxIDNumber == null || b.SellerPhone == null)
+                {
+                    return "必填欄位未填寫，修改失敗";
+                }
                 prod.CompanyName = b.CompanyName;
                 prod.TaxIDNumber = b.TaxIDNumber;
                 prod.SellerHomePage = b.SellerHomePage;
                 prod.SellerDeccription = b.SellerDeccription;
-                prod.SellerPhone = b.SellerPhone;               
+                prod.SellerPhone = b.SellerPhone;
                 db.SaveChanges();
                 return "修改成功";
             }
@@ -505,20 +539,25 @@ namespace prjITicket.Controllers
 
         }
 
+        //todo 12/13
         public string MemberPassSave(QMember b)
         {
             int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
-            string password=(Session[CDictionary.SK_Logined_Member] as Member).Password;
-            Member prod = db.Member.FirstOrDefault(t => t.MemberID == id&&t.Password==b.Password);
-            if (prod != null&&b.NPassword!=null)
+            string password = (Session[CDictionary.SK_Logined_Member] as Member).Password;
+            Member prod = db.Member.FirstOrDefault(t => t.MemberID == id && t.Password == b.Password);
+            if (prod != null && b.NPassword != null)
             {
                 prod.Password = b.NPassword;
                 db.SaveChanges();
                 password = "";
-                return "修改成功";              
+                return "密碼修改成功，下次請用新密碼登入";
             }
             password = "";
-            return "修改失敗";
+            if (prod == null && b.NPassword == null)
+            {
+                return "請輸入密碼，修改失敗";
+            }
+            return "原密碼輸入錯誤，修改失敗";
 
         }
 
@@ -654,15 +693,30 @@ namespace prjITicket.Controllers
             return postCode;
         }
 
+        //todo
         //會員訂單管理查詢
-        public ActionResult getOrderbyEmail(string Email, int page = 1)
+        public ActionResult getOrderbyMemberId(int memberId, int page = 1)
         {
             int pagesize = 5;
             int pagecurrent = page < 1 ? 1 : page;
-            List<Orders> order = db.Orders.Where(o => o.Email == Email).ToList();
+            List<Orders> order = db.Orders.Where(o => o.MemberID == memberId).ToList();
             IPagedList<Orders> pagelist = order.ToPagedList(pagecurrent, pagesize);
-            ViewBag.Email = Email;
-            return PartialView("getOrderbyEmail", pagelist);
+            ViewBag.MemberId = memberId;
+            return PartialView("getOrderbyMemberId", pagelist);
+        }
+
+        //todo 12/13
+
+        //會員訂單管理showQRCode
+        public string getQRCodeByOrderId(int orderId)
+        {
+            List<Order_Detail> order_Details = db.Orders.FirstOrDefault(o => o.OrderID == orderId).Order_Detail.ToList();
+            List<string> datas = new List<string>();
+            foreach (Order_Detail order_Detail in order_Details)
+            {
+                datas.Add(new ActivityController().ShowQRCode(order_Detail.OrderDetailID));
+            }
+            return JsonConvert.SerializeObject(datas);
         }
 
         //會員我的收藏查詢
@@ -676,12 +730,35 @@ namespace prjITicket.Controllers
             return PartialView("getActivityFavouriteByMemberId", pagelist);
         }
 
+        //會員我的收藏圈圈數字改變
+        public int changeActivityFavouriteByMemberId(int memberId)
+        {
+            int number = db.ActivityFavourite.Where(a => a.MemberId == memberId).Count();
+            return number;
+        }
+
+
+        //會員我的收藏刪除
+        public string deleteActivityFavouriteByActivityId(int memberId, int activityId)
+        {
+            ActivityFavourite af = db.ActivityFavourite.FirstOrDefault(a => a.ActivityId == activityId && a.MemberId == memberId);
+            db.ActivityFavourite.Remove(af);
+            db.SaveChanges();
+
+            return "刪除成功";
+        }
+
+
         //todo
         //取得後台系統訊息 ShoppingCartList.cshtml參考
-        public ActionResult getShortMassageByMemberId(int MemberId)
+        public ActionResult getShortMassageByMemberId(int MemberId, int page = 1)
         {
-            List<ShortMessage> massage = db.ShortMessage.Where(s => s.MemberID == MemberId).ToList();
-            return PartialView(massage);
+            int pagesize = 5;
+            int pagecurrent = page < 1 ? 1 : page;
+            List<ShortMessage> massage = db.ShortMessage.OrderByDescending(s => s.ShortMessageID).Where(s => s.MemberID == MemberId).ToList();
+            IPagedList<ShortMessage> pagelist = massage.ToPagedList(pagecurrent, pagesize);
+            ViewBag.MemberId = MemberId;
+            return PartialView("getShortMassageByMemberId", pagelist);
         }
 
     }

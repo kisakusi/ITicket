@@ -14,21 +14,31 @@
 <link href="~/Content/Forum_use/forumcontent.css" rel="stylesheet" />
 <link href="~/Content/Forum_use/css/styles.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
 @foreach (var item in Model.Article.Reply)
 {
-
-
     <div class="media mb-4">
-        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+        <img class="reply_Profile" style="content:url(/images/Login/Upload/@item.Member.Icon); width:50px; height:50px;">
         <div class="media-body">
             <div class="float-right">
-                <button class="btn" data-toggle="collapse" href=#CollapseDemo@(count) role="button" aria-expanded="false" aria-controls="CollapseDemo@(count)"><i class="fa fa-bars"></i></button>
+                <div class="w3-dropdown-hover w3-right" style="background-color:white">
+                    <button class="btn"><i class="fa fa-bars"></i></button>
+                    <div id="Dropdown@(count)" class="w3-dropdown-content w3-bar-block w3-border w3-animate-opacity" style="right:0;width:80px">
+                        <button onclick="reply_quote(@item.ReplyID)" class="emotion info">引用留言</button> @*Quote V.動詞 引用*@
+                        <button class="emotion info" onclick="showModal(@count)">檢舉留言</button>
+                        @if (member != null && item.MemberID == member.MemberID)
+                        {
+                            <button onclick="toggleEdit(@item.ReplyID)" class="emotion info">編輯留言</button>
+                            <button onclick="replydelete(@item.ReplyID)" class="emotion info">刪除留言</button>
+                        }
+                    </div>
+                </div>
             </div>
-
             <h5 class="mt-0">@item.Member.Name</h5>
             <div id="replyshow">
-                <p id="replyshow_content_@(item.ReplyID)">@(item.ReplyContent)</p>
-                <input onkeydown="txtReplyKeyDown(@item.ReplyID)" id="replyEdit_content_@(item.ReplyID)" name="@(item.ReplyID)" type="text" style="width:600px;display:none;" rows="1" value="@(item.ReplyContent)">
+                <div id="replyshow_content_@(item.ReplyID)">@Html.Raw(item.ReplyContent)</div>
+
+                <input onkeydown="txtReplyKeyDown(@item.ReplyID)" id="replyEdit_content_@(item.ReplyID)" name="@(item.ReplyID)" type="text" style="width:600px;display:none;" rows="1" value="@Html.Raw(item.ReplyContent)">
                 <p id="fnt_@(item.ReplyID)" style="display:none;font-size:13px;color:gray">
                     修改完成後按
                     <span style="color:blue">Enter</span>修改或是
@@ -56,22 +66,10 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col">
-                    <div class="collapse multi-collapse" id="CollapseDemo@(count)">
-                        <div class="card card-body">
-                            <div class="col-xs-3">
-                                <button class="emotion info" onclick="showModal(@count)">檢舉</button>
-                                @if (member != null && item.MemberID == member.MemberID)
-                                {
-                                    <button onclick="toggleEdit(@item.ReplyID)" class="emotion info">編輯留言</button>
-                                    <button onclick="replydelete(@item.ReplyID)" class="emotion info">刪除留言</button>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+
+            <br />
+
         </div>
     </div>
 
@@ -101,30 +99,24 @@
             <footer class="w3-container w3-teal">
                 <div style="margin:5px 0px;" class="float-right">
                     <button class="w3-button w3-black" type="button" onclick="closeModal(@count)">取消</button>
-                    <button class="w3-button w3-pale-green" type="button" onclick="reportReason(@item.ReplyID)">確定</button>
+                    <button class="w3-button w3-pale-green" type="button" onclick="reportReason(@item.ReplyID,@count)">確定</button>
+
                 </div>
             </footer>
         </div>
     </div>
-
-
+    
     count += 1;
-
-
 }
 
 <script>
-
-
-
-
     function replydelete(replyId) {
         $.ajax({
                     type: "post",
                     url: "@Url.Action("Reply_Delete")",
                     data: { replyId: replyId ,ArticleID:@Model.Article.ArticleID},
             success: function (data) {
-                        alert(data)
+                alert("刪除成功");
                         $("#ajaxdemoshow").load(`/Forum/forum_reply?articleID=@Model.Article.ArticleID`);
                     }
                 });
@@ -133,7 +125,7 @@
     function txtReplyKeyDown(replyId) {
 
         if (window.event.keyCode == 13) {
-            let rpcontent = $("#replyEdit_content_"+`${replyId}`).val();
+            let rpcontent = $("#replyEdit_content_"+ replyId).val();
 
             if (rpcontent == "")
             {
@@ -143,11 +135,11 @@
             {
                 $.ajax({
                     type: "post",
-                    url: "@Url.Action("Reply_Edit")",
-                    data: { rpcontent: rpcontent, replyId: replyId },
+                    url: "@Url.Action("Reply_Edit","Forum")",
+                    data: { rpcontent: rpcontent, replyID: replyId },
                     success: function (data) {
                         alert("成功")
-                        $("#ajaxdemoshow").load(`/Forum/forum_reply?articleID=@Model.Article.ArticleID`);
+                        $("#ajaxdemoshow").load(`@Url.Action("forum_reply","Forum",new { articleID =Model.Article.ArticleID})`);
                     }
                 });
             }
@@ -187,7 +179,8 @@
         Modal.style.display = 'none';
     }
 
-    function reportReason(replyId) {
+    function reportReason(replyId,count) {
+        let Modal = document.getElementById('Modal' + count);
         let reportId = $('#reason').val();
         if (reportId === '#') {
             alert("社會再走，理由要有");
@@ -203,6 +196,7 @@
                      alert(data);
                      window.location.href = 'http://localhost:49949/Login/Login';
                  } else {
+                     Modal.style.display = 'none';
                      alert("檢舉" + data);
                  }
         }
@@ -214,13 +208,14 @@
         let likebtn = document.getElementById('actionlike' + replyId);
         let dislikebtn = document.getElementById('actiondislike' + replyId);
         let ActionId = 1;
+        let goodpoint = document.getElementById('goodpoint' + replyId);
         if (dislikebtn.className == 'bpclick') {
             alert("此篇留言你已點了不喜歡。");
         }
         else {
             if (likebtn.className == 'gp') {
                 likebtn.className = 'gpclick';
-                
+
                 $.ajax({
                  type: "post",
                  url: "@Url.Action("Reply_EmotionAction")",
@@ -229,6 +224,8 @@
                         if (data != "成功") {
                             alert(data);
                             window.location.href = 'http://localhost:49949/Login/Login';
+                        } else {
+                            goodpoint.innerText = parseInt(goodpoint.innerText) + 1;
                         }
                     },
                     error: function (data) {
@@ -243,8 +240,7 @@
                  url: "@Url.Action("Reply_EmotionAction_Cancel")",
                     data: { ReplyID: replyId},
                     success: function (data) {
-                        
-                        
+                        goodpoint.innerText = parseInt(goodpoint.innerText) - 1;
                     },
                     error: function (data) {
                     }
@@ -252,10 +248,10 @@
             }
         }
     }
-
     function dislikeBtn(replyId) {
         let likebtn = document.getElementById('actionlike' + replyId);
         let dislikebtn = document.getElementById('actiondislike' + replyId);
+        let badpoint = document.getElementById('badpoint' + replyId);
         let ActionId = 2;
 
         if (likebtn.className == 'gpclick') {
@@ -272,6 +268,8 @@
                           if (data != "成功") {
                               alert(data);
                               window.location.href = 'http://localhost:49949/Login/Login';
+                          } else {
+                              badpoint.innerText = parseInt(badpoint.innerText) + 1;
                           }
                     },
                     error: function (data) {
@@ -285,6 +283,7 @@
                  url: "@Url.Action("Reply_EmotionAction_Cancel")",
                     data: { ReplyID: replyId},
                     success: function (data) {
+                        badpoint.innerText = parseInt(badpoint.innerText) - 1;
                     },
                     error: function (data) {
                     }
@@ -293,5 +292,6 @@
         }
     }
 
+   
 </script>
 

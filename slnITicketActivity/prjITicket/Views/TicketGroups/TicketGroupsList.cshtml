@@ -48,24 +48,36 @@
         //獲得關鍵字搜尋到的套票頁面的方法
         $("#btnSearch").click(function () {
             let keyword = $("#txtKeyword").val();
-
             let orderMode = $(":radio:checked").val();
 
             let priceFilter = $("#priceFilter").prop("checked") ? 1 : 0;
             let values = html5Slider.noUiSlider.get();
             let minPrice = Math.round(values[0]);
-            let maxPrice = Math.round(values[1]);  
+            let maxPrice = Math.round(values[1]);
+            if (keyword.length != 0) {               
+                condition = { keyword: keyword, mode: "keyword", priceFilter: priceFilter, minPrice: minPrice, maxPrice: maxPrice };
 
-            condition = { keyword: keyword, mode: "keyword", priceFilter: priceFilter, minPrice: minPrice, maxPrice: maxPrice};
+                $.ajax({
+                    type: "get",
+                    url: "@Url.Action("GetTicketGroupsPagesByKeyword")",
+                    data: { keyword: keyword, orderMode: orderMode, priceFilter: priceFilter, minPrice: minPrice, maxPrice: maxPrice },
+                    success: function (result) {
+                        $("#showTicketGroupsPages").html(result);
+                    }
+                });
+            }
+            else {
+                condition = { mode: "all", priceFilter: priceFilter, minPrice: minPrice, maxPrice: maxPrice };
 
-            $.ajax({
-                type: "get",
-                url: "@Url.Action("GetTicketGroupsPagesByKeyword")",
-                data: { keyword: keyword, orderMode: orderMode, priceFilter: priceFilter, minPrice: minPrice, maxPrice: maxPrice },
-                success: function (result) {
-                    $("#showTicketGroupsPages").html(result);
-                }
-            });
+                $.ajax({
+                    type: "get",
+                    url: "@Url.Action("GetTicketGroupsPages")",
+                    data: { orderMode: orderMode, priceFilter: priceFilter, minPrice: minPrice, maxPrice: maxPrice },
+                    success: function (data) {                        
+                        $("#showTicketGroupsPages").html(data);
+                    }
+                });
+            }
         });
         //價格排序器有變化就執行以下
         $(":radio").change(function () {

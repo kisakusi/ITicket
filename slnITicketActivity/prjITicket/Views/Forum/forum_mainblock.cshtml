@@ -25,7 +25,6 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xl-2 col-md-3 col-sm-12 sidebar">
-
             <div style="text-overflow: ellipsis;">
                 @Html.ActionLink("所有文章的列表", "forum_mainblock", "Forum", null, null)
             </div>
@@ -37,10 +36,13 @@
                 </div>
             }
 
-
-            <div class="navbar-fixed-bottom" style="bottom:100px;">
-                <a href="~/Forum/before_Add_article" class="btn btn-info btn-lg" style="font-size:8vmin;position:fixed; bottom:50px;">
-                    <span class="glyphicon"></span> 發文
+            <div class="navbar-fixed-bottom" style="bottom:100px;  ">
+                <a class="btn btn-primary" id="btnSend" href="~/Forum/before_Add_article" title="發文" style="font-weight:bold; border-radius:50%; box-shadow:3px 3px 3px black;font-size:6vmin;position:fixed; bottom:50px;">
+                    <i class="fas fa-edit" style="padding-left: 17px; padding-bottom: 22px; padding-right: 2px; "></i>
+                    @*<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-plus-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                    </svg>*@
                 </a>
             </div>
         </div>
@@ -49,47 +51,125 @@
             <!-- Page Content -->
             <!-- Page Heading -->
             <div class="form-group col-6 my-4">
-                <input type="text" id="searchWord" class="form-control" placeholder="搜索文章" style="font-size:20px;" />
+                <input type="text" id="searchWord" class="form-control" placeholder="搜索文章" style="font-size:20px;" onblur="SearchArticle()" />
             </div>
-            <div class="form-check col-6 my-4">
+            <div class="form-check col-6">
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" value="2" id="Editor" />
+                    <input class="form-check-input" type="checkbox" value="2" id="Editor" onclick="SearchArticle()" />
                     <label class="form-check-label" for="Editor">作者</label>
                 </div>
-
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" value="3" id="Title" />
+                    <input class="form-check-input" type="checkbox" value="3" id="Title" onclick="SearchArticle()" />
                     <label class="form-check-label" for="Title">標題</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" value="5" id="Content" />
+                    <input class="form-check-input" type="checkbox" value="5" id="Content" onclick="SearchArticle()" />
                     <label class="form-check-label" for="Content">內文</label>
                 </div>
             </div>
         </div>
 
 
-
-
         <!-- Project One -->
         <div class="col-xl-2 col-md-3"></div>
         <div class=" col-md-9 col-sm-12" id="contentList">
 
+            <h1 class="my-4">
+                所有的文章列表
+            </h1>
+
+            @foreach (var item in Model.Article.Take(4))
+            {
+
+                <div class="row">
+                    <div class="col-xl-1" style="height:auto"></div>
+                    <div class="col-xl-5 col-lg-6 col-md-10">
+                        <a href="~/Forum/forum_content/?articleID=@item.ArticleID"><img id="img@(count)" class="img-fluid rounded mb-3 mb-md-0" style="width:600px;" src="@item.Picture" alt=""></a>
+                    </div>
+                    <div class="col-xl-4 col-lg-6 col-md-10">
+                        @if (member != null && (member.MemberRoleId==3 || item.MemberID == member.MemberID))
+                        {
+                            @Html.ActionLink(" 刪除 ", "Delete", "Forum", new { articleID = item.ArticleID }, null);
+                            @Html.ActionLink(" 編輯 ", "before_Edit_article", "Forum", new { articleID = item.ArticleID }, null);
+                        }
+                        <h3>@Html.ActionLink(string.IsNullOrEmpty(item.ArticleTitle) ? "沒有標題" : item.ArticleTitle, "forum_content", "Forum", new { articleID = item.ArticleID }, null)</h3>
+                        <p id="content" style="overflow:hidden;white-space: nowrap;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;white-space: normal;">
+                            @RemoveHtml(item.ArticleContent)
+                        </p>
+                        @Html.ActionLink("更多", "forum_content", "Forum", new { articleID = item.ArticleID }, new { @class = "btn btn-primary" })
+                    </div>
+                </div>
+
+                <hr>
+                count++;
+            }
+            <!-- Pagination -->
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                @for (int i = 0; i <= Model.page; i++)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="page(@i)">@(i + 1)</a>
+                    </li>
+                }
+
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
         </div>
         <!-- Pagination -->
     </div>
 </div>
-
 <script>
-        $(function () {
-        $.ajax({
-            type: "post",
-            url: "@Url.Action("SearchArticle")",
-            success: function (result) {
-             $("#contentList").empty().html(result)
-             }
+    function page(Page) {
+        var page = Page;
+            var searchText = $("#searchWord").val();
+        var CategoryID = @Model.ArticleCategoryID
+             $.ajax({
+                type: "post",
+                url: "@Url.Action("SearchArticle")",
+                data: { searchText: searchText, Page: page, CategoryID: CategoryID },
+                success: function (result) {
+                    $("#contentList").empty().html(result)
+                }
             })
-    })
+        }
+    function SearchArticle() {
+        var area1 = 1;
+        var area2 = 1;
+        var area3 = 1;
+        if ($("#Editor").prop("checked")) {
+            area1 = 2;
+        }
+        if ($("#Title").prop("checked")) {
+            area2 = 3;
+        }
+        if ($("#Content").prop("checked")) {
+            area3 = 5;
+        }
+        var searchType = area1 * area2 * area3;
+            var CategoryID = @Model.ArticleCategoryID;
+            var searchText = $("#searchWord").val();
+            var Page = null;
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("SearchArticle")",
+                data: { searchText: searchText, CategoryID: CategoryID, searchType: searchType },
+                success: function (result) {
+                    $("#contentList").empty().html(result)
+                }
+            })
+    }
+
         function category(ID) {
         var CategoryID = ID.id;
         var searchText = $("#searchWord").val();
@@ -103,5 +183,4 @@
              }
             })
     }
-    
 </script>

@@ -17,8 +17,8 @@ namespace prjITicket.Controllers
         // 首頁按下套票後呼叫的Controller
         public ActionResult TicketGroupsList()
         {
-            List<TicketGroups> ticketgroups = db.TicketGroups.ToList();
-
+            List<TicketGroups> ticketgroups = db.TicketGroups.Where(t=>t.Status==true).ToList();
+            //if (ticketgroups.Count() == 0) return View("ProductNotFound","_Layout");
             // todo取出套票中各個活動最便宜的票價，然後加總乘以套票的優惠折扣，其中最貴的套票的價錢          
             int max = (int)ticketgroups.Max(ticketGroup => Math.Round(ticketGroup.TicketGroupDetail.Select(
                 tgd => { return tgd.Activity.Tickets.Count() == 0 ? 0 : tgd.Activity.Tickets.Min(t => t.Price); }).Sum() * (1 - ticketGroup.TicketGroupDiscount), 0));
@@ -65,6 +65,24 @@ namespace prjITicket.Controllers
             }
         }
 
+        //tobeadd讓Ajax調用的方法，在TicketGroupsDetail的View中，每次按下數量加號，根據票種和場次判斷是否還有票
+        public string isTicketsStillInStock(int ticketCategoryId, int ticketTimeId, int trCount)
+        {
+            Tickets ticket = db.Tickets.FirstOrDefault(t => t.TicketCategoryId == ticketCategoryId && t.TicketTimeId == ticketTimeId);
+            if(ticket == null)
+            {
+                return "暫無提供";
+            }
+            else if (++trCount > ticket.UnitsInStock)
+            {
+                return "已售完";
+            }
+            else
+            {
+                return "還有票";
+            }
+        }
+
         //在TicketGroupsList頁面中Ajax調用這個方法取得活動分頁
         public ActionResult GetTicketGroupsPages(int page = 1, string orderMode = "pricedown", int minPrice = 0, int maxPrice = int.MaxValue, int priceFilter = 0)
         {
@@ -73,8 +91,8 @@ namespace prjITicket.Controllers
             //ViewBag紀錄此Action方法，才能執行正確的換頁
             ViewBag.ActionName = "GetTicketGroupsPages";
             //ViewBag紀錄此OrderMode，因為換頁時也會呼叫此方法
-            ViewBag.OrderMode = orderMode;
-            List<TicketGroups> ticketgroups = db.TicketGroups.ToList();
+            ViewBag.OrderMode = orderMode;            
+            List<TicketGroups> ticketgroups = db.TicketGroups.Where(t=>t.Status==true).ToList();
             if (priceFilter == 1)
             {
                 ViewBag.PriceFilter = 1;
@@ -108,7 +126,7 @@ namespace prjITicket.Controllers
             ViewBag.OrderMode = orderMode;
             List<Activity> activities = db.Activity.Where(a => a.ActivityStatusID == 1 && a.ActivityName.ToLower().Contains(keyword.ToLower())).ToList();
             List<int> activityIds = activities.Select(a => a.ActivityID).ToList();
-            List<TicketGroups> groups = db.TicketGroups.AsEnumerable().Where(tg =>
+            List<TicketGroups> groups = db.TicketGroups.Where(t=>t.Status==true).AsEnumerable().Where(tg =>
             {
                 foreach (TicketGroupDetail tgd in tg.TicketGroupDetail)
                 {

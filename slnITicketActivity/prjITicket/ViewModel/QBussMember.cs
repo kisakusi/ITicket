@@ -18,7 +18,7 @@ namespace prjITicket.ViewModel
         public string Passport { get; set; }
         public string NickName { get; set; }
         public Nullable<System.DateTime> BirthDate { get; set; }
-        [RegularExpression(@"^(?=.*\d).{10,10}$", ErrorMessage = "手機號碼10碼")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "手機號碼10碼")]
         public string Phone { get; set; }
         [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*\d).{8,12}$", ErrorMessage = "密碼請輸入8-12碼,至少一個英文及數字")]
         public string Password { get; set; }
@@ -33,11 +33,14 @@ namespace prjITicket.ViewModel
 
         public int SellerID { get; set; }
         public string CompanyName { get; set; }
-        [RegularExpression(@"^(?=.*\d).{8,8}$", ErrorMessage = "統編8碼")]
+        [RegularExpression(@"^\d{8}$", ErrorMessage = "統編需8碼")]
         public string TaxIDNumber { get; set; }
         public string SellerHomePage { get; set; }
+        
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "手機號碼需10碼")]        
         public string SellerPhone { get; set; }
         public string SellerDeccription { get; set; }
+        public Nullable<bool> fPass { get; set; }
         
 
     }

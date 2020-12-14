@@ -86,6 +86,9 @@
         <AssociationConnector Association="TicketSysModel.FK_ActivityFavourite_Activity" />
         <AssociationConnector Association="TicketSysModel.FK_ActivityFavourite_Member" />
         <EntityTypeShape EntityType="TicketSysModel.ActivityFailedReason" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TicketSysModel.Ad_Article_Activity" Width="1.5" PointX="20.75" PointY="16.5" />
+        <AssociationConnector Association="TicketSysModel.FK_Ad_Article_Activity_Activity" />
+        <AssociationConnector Association="TicketSysModel.FK_Ad_Article_Activity_Article" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

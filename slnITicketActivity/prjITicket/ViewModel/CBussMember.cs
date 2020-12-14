@@ -52,6 +52,6 @@ namespace prjITicket.ViewModel
         public string SellerHomePage { get { return this.BussEntity.SellerHomePage; } }
         public string SellerPhone { get { return this.BussEntity.SellerPhone; } }
         public string SellerDeccription { get { return this.BussEntity.SellerDeccription; } }
-
+        public Nullable<bool> fPass { get { return this.BussEntity.fPass; } }
     }
 }

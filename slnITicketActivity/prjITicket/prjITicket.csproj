@@ -165,6 +165,9 @@
     <Content Include="Content\BackEnd\demo\chart-bar-demo.js" />
     <Content Include="Content\BackEnd\demo\chart-pie-demo.js" />
     <Content Include="Content\BackEnd\demo\datatables-demo.js" />
+    <Content Include="Content\BackEnd\js\BackEndArticle01.js" />
+    <Content Include="Content\BackEnd\js\BackEndArticle02.js" />
+    <Content Include="Content\BackEnd\js\BackEndDemoMA.js" />
     <Content Include="Content\BackEnd\js\BackEndMember01.js" />
     <Content Include="Content\BackEnd\js\BackEndMember02.js" />
     <Content Include="Content\BackEnd\js\scripts.js" />
@@ -367,14 +370,19 @@
     <Content Include="Content\Forum_use\forumcontent.css" />
     <Content Include="Content\Forum_use\ImageStore\0dce6959-6791-4235-9a76-8b68e9b21706.jpg" />
     <Content Include="Content\Forum_use\ImageStore\1144.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\170aa7b6-1e62-4c9f-bce5-1b76cf85212b.jpg" />
     <Content Include="Content\Forum_use\ImageStore\2ee498cf-67ee-4210-bec0-3745413a49dd.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\306acb90-fc29-4d90-8b53-fffd6ee0cb84.jpg" />
     <Content Include="Content\Forum_use\ImageStore\3a9ba3f5-f46a-4b67-9f13-280069f41fa2.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4bef9b91-f571-46db-bd1e-6eaa0041b8a4.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4cb018cc-309e-4d9c-977d-909f2e2a205e.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4ed66f04-19e6-400a-8a51-f78fe7fdf5e5.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4f4af66d-c130-4657-af6f-0fd500cd8ebd.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\5456471c-d8f6-422d-8572-95709d4d5c03.jpg" />
     <Content Include="Content\Forum_use\ImageStore\6d90aef4-0044-4f93-a162-65032004fadc.jpg" />
     <Content Include="Content\Forum_use\ImageStore\73029c2f-73cd-4626-92cd-56cb242ddc50.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\78fbadfd-de5c-471c-893e-bd574d605003.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\7dc95bc5-5ab6-42b7-bf62-9183ee4f35b6.jpg" />
     <Content Include="Content\Forum_use\ImageStore\80daf9cd-f192-4708-9035-59f42e9944be.jpg" />
     <Content Include="Content\Forum_use\ImageStore\822d2698-a877-4544-9dea-3fb9dc7a45df.jpg" />
     <Content Include="Content\Forum_use\ImageStore\8af19fe7-96d6-4691-b539-2f083f8c5300.jpg" />
@@ -383,12 +391,17 @@
     <Content Include="Content\Forum_use\ImageStore\a4f3d2b4-82eb-444f-b29b-c729449e7398.jpg" />
     <Content Include="Content\Forum_use\ImageStore\b7e3ee1d-c30e-42d5-9598-d704ccfc9358.jpg" />
     <Content Include="Content\Forum_use\ImageStore\b8659b1f-6e23-417a-b2a1-cc0c9adf02da.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\bf8213d2-f5a5-48f3-bc76-51839e70f86a.jpg" />
     <Content Include="Content\Forum_use\ImageStore\c24f63f8-5e1d-44b7-943e-9caf183927c5.jpg" />
     <Content Include="Content\Forum_use\ImageStore\c2bad02e-f88a-47de-876c-b4793644ec60.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\cb82961c-4f04-479c-8f2d-1bfe0d1e0902.jpg" />
     <Content Include="Content\Forum_use\ImageStore\d58bd604-0563-46c3-baeb-eb33635e6072.jpg" />
     <Content Include="Content\Forum_use\ImageStore\d5ef6e91-cc2b-4621-85b0-5ea131664680.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\d8634d5e-d55f-44d4-bc16-90f03ac00c3f.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\deae2d8a-3d9f-4465-8fb1-031a1cbcdc1f.jpg" />
     <Content Include="Content\Forum_use\ImageStore\default.jpg" />
     <Content Include="Content\Forum_use\ImageStore\e12812f1-f5f7-4b54-aac7-7f89ea0cde73.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\e20db465-7952-4ab0-a660-96364b265518.jpg" />
     <Content Include="Content\Forum_use\ImageStore\e821a0be-f276-401e-a0a1-178db393c50b.jpg" />
     <Content Include="Content\Forum_use\ImageStore\fa6519b6-ec44-4989-a702-07beb058fbf6.jpg" />
     <Content Include="Content\Forum_use\img\anonymous.jpg" />
@@ -452,6 +465,7 @@
     <Content Include="Content\Login\fonts\poppins\roboto-condensed-v16-latin-700italic.svg" />
     <Content Include="Content\Login\fonts\poppins\roboto-condensed-v16-latin-italic.svg" />
     <Content Include="Content\Login\fonts\poppins\roboto-condensed-v16-latin-regular.svg" />
+    <Content Include="Content\Login\footerstyle.css" />
     <Content Include="Content\Login\functionCS\ShowPassword.css" />
     <Content Include="Content\Login\functionJS\GoogleReCaptchaAPI.js" />
     <Content Include="Content\Login\images\form-v1-1.png" />
@@ -466,6 +480,10 @@
     <Content Include="Content\Login\images\signin-image.jpg" />
     <Content Include="Content\Login\images\signup-image.jpg" />
     <Content Include="Content\Login\images\wizard-v4.jpg" />
+    <Content Include="Content\Login\SellerImageSQL0907.sql" />
+    <Content Include="Content\Login\SellerImage\2.jpg" />
+    <Content Include="Content\Login\SellerImage\anonymous.jpg" />
+    <Content Include="Content\Login\SellerImage\git版本控制解釋.txt" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\Site.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -599,6 +617,9 @@
     <Content Include="Content\BackEnd\node_modules\jquery\external\sizzle\dist\sizzle.min.map" />
     <Content Include="Content\BackEnd\node_modules\jquery\package.json" />
     <Content Include="Content\BackEnd\node_modules\jquery\README.md" />
+    <Content Include="Content\Login\DemoFile\企業合同確認書.docx" />
+    <Content Include="Content\Login\SellerImage\201教室座位表.pdf" />
+    <Content Include="Content\Login\SellerImage\TicketSys.bak" />
     <None Include="Properties\PublishProfiles\shoppingcarajax - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -621,13 +642,16 @@
     <Compile Include="ChatHub.cs" />
     <Compile Include="Controllers\ActivityController.cs" />
     <Compile Include="Controllers\BackEndActivityController.cs" />
+    <Compile Include="Controllers\BackEndArticleController.cs" />
     <Compile Include="Controllers\BackEndMemberController.cs" />
     <Compile Include="Controllers\BackEndOrderController.cs" />
+    <Compile Include="Controllers\BackEndTicketGroupController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\ForumController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\BackEndApiController.cs" />
+    <Compile Include="Controllers\QRCodeController.cs" />
     <Compile Include="Controllers\SellerCenterController.cs" />
     <Compile Include="Controllers\TicketGroupsController.cs" />
     <Compile Include="Global.asax.cs">
@@ -645,6 +669,9 @@
     <Compile Include="Models\ActivityStatus.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Ad_Article_Activity.cs">
+      <DependentUpon>TicketSysModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Article.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
@@ -657,6 +684,7 @@
     <Compile Include="Models\Article_Report.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\BackEndArticleFactory.cs" />
     <Compile Include="Models\BackEndMemberFactory.cs" />
     <Compile Include="Models\BanLIst.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
@@ -682,6 +710,7 @@
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\facebook.cs" />
+    <Compile Include="Models\Forum\Authority.cs" />
     <Compile Include="Models\Forum\CCropImage.cs" />
     <Compile Include="Models\Forum\CForum_ArticleList_Factory.cs" />
     <Compile Include="Models\Forum\CleanClear.cs" />
@@ -763,9 +792,15 @@
     <Compile Include="Models\CActivity.cs" />
     <Compile Include="Service\MailService.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="ViewModel\CBackEndActivity.cs" />
-    <Compile Include="ViewModel\CBackEndOrderDetail.cs" />
-    <Compile Include="ViewModel\CBackEndOrders.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndActivity.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndActivityDetail.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndActivityDetailModel.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndActivityReason.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndActivityTimes.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndOrderDetail.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndOrders.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndTicketGroupDetail.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndTicketGroupList.cs" />
     <Compile Include="ViewModel\CBussMember.cs" />
     <Compile Include="ViewModel\CBussRegister.cs" />
     <Compile Include="ViewModel\CMember.cs" />
@@ -832,7 +867,6 @@
     <Content Include="Views\Shared\_BackSellerLayout.cshtml" />
     <Content Include="Views\Login\Forget.cshtml" />
     <Content Include="Views\Login\getActivityFavouriteByMemberId.cshtml" />
-    <Content Include="Views\Login\getOrderbyEmail.cshtml" />
     <Content Include="Views\Login\getShortMassageByMemberId.cshtml" />
     <Content Include="Views\Login\PasswordValidate.cshtml" />
     <Content Include="Views\Activity\OrderDetailByTicketGroup.cshtml" />
@@ -840,6 +874,15 @@
     <Content Include="Views\Activity\ZeroActivity.cshtml" />
     <Content Include="Views\Activity\UploadTicketGroup.cshtml" />
     <Content Include="Views\Activity\CustomerSupport.cshtml" />
+    <Content Include="Views\BackEndArticle\ArticleList.cshtml" />
+    <Content Include="Views\BackEndTicketGroup\TicketGroupDetail.cshtml" />
+    <Content Include="Views\BackEndTicketGroup\TicketGroupMaintain.cshtml" />
+    <Content Include="Views\Forum\forum_Activity.cshtml" />
+    <Content Include="Views\Forum\GetActivityPages.cshtml" />
+    <Content Include="Views\Forum\GetActivitySubDetailPage.cshtml" />
+    <Content Include="Views\Login\getOrderbyMemberId.cshtml" />
+    <Content Include="Views\SellerCenter\PackageCenter.cshtml" />
+    <Content Include="Views\SellerCenter\PackageCenterM.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

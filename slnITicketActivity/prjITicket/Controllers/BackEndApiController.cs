@@ -2,6 +2,7 @@
 using LinqKit;
 using prjITicket.Models;
 using prjITicket.ViewModel;
+using prjITicket.ViewModel.BackEnd;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,14 @@ namespace BackEnd.Controllers
         public int StatusID { get => statusID; set => statusID = value; }
         public int ActivityID { get => activityID; set => activityID = value; }
     }
+    public class updateNoPassMessage
+    {
+        private int sellerID;
+        private string message;
+
+        public int SellerID { get => sellerID; set => sellerID = value; }
+        public string Message { get => message; set => message = value; }
+    }
     public class OrderQuery
     {
         private string orderStatus0;//未付款
@@ -50,6 +59,33 @@ namespace BackEnd.Controllers
         private string orderID;
 
         public string OrderID { get => orderID; set => orderID = value; }
+    }
+
+    public class TicketGroupList
+    {
+        private string ticketGroupName;//套票名稱
+        private string companyName;//商家名稱
+        private string ticketGroupStatus1;//套票審核狀態
+        private string ticketGroupStatus2;//套票審核狀態
+
+        public string TicketGroupName { get => ticketGroupName; set => ticketGroupName = value; }
+        public string CompanyName { get => companyName; set => companyName = value; }
+        public string TicketGroupStatus1 { get => ticketGroupStatus1; set => ticketGroupStatus1 = value; }
+        public string TicketGroupStatus2 { get => ticketGroupStatus2; set => ticketGroupStatus2 = value; }
+    }
+    public class updateTicketGroupStatus
+    {
+        private bool status;
+        private int ticketGroupID;
+
+        public bool Status { get => status; set => status = value; }
+        public int TicketGroupID { get => ticketGroupID; set => ticketGroupID = value; }
+    }
+    public class getTiketTimes
+    {
+        private int activityID;
+
+        public int ActivityID { get => activityID; set => activityID = value; }
     }
 
     public class WebApiController : ApiController
@@ -103,16 +139,24 @@ namespace BackEnd.Controllers
                 predicate_Status = predicate_Status.Or(st => st.ActivityStatusID.Equals(AcStatusID2));
 
             backEndActivities = from a in ticket.Activity.Where(predicate_Activity)
+
                                 join s in ticket.Seller.Where(predicate_seller)
                                 on a.SellerID equals s.SellerID
+
                                 join status in ticket.ActivityStatus.Where(predicate_Status)
                                 on a.ActivityStatusID equals status.ActivityStatusID
-                                select new CBackEndActivity { ActivityEntity = a, Seller = s, ActivityStatus = status };
+
+                                select new CBackEndActivity
+                                {
+                                    ActivityEntity = a,
+                                    Seller = s,
+                                    ActivityStatus = status,
+                                };
 
             return backEndActivities.ToList();
         }
 
-        //後台產品審核API
+        //後台產品審核成功API
         [HttpPut]
         public string updateActivtyStatus([FromBody]updateActivtyStatus updateActivtyStatus)
         {
@@ -140,6 +184,32 @@ namespace BackEnd.Controllers
             }
 
         }
+
+        //後臺活動審核未通過，傳送通知給商家API
+        [HttpPost]
+        public void updateNoPassMessage([FromBody]updateNoPassMessage updateNoPassMessage)
+        {
+
+            int SellerID = updateNoPassMessage.SellerID;
+            string Message = updateNoPassMessage.Message;
+
+            ShortMessage shortMessage = new ShortMessage();
+
+            var memberid = (
+                from seller in ticket.Seller
+                from m in ticket.Member
+                where seller.MemberId == m.MemberID
+                && seller.SellerID == SellerID
+                select m.MemberID).FirstOrDefault();
+
+
+            shortMessage.MemberID = memberid;
+            shortMessage.MessageContent = Message;
+
+            ticket.ShortMessage.Add(shortMessage);
+            ticket.SaveChanges();
+        }
+
 
         //後台訂單查詢API
         [HttpPost]
@@ -170,10 +240,10 @@ namespace BackEnd.Controllers
                 predicate_OrderGuid = predicate_OrderGuid.And(o => o.OrderGuid.Equals(OrderGuid));
 
             if (!string.IsNullOrEmpty(UserName))
-                predicate_UserName = predicate_UserName.And(o => o.Name.Equals(UserName));
+                predicate_UserName = predicate_UserName.And(o => o.Name.Contains(UserName));
 
             if (!string.IsNullOrEmpty(UserEmail))
-                predicate_UserEmail = predicate_UserEmail.And(o => o.Email.Equals(UserEmail));
+                predicate_UserEmail = predicate_UserEmail.And(o => o.Email.Contains(UserEmail));
 
             if (!string.IsNullOrEmpty(OrderStatus0))
                 predicate_OrdersStatus = predicate_OrdersStatus.Or(o => o.OrderStatus.Equals(OrderStatus0_bool));
@@ -195,11 +265,10 @@ namespace BackEnd.Controllers
         [HttpPost]
         public List<CBackEndOrderDetail> getOrderDetail([FromBody]OrderDetail orderDetail)
         {
-            string OrderID = orderDetail.OrderID;        
+            string OrderID = orderDetail.OrderID;
             int Orderid;
             int.TryParse(OrderID, out Orderid);
-
-
+   
             IQueryable<CBackEndOrderDetail> BackEndOrders = null;
 
             Orders Orders = new Orders();
@@ -259,6 +328,126 @@ namespace BackEnd.Controllers
                             };
 
             return BackEndOrders.ToList();
+        }
+
+        //後台套票查詢API
+        [HttpPost]
+        public List<CBackEndTicketGroupList> getTicketGroupList([FromBody]TicketGroupList ticketGroupList)
+        {
+            string TGstatus1 = ticketGroupList.TicketGroupStatus1;
+            bool Status1;
+            bool.TryParse(TGstatus1, out Status1);
+
+            string TGstatus2 = ticketGroupList.TicketGroupStatus2;
+            bool Status2;
+            bool.TryParse(TGstatus2, out Status2);
+
+            string CompanyName = !string.IsNullOrEmpty(ticketGroupList.CompanyName) ? ticketGroupList.CompanyName.Trim() : null;
+            string TicketGroupName = !string.IsNullOrEmpty(ticketGroupList.TicketGroupName) ? ticketGroupList.TicketGroupName.Trim() : null;
+
+
+            IQueryable<CBackEndTicketGroupList> TicketGroupList = null;
+
+            var predicate_TicketGroupName = PredicateBuilder.New<TicketGroups>(true);
+            var predicate_CompanyName = PredicateBuilder.New<Seller>(true);
+            var predicate_TGStatus = PredicateBuilder.New<TicketGroups>(false);
+
+            if (!string.IsNullOrEmpty(CompanyName))
+                predicate_CompanyName = predicate_CompanyName.And(s => s.CompanyName.Contains(CompanyName));
+
+            if (!string.IsNullOrEmpty(TicketGroupName))
+                predicate_TicketGroupName = predicate_TicketGroupName.And(tgn => tgn.TicketGroupName.Contains(TicketGroupName));
+
+            if (!string.IsNullOrEmpty(TGstatus1))
+                predicate_TGStatus = predicate_TGStatus.Or(tg => tg.Status.Equals(Status1));
+
+            if (!string.IsNullOrEmpty(TGstatus2))
+                predicate_TGStatus = predicate_TGStatus.Or(tg => tg.Status.Equals(Status2));
+
+            TicketGroupList = (from tg in ticket.TicketGroups.Where(predicate_TicketGroupName).Where(predicate_TGStatus)
+
+                               join tgd in ticket.TicketGroupDetail
+                               on tg.TicketGroupId equals tgd.TicketGroupId
+
+                               join a in ticket.Activity
+                               on tgd.ActivityId equals a.ActivityID
+
+                               join s in ticket.Seller.Where(predicate_CompanyName)
+                               on a.SellerID equals s.SellerID
+
+
+                               select new CBackEndTicketGroupList
+                               {
+                                   TicketGroups = tg,
+                                   Seller = s
+                               }).Distinct();
+
+            return TicketGroupList.ToList();
+        }
+
+        //後台套票審核成功API
+        [HttpPut]
+        public string updateTicketGroupStatus([FromBody]updateTicketGroupStatus updateTicketGroupStatus)
+        {
+            try
+            {
+                bool status = updateTicketGroupStatus.Status;
+                int TicketGroupID = updateTicketGroupStatus.TicketGroupID;
+
+                var TicketGroup = ticket.TicketGroups.Where(tg => tg.TicketGroupId == TicketGroupID).FirstOrDefault();
+
+                TicketGroup.Status = status;
+
+                int num = ticket.SaveChanges();
+                if (num == 1)
+                {
+                    return "true";
+                }
+                else
+                {
+                    return "false";
+                }
+            }
+            catch (Exception ex)
+            {
+                return (ex.Message);
+
+            }
+
+        }
+
+        //後臺套票審核未通過，傳送通知給商家API
+        [HttpPost]
+        public void TicketGroupNoPassMessage([FromBody]updateNoPassMessage updateNoPassMessage)
+        {
+            int SellerID = updateNoPassMessage.SellerID;
+            string Message = updateNoPassMessage.Message;
+
+            ShortMessage shortMessage = new ShortMessage();
+
+            var memberid = (
+                from seller in ticket.Seller
+                from m in ticket.Member
+                where seller.MemberId == m.MemberID
+                && seller.SellerID == SellerID
+                select m.MemberID).FirstOrDefault();
+
+            shortMessage.MemberID = memberid;
+            shortMessage.MessageContent = Message;
+
+            ticket.ShortMessage.Add(shortMessage);
+            ticket.SaveChanges();
+        }
+
+        //套票->活動->場次
+        [HttpPost]
+        public List<DateTime> getTicketTimes([FromBody]getTiketTimes getTiketTimes)
+        {
+            int ActivityID = getTiketTimes.ActivityID;
+
+            List<DateTime> ticketTimes = ticket.TicketTimes.Where(t => t.ActivityId == ActivityID).Select(s => s.TicketTime).ToList();
+
+            return ticketTimes;
         }
     }
 }

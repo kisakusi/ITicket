@@ -9,6 +9,7 @@
 <script src="~/Content/Login/functionJS/GoogleReCaptchaAPI.js"></script>
 @*顯示或隱藏密碼*@
 <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+
 @{
     ViewBag.Title = "登入";
 
@@ -37,7 +38,7 @@
                             <div class="form-group">
                                 <label for="your_name"><i class="zmdi zmdi-account material-icons-name" style="font-size:24px"></i></label>
                                 @*<input type="Email" name="Email" id="Email" placeholder="Your Email" />*@
-                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @placeholder = "你的Email" } })
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @placeholder = "你的Email", id = "youremail" } })
                             </div>
                             <div class="form-group" style="position:relative">
                                 <label for="your_pass"><i class="zmdi zmdi-lock" style="font-size:20px"></i></label>
@@ -49,13 +50,13 @@
                                 <input type="checkbox" name="remember-me" id="remember-me" class="agree-term" />
                                 <label for="remember-me" class="label-agree-term"><span><span></span></span>記住帳密</label>
                             </div>
-                            <div class="g-recaptcha " data-sitekey="6LdLEP8ZAAAAALCj9nZjFMuqSQjxfT-eZvtQNV-n" data-theme="dark" ></div>
-                            
+                            <div class="g-recaptcha " data-sitekey="6LdLEP8ZAAAAALCj9nZjFMuqSQjxfT-eZvtQNV-n" data-theme="dark"></div>
+
                             @*<div>
 
-                                @ViewFunc.ReCaptchaWidget(Html, "signin", Url.Action("ValidateReCAPTCHA", "Login"), "dark")
+                                    @ViewFunc.ReCaptchaWidget(Html, "signin", Url.Action("ValidateReCAPTCHA", "Login"), "dark")
 
-                            </div>*@
+                                </div>*@
 
                             <div class="form-group form-button">
                                 <input type="submit" name="signin" id="signin" class="form-submit" value="登入" @*disabled*@ />
@@ -78,7 +79,9 @@
                         </div>
                     </div>
                 </div>
-
+                <a href="#" class="btn btn-secondary" id="mangeruser">管理員</a>
+                <a href="#" class="btn btn-secondary" id="user">一般使用者</a>
+                <a href="#" class="btn btn-secondary" id="bussuser">商家</a>
             </div>
 
         </section>
@@ -86,6 +89,20 @@
     </div>
 }
 
+<script>
+    $("#mangeruser").click(function () {
+        $("#youremail").val("admin");
+        $("#pwd").val("admin");
+    });
+    $("#user").click(function () {
+        $("#youremail").val("iticketshopping@gmail.com");
+        $("#pwd").val("zz01020304");
+    });
+    $("#bussuser").click(function () {
+        $("#youremail").val("fantasysdo@yahoo.co.jp");
+        $("#pwd").val("admin");
+    });
+</script>
 
 <script>
     $(function () {

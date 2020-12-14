@@ -21,7 +21,7 @@
 
     <!--查詢條件-->
 
-    <div class="card mb-4">
+    <div class="card mb-4" >
         <div class="card-body">
             <div class="card-title">
                 查詢條件
@@ -73,7 +73,7 @@
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="OrderTable" style="width:100%" cellspacing="0"></table>
+                    <table class="table table-bordered" id="OrderTable" style="width:100%;font-size:14px" cellspacing="0"></table>
 
                 </div>
             </div>
@@ -84,7 +84,6 @@
 <script>
 
     function OrderDetail(OrderID, OrderGuid) {
-        //console.log(OrderID, OrderGuid);
         let OrderDetailTitle = `<label style="font-size:20px">訂單編號：[${OrderGuid}] </label> </br><p style="font-size:20px"> 訂單明細</p>`;
         let OrderDetailhtml = `
                     <input type="text" value="${OrderID}" hidden>
@@ -112,11 +111,15 @@
             lengthMenu: [[5, 10, 20, -1], [5, 10, 20, "All"]],
             autoWidth: false,
             language: {
-                //"info": "", // 表格左下角显示的文字
                 paginate: {
                     previous: "上一頁",
                     next: "下一頁"
-                }
+                },
+                sProcessing: "處理中…",
+                sInfo: "顯示第 _START_ 至 _END_ 筆, 共 _TOTAL_ 筆",
+                sInfoEmpty: "顯示第 0 至 0 筆, 共 0 筆",
+                lengthMenu: "顯示 _MENU_ 項結果",
+                zeroRecords: "沒有符合的結果",
             },
             ajax: {
                 type: "post",
@@ -176,7 +179,6 @@
 
             }
         }
-        //return OrderDetailTablesSettings;
 
         $("#OrderDetailTable").dataTable(OrderDetailTablesSettings);
     }
@@ -190,18 +192,20 @@
         function dataTablesSettings() {
             var dataTablesSettings = {
                 searching: false, //關閉search filter功能
-                //processing: true,
-
                 scrollCollapse: true,
 
                 lengthMenu: [[5, 10, 20, -1], [5, 10, 20, "All"]],
                 autoWidth: false,
                 language: {
-                    //"info": "", // 表格左下角显示的文字
                     paginate: {
                         previous: "上一頁",
                         next: "下一頁"
-                    }
+                    },
+                    sProcessing: "處理中…",
+                    sInfo: "顯示第 _START_ 至 _END_ 筆, 共 _TOTAL_ 筆",
+                    sInfoEmpty: "顯示第 0 至 0 筆, 共 0 筆",
+                    lengthMenu: "顯示 _MENU_ 項結果",
+                    zeroRecords: "沒有符合的結果",
                 },
                 ajax: {
                     type: "post",
@@ -221,7 +225,6 @@
                 //參數值有true/false。
                 //簡單來說，就是讓前端處理分頁的功能
                 serverSide: false,
-
 
                 //指定Server端的資料行繫結名稱
                 columns: [
@@ -260,7 +263,6 @@
                         "title": " ",
                         "data": "OrderID",
                         "render": function (data, type, row, meta) {
-                            //console.log()
                             return data = '<button class="btn btn-info btn-sm" data-id='
                                 + data
                                 + ' onclick="OrderDetail('
@@ -315,12 +317,6 @@
 
     }
 
-
-//OrderDetail
-//var OrderDetail =
-//    ' <div id="OrderDetailBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="AjaxBox" aria-hidden="true" style="z-index: 1600;"> <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document"> <div class="modal-content"> <div class="modal-header"><h5 id="OrderDetailTitle" class="modal-title"></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span> </button> </div> <div id="OrderDetailBody" class="modal-body"></div> <div class="modal-footer"><button id="OK" type="button" class="btn btn-primary" data-dismiss="modal"> 確認</button></div></div> </div> </div>'
-
-
     Date.prototype.Format = function (fmt) {
         var o = {
             "M+": this.getMonth() + 1, //月份 
@@ -328,8 +324,6 @@
             "h+": this.getHours(), //小时 
             "m+": this.getMinutes(), //分 
             "s+": this.getSeconds() //秒 
-            //"q+": Math.floor((this.getMonth() + 3) / 3), //季度 
-            //"S": this.getMilliseconds() //毫秒 
         };
         if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
         for (var k in o)

@@ -44,6 +44,14 @@
           <Property Name="ActivityStatusID" Type="int" Nullable="false" />
           <Property Name="ActivityStatusName" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
+        <EntityType Name="Ad_Article_Activity">
+          <Key>
+            <PropertyRef Name="AdID" />
+          </Key>
+          <Property Name="AdID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ArticleID" Type="int" Nullable="false" />
+          <Property Name="ActivityID" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Article">
           <Key>
             <PropertyRef Name="ArticleID" />
@@ -393,6 +401,30 @@
             </Principal>
             <Dependent Role="ActivityFavourite">
               <PropertyRef Name="MemberId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ad_Article_Activity_Activity">
+          <End Role="Activity" Type="Self.Activity" Multiplicity="1" />
+          <End Role="Ad_Article_Activity" Type="Self.Ad_Article_Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Activity">
+              <PropertyRef Name="ActivityID" />
+            </Principal>
+            <Dependent Role="Ad_Article_Activity">
+              <PropertyRef Name="ActivityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ad_Article_Activity_Article">
+          <End Role="Article" Type="Self.Article" Multiplicity="1" />
+          <End Role="Ad_Article_Activity" Type="Self.Ad_Article_Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Article">
+              <PropertyRef Name="ArticleID" />
+            </Principal>
+            <Dependent Role="Ad_Article_Activity">
+              <PropertyRef Name="ArticleID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -905,6 +937,7 @@
           <EntitySet Name="ActivityFailedReason" EntityType="Self.ActivityFailedReason" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ActivityFavourite" EntityType="Self.ActivityFavourite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ActivityStatus" EntityType="Self.ActivityStatus" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ad_Article_Activity" EntityType="Self.Ad_Article_Activity" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Article" EntityType="Self.Article" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Article_Emotion" EntityType="Self.Article_Emotion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Article_Report" EntityType="Self.Article_Report" Schema="dbo" store:Type="Tables" />
@@ -957,6 +990,14 @@
           <AssociationSet Name="FK_ActivityFavourite_Member" Association="Self.FK_ActivityFavourite_Member">
             <End Role="Member" EntitySet="Member" />
             <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ad_Article_Activity_Activity" Association="Self.FK_Ad_Article_Activity_Activity">
+            <End Role="Activity" EntitySet="Activity" />
+            <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ad_Article_Activity_Article" Association="Self.FK_Ad_Article_Activity_Article">
+            <End Role="Article" EntitySet="Article" />
+            <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
           </AssociationSet>
           <AssociationSet Name="FK_Article_ArticleCategories" Association="Self.FK_Article_ArticleCategories">
             <End Role="ArticleCategories" EntitySet="ArticleCategories" />
@@ -1157,6 +1198,7 @@
           <NavigationProperty Name="Tickets" Relationship="Self.FK_Tickets_Activity" FromRole="Activity" ToRole="Tickets" />
           <NavigationProperty Name="TicketTimes" Relationship="Self.FK_TicketTimes_Activity" FromRole="Activity" ToRole="TicketTimes" />
           <NavigationProperty Name="ActivityFavourite" Relationship="TicketSysModel.FK_ActivityFavourite_Activity" FromRole="Activity" ToRole="ActivityFavourite" />
+          <NavigationProperty Name="Ad_Article_Activity" Relationship="TicketSysModel.FK_Ad_Article_Activity_Activity" FromRole="Activity" ToRole="Ad_Article_Activity" />
         </EntityType>
         <EntityType Name="ActivityStatus">
           <Key>
@@ -1182,6 +1224,7 @@
           <NavigationProperty Name="Article_Report" Relationship="Self.FK_Article_Report_Article_Report" FromRole="Article" ToRole="Article_Report" />
           <NavigationProperty Name="Article_Emotion" Relationship="Self.FK_Emotion_Article" FromRole="Article" ToRole="Article_Emotion" />
           <NavigationProperty Name="Reply" Relationship="Self.FK_Reply_Article" FromRole="Article" ToRole="Reply" />
+          <NavigationProperty Name="Ad_Article_Activity" Relationship="TicketSysModel.FK_Ad_Article_Activity_Article" FromRole="Article" ToRole="Ad_Article_Activity" />
         </EntityType>
         <EntityType Name="Article_Emotion">
           <Key>
@@ -2307,6 +2350,15 @@
             <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
           </AssociationSet>
           <EntitySet Name="ActivityFailedReason" EntityType="TicketSysModel.ActivityFailedReason" />
+          <EntitySet Name="Ad_Article_Activity" EntityType="TicketSysModel.Ad_Article_Activity" />
+          <AssociationSet Name="FK_Ad_Article_Activity_Activity" Association="TicketSysModel.FK_Ad_Article_Activity_Activity">
+            <End Role="Activity" EntitySet="Activity" />
+            <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ad_Article_Activity_Article" Association="TicketSysModel.FK_Ad_Article_Activity_Article">
+            <End Role="Article" EntitySet="Article" />
+            <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ActivityFavourite">
           <Key>
@@ -2349,6 +2401,40 @@
           <Property Name="ActivityFailedReasonID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FailedReason" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="Ad_Article_Activity">
+          <Key>
+            <PropertyRef Name="AdID" />
+          </Key>
+          <Property Name="AdID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ArticleID" Type="Int32" Nullable="false" />
+          <Property Name="ActivityID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Activity" Relationship="TicketSysModel.FK_Ad_Article_Activity_Activity" FromRole="Ad_Article_Activity" ToRole="Activity" />
+          <NavigationProperty Name="Article" Relationship="TicketSysModel.FK_Ad_Article_Activity_Article" FromRole="Ad_Article_Activity" ToRole="Article" />
+        </EntityType>
+        <Association Name="FK_Ad_Article_Activity_Activity">
+          <End Type="TicketSysModel.Activity" Role="Activity" Multiplicity="1" />
+          <End Type="TicketSysModel.Ad_Article_Activity" Role="Ad_Article_Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Activity">
+              <PropertyRef Name="ActivityID" />
+            </Principal>
+            <Dependent Role="Ad_Article_Activity">
+              <PropertyRef Name="ActivityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ad_Article_Activity_Article">
+          <End Type="TicketSysModel.Article" Role="Article" Multiplicity="1" />
+          <End Type="TicketSysModel.Ad_Article_Activity" Role="Ad_Article_Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Article">
+              <PropertyRef Name="ArticleID" />
+            </Principal>
+            <Dependent Role="Ad_Article_Activity">
+              <PropertyRef Name="ArticleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2704,6 +2790,15 @@
               <MappingFragment StoreEntitySet="ActivityFailedReason">
                 <ScalarProperty Name="FailedReason" ColumnName="FailedReason" />
                 <ScalarProperty Name="ActivityFailedReasonID" ColumnName="ActivityFailedReasonID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ad_Article_Activity">
+            <EntityTypeMapping TypeName="TicketSysModel.Ad_Article_Activity">
+              <MappingFragment StoreEntitySet="Ad_Article_Activity">
+                <ScalarProperty Name="ActivityID" ColumnName="ActivityID" />
+                <ScalarProperty Name="ArticleID" ColumnName="ArticleID" />
+                <ScalarProperty Name="AdID" ColumnName="AdID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

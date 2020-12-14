@@ -39,6 +39,14 @@
     <Property Name="ActivityStatusID" Type="int" Nullable="false" />
     <Property Name="ActivityStatusName" Type="nvarchar" MaxLength="50" Nullable="false" />
   </EntityType>
+  <EntityType Name="Ad_Article_Activity">
+    <Key>
+      <PropertyRef Name="AdID" />
+    </Key>
+    <Property Name="AdID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ArticleID" Type="int" Nullable="false" />
+    <Property Name="ActivityID" Type="int" Nullable="false" />
+  </EntityType>
   <EntityType Name="Article">
     <Key>
       <PropertyRef Name="ArticleID" />
@@ -388,6 +396,30 @@
       </Principal>
       <Dependent Role="ActivityFavourite">
         <PropertyRef Name="MemberId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ad_Article_Activity_Activity">
+    <End Role="Activity" Type="Self.Activity" Multiplicity="1" />
+    <End Role="Ad_Article_Activity" Type="Self.Ad_Article_Activity" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Activity">
+        <PropertyRef Name="ActivityID" />
+      </Principal>
+      <Dependent Role="Ad_Article_Activity">
+        <PropertyRef Name="ActivityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ad_Article_Activity_Article">
+    <End Role="Article" Type="Self.Article" Multiplicity="1" />
+    <End Role="Ad_Article_Activity" Type="Self.Ad_Article_Activity" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Article">
+        <PropertyRef Name="ArticleID" />
+      </Principal>
+      <Dependent Role="Ad_Article_Activity">
+        <PropertyRef Name="ArticleID" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -900,6 +932,7 @@
     <EntitySet Name="ActivityFailedReason" EntityType="Self.ActivityFailedReason" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ActivityFavourite" EntityType="Self.ActivityFavourite" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ActivityStatus" EntityType="Self.ActivityStatus" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Ad_Article_Activity" EntityType="Self.Ad_Article_Activity" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Article" EntityType="Self.Article" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Article_Emotion" EntityType="Self.Article_Emotion" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Article_Report" EntityType="Self.Article_Report" Schema="dbo" store:Type="Tables" />
@@ -952,6 +985,14 @@
     <AssociationSet Name="FK_ActivityFavourite_Member" Association="Self.FK_ActivityFavourite_Member">
       <End Role="Member" EntitySet="Member" />
       <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ad_Article_Activity_Activity" Association="Self.FK_Ad_Article_Activity_Activity">
+      <End Role="Activity" EntitySet="Activity" />
+      <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ad_Article_Activity_Article" Association="Self.FK_Ad_Article_Activity_Article">
+      <End Role="Article" EntitySet="Article" />
+      <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
     </AssociationSet>
     <AssociationSet Name="FK_Article_ArticleCategories" Association="Self.FK_Article_ArticleCategories">
       <End Role="ArticleCategories" EntitySet="ArticleCategories" />

@@ -20,6 +20,7 @@ namespace prjITicket.Models
             this.Article_Report = new HashSet<Article_Report>();
             this.Article_Emotion = new HashSet<Article_Emotion>();
             this.Reply = new HashSet<Reply>();
+            this.Ad_Article_Activity = new HashSet<Ad_Article_Activity>();
         }
     
         public int ArticleID { get; set; }
@@ -38,5 +39,7 @@ namespace prjITicket.Models
         public virtual ICollection<Article_Emotion> Article_Emotion { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Reply> Reply { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Ad_Article_Activity> Ad_Article_Activity { get; set; }
     }
 }

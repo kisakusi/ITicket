@@ -28,12 +28,23 @@
             data: $("#login-form").serialize(),
             success: function (data) {
                 if (data == "無此帳號") {
-                    alert("無此帳號");
+                    swal({
+                        title: "無此帳號",
+                        icon: "error",
+                        button: "確定",
+                    });
                 }
                 else
                 {
-                    alert("送出成功");
-                    window.close();
+                    swal({
+                        title: "送出成功",
+                        icon: "success",
+                        button: "確定!",
+                    }).then(x => {
+                        window.close();
+                    });
+                    
+                    
                 }
                 
 

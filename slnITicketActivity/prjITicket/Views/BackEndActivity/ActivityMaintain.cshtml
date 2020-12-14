@@ -79,7 +79,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="ActivityTable" style="width:100%" cellspacing="0"></table>
+                <table class="table table-bordered" id="ActivityTable" style="width:100%;font-size:14px" cellspacing="0"></table>
             </div>
         </div>
     </div>
@@ -101,7 +101,12 @@
                     paginate: {
                         previous: "上一頁",
                         next: "下一頁"
-                    }
+                    },
+                    sProcessing: "處理中…",
+                    sInfo: "顯示第 _START_ 至 _END_ 筆, 共 _TOTAL_ 筆",
+                    sInfoEmpty: "顯示第 0 至 0 筆, 共 0 筆",
+                    lengthMenu: "顯示 _MENU_ 項結果",
+                    zeroRecords: "沒有符合的結果",
                 },
                 ajax: {
                     type: "post",
@@ -123,7 +128,6 @@
                 //參數值有true/false。
                 //簡單來說，就是讓前端處理分頁的功能
                 serverSide: false,
-
 
                 //指定Server端的資料行繫結名稱
                 columns: [

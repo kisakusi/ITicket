@@ -1,7 +1,7 @@
 ﻿@using prjITicket.Models;
 @using PagedList;
 @using PagedList.Mvc;
-@model IEnumerable<prjITicket.Models.ShortMessage>
+@model IPagedList<prjITicket.Models.ShortMessage>
 <link href="~/Content/PagedList.css" rel="stylesheet" />
 
 @if (Model.Count() == 0)
@@ -20,8 +20,10 @@ else
             </th>
             <th>
                 訊息內容
+            </th>  
+            <th>
+                
             </th>
-            <th></th>
         </tr>
 
         @foreach (var item in Model)
@@ -31,7 +33,7 @@ else
                     系統管理員
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.MessageContent)
+                    @item.MessageContent
                 </td>
                 <td></td>
             </tr>
@@ -39,3 +41,10 @@ else
 
     </table>
 }
+@Html.PagedListPager(Model, page => Url.Action("getShortMassageByMemberId", new { MemberId = ViewBag.MemberId, page = page }),
+    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
+        new AjaxOptions {
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = "form1div"
+        }
+        ))

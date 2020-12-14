@@ -7,6 +7,7 @@
 <script src="~/Scripts/jquery-1.10.2.min.js"></script>
 <script src="~/Scripts/jquery.validate.min.js"></script>
 <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
 @{
     ViewBag.Title = "BussRegister";
 }
@@ -33,14 +34,15 @@
                         </div>
                         <div class="form-group">
                             <label for="pass"><i class="zmdi zmdi-lock"></i></label>
-                            <input type="password" name="Password" id="pass" placeholder="密碼" oninput="CheckPassword(this.value)" />
+                            <input type="password" name="Password" id="pass" placeholder="密碼" oninput="CheckPassword()" />
                             @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
-                            <span id="CheckPassword"></span>
+                            <span style="color:darkgray" id="CheckPassword">密碼請輸入8-12碼,至少一個英文及數字</span>
                         </div>
                         <div class="form-group">
                             <label for="repass"><i class="zmdi zmdi-lock"></i></label>
-                            <input type="password" name="repass" id="repass" placeholder="再確認密碼" />
+                            <input type="password" name="repass" id="repass" placeholder="再確認密碼" oninput="NCheckPassword(this.value)" />
                             @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                            <span id="CheckPassword2"></span>
                         </div>
                         <div class="form-group">
                             <label for="companyName"><i class="zmdi zmdi-account material-icons-name"></i></label>
@@ -49,14 +51,15 @@
                         </div>
                         <div class="form-group">
                             <label for="taxIdNumber"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                            <input type="text" name="TaxIDNumber" id="TaxIDNumber" required placeholder="統編" oninput="CheckTax(this.value)" />
+                            <input type="text" name="TaxIDNumber" id="TaxIDNumber" required placeholder="統編"  />
                             @Html.ValidationMessageFor(model => model.TaxIDNumber, "", new { @class = "text-danger" })
-                            <span id="checktax" name="checktax"></span>
+                            <span class="text-secondary" id="checktax" name="checktax">統編8碼,ex:12345678</span>
                         </div>
                         <div class="form-group">
                             <label for="sellerPhone"><i class="zmdi zmdi-account material-icons-name"></i></label>
                             <input type="text" name="SellerPhone" id="SellerPhone" placeholder="手機號碼" />
                             @Html.ValidationMessageFor(model => model.SellerPhone, "", new { @class = "text-danger" })
+                            <span class="text-secondary" id="checkphone">手機號碼輸入10碼,ex:0912345678</span>
                         </div>
                         <div class="form-group">
                             <input type="checkbox" name="agreeterm" id="agree-term" class="agree-term " value="true" />
@@ -64,7 +67,7 @@
                         </div>
                         <span id="errorval" class="text-danger">@ViewBag.Message</span>
                         <div class="form-inline">
-                            <a class="btn btn-dark " href="~/Login/DemoDownload">企業登記範例檔案</a>                           
+                            <a class="btn btn-dark " href="@Url.Action("DemoDownload","Login")">企業登記範例檔案</a>                           
                             <input id="IsFile" class="btn btn-secondary" style=" margin-top:3px" type="file" name="FileSave" value="檔案上傳" />
                             <span class="alert-light">請上傳企業登記檔案</span>
                         </div>
@@ -82,7 +85,7 @@
                     @Html.ActionLink("一般會員註冊", "Register", "Login", new { htmlAttributes = new { @class = "signup-image-link" }, style = "font-size:16px;" })
                 </div>
             </div>
-            <span></span>
+            <a href="#" class="btn btn-secondary" id="demobussuser">註冊DEMO</a>
         </div>
     </section>
 
@@ -159,19 +162,88 @@
 </div>
 
 <script>
+    $("#demobussuser").click(function () {
+        $("#email").val("iticketshopping@gmail.com");
+        $("#pass").val("zz010203");
+        $("#repass").val("zz010203");
+        $("#CompanyName").val("無印良品有限公司");
+        $("#TaxIDNumber").val("97434587");
+        $("#SellerPhone").val("0908000203");       
+        CheckMember("iticketshopping@gmail.com");
+        CheckPassword();
+        NCheckPassword();
+        TaxIDNumber();
+        SellerPhone();
+    });
+
+
     function hello() {
         $("#ContextShow").click();
     }
-
+    $("#TaxIDNumber").on("input", function () {
+        if (/^\d{8}$/.test($("#TaxIDNumber").val())) {
+            $("#checktax").html("\u2705 輸入格式部正確").removeClass("text-danger").removeClass("text-secondary").addClass("text-success")
+        }
+        else if ($("#TaxIDNumber").val()=="")
+        {
+            $("#checktax").html("統編8碼,ex:12345678").removeClass("text-danger").removeClass("text-success").addClass("text-secondary")
+        }
+        else
+        {
+            $("#checktax").html("輸入格式錯誤").removeClass("text-success").removeClass("text-secondary").addClass("text-danger")
+        }
+    });
+    function TaxIDNumber()
+    {
+        if (/^\d{8}$/.test($("#TaxIDNumber").val())) {
+            $("#checktax").html("\u2705 輸入格式部正確").removeClass("text-danger").removeClass("text-secondary").addClass("text-success")
+        }
+        else if ($("#TaxIDNumber").val() == "") {
+            $("#checktax").html("統編8碼,ex:12345678").removeClass("text-danger").removeClass("text-success").addClass("text-secondary")
+        }
+        else {
+            $("#checktax").html("輸入格式錯誤").removeClass("text-success").removeClass("text-secondary").addClass("text-danger")
+        }
+    }
+    $("#SellerPhone").on("input", function () {
+        if (/^\d{10}$/.test($("#SellerPhone").val())) {
+            $("#checkphone").html("\u2705 輸入格式部正確").removeClass("text-danger").removeClass("text-secondary").addClass("text-success")
+        }
+        else if ($("#SellerPhone").val() == "") {
+            $("#checkphone").html("手機號碼輸入10碼,ex:0912345678").removeClass("text-danger").removeClass("text-success").addClass("text-secondary")
+        }
+        else {
+            $("#checkphone").html("輸入格式錯誤").removeClass("text-success").removeClass("text-secondary").addClass("text-danger")
+        }
+    });
+    function SellerPhone()
+    {
+        if (/^\d{10}$/.test($("#SellerPhone").val())) {
+            $("#checkphone").html("\u2705 輸入格式部正確").removeClass("text-danger").removeClass("text-secondary").addClass("text-success")
+        }
+        else if ($("#SellerPhone").val() == "") {
+            $("#checkphone").html("手機號碼輸入10碼,ex:0912345678").removeClass("text-danger").removeClass("text-success").addClass("text-secondary")
+        }
+        else {
+            $("#checkphone").html("輸入格式錯誤").removeClass("text-success").removeClass("text-secondary").addClass("text-danger")
+        }
+    }
    
 
 </script>
 
 <script>
     $("#signup").click(function () {
+        
         if ($("#pass").val() != $("#repass").val()) {
             $("#errorval").html("密碼不一樣").css('color', 'red');
 
+        }
+        else if ($("#pass").val() == "" || $("#repass").val() == "") {
+            $("#errorval").html("請輸入密碼").css('color', 'red');
+        }
+        else if (!$("#CheckPassword").html().includes("\u2705")) {
+            $("#errorval").html("欄位輸入不正確請在檢查").css('color', 'red');
         }
         else if (!$("#agree-term").prop("checked")) {
             $("#errorval").html("請勾選同意").css('color', 'red');
@@ -179,10 +251,22 @@
         else if ($("#IsFile").val()=="") {
             $("#errorval").html("請上傳檔案").css('color', 'red');
         }
+        
         else {
-            console.log($("#IsFile").val())
-            $("#register-form").submit();
-            alert('註冊成功，請去信箱進行信箱驗證,企業審核通過後即可上傳產品')
+            swal({
+                title: "註冊成功，請去信箱進行信箱驗證!\n待管理員審核通過後即可上傳產品",
+                text: "請點擊",
+                icon: "success",
+                button: { className: "btn-outline-light", text: "確定" },closeOnClickOutside: false, closeOnEsc: false,
+            }).then(x => {
+                if (x)
+                {
+                    $("#register-form").submit();
+                }
+            });
+           
+            
+            
         }
     });
      function CheckMember(Email)
@@ -204,9 +288,20 @@
 
     }
 
-    function CheckPassword(password)
+    function CheckPassword()
     {
-        $.ajax({
+        if (/^(?=.*[a-zA-Z])(?=.*\d).{8,12}$/.test($("#pass").val())) {
+            $("#CheckPassword").html("\u2705 密碼格式正確").css('color', 'green');
+        }
+        else
+        {
+            $("#CheckPassword").html("請輸入8-12碼,至少一個英文及數字").css('color', 'red');
+        }
+
+
+
+
+        @*$.ajax({
             type: 'GET',
             url:`@Url.Action("IsPassword")?password=${password}`,
             success: function (result)
@@ -215,12 +310,21 @@
                     $("#CheckPassword").css('color', 'green')
                 }
                 else {
-                    $("#CheckPassword").css('color', 'black')
+                    $("#CheckPassword").css('color', 'red')
                 }
                 $("#CheckPassword").html(result);
             }
-        });
+        });*@
 
+    }
+    function NCheckPassword() {
+        if ($("#pass").val() != $("#repass").val()) {
+            $("#CheckPassword2").html("密碼不一樣").css('color', 'red');
+
+        }
+        else {
+            $("#CheckPassword2").html("\u2705 重複輸入密碼正確").css('color', 'green');
+        }
     }
     //function CheckTax(tax) {
     //    $.ajax({

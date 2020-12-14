@@ -11,6 +11,25 @@
 <link href="~/Content/Forum_use/forumcontent.css" rel="stylesheet" />
 <link href="~/Content/Forum_use/css/styles.css" rel="stylesheet" />
 <div class="container">
+    @* 彈出視窗:Modal *@
+    <div class="modal fade" id="UploadImage" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">活動資訊</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="showActivity" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="button" class="btn btn-primary" id="ButtonCrop" data-dismiss="modal" value="Save the Crop Image" />
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <!-- Post Content Column -->
         <div class="col-lg-9">
@@ -20,6 +39,7 @@
             <!-- Author -->
             <p class="lead">
                 by
+                @Html.ActionLink(Model.Article.Member.Name, "forum_mainblock", "Forum", new { searchText = Model.Article.Member.Name })
                 <a href="#">@Model.Article.Member.Name</a>
             </p>
             <hr>
@@ -93,12 +113,15 @@
                     </footer>
                 </div>
             </div>
+            <div id="ajaxshowActivity">
+
+            </div>
             <!-- Comments Form -->
             <div class="card my-4">
                 <h5 class="card-header">留言區:</h5>
                 <div class="card-body">
                     <div class="form-group">
-                        <textarea class="form-control" rows="3" id="replycontent"></textarea>
+                        <textarea id="editor" class="form-control" name="editorshow"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" id="replysql">Submit</button>
                 </div>
@@ -123,7 +146,8 @@
             </div>
             <!-- Categories Widget -->
             <div class="card my-3">
-                <h5 class="card-header">Categories</h5>
+                <h5 class="card-header">@Model.Article.Member.NickName</h5>
+                <img style="content:url(/images/Login/Upload/@Model.Article.Member.Icon); height:200px;">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6">
@@ -164,20 +188,73 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>  
     <!-- /.row -->
+    <button type="button" id="BackTop" class="toTop-arrow"></button>
 </div>
+<script src="~/Content/Forum_use/build/ckeditor.js"></script>
 <script>
-    refreshTime()
-    function refreshTime() {
-        $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID")
+    class MyUploadAdapter {
+        // According to the document we need a constructor first
+        constructor(loader) {
+            this.loader = loader;
+        }
+
+        // start upload methods
+        upload() {
+            return new Promise((resolve, reject) => {
+                // 使用 FileReader() 物件讀取檔案
+                const reader = this.reader = new window.FileReader();
+                // 觸發 load 事件後，resolve 丟回物件完成 Promise
+                reader.addEventListener('load', () => {
+                    resolve({ default: reader.result });
+                });
+
+                // 觸發錯誤事件，以 reject 丟回 Promise 失敗原因
+                reader.addEventListener('error', err => {
+                    reject(err);
+                });
+                // 觸發 abort 事件時，以 reject() ，使 Promise 失敗
+                reader.addEventListener('abort', () => {
+                    reject();
+                });
+
+                // 告訴 FileReader 物件用 url 格式讀取，用於設定 img.src 性質
+                this.loader.file.then(file => {
+                    reader.readAsDataURL(file);
+                });
+            });
+        }
+
+        // start abort()
+        abort() {
+            //  觸發 FileReader abort 事件
+            this.reader.abort();
+        }
     }
-    setInterval("refreshTime()", 300000);
 
-    $("#content").html(`@Html.Raw(Model.Article.ArticleContent)`);
 
-     $("#replysql").click(function () {
-        let rpcontent = $("#replycontent").val();
+    function MyAdapterPlugin(editor) {
+        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => { return new MyUploadAdapter(loader) };
+    };
+
+    let editor;
+    ClassicEditor
+        .create(document.querySelector('#editor'), {
+            extraPlugins: [MyAdapterPlugin],
+        })
+        .then(neweditor => {
+            //把編輯器的參考存起來
+            editor = neweditor;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+
+
+    $("#replysql").click(function () {
+        let rpcontent = editor.getData();
         let articleID = @Model.Article.ArticleID;
          if (rpcontent == "") {
              alert("請輸入留言");
@@ -202,6 +279,42 @@
          }
 
     });
+    refreshTime()
+    function refreshTime() {
+        $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID")
+        $("#ajaxshowActivity").empty().load("/Forum/forum_Activity?articleID=@Model.Article.ArticleID")
+    }
+    setInterval("refreshTime()", 300000);
+    $("#content").html(`@Html.Raw(Model.Article.ArticleContent)`);
+
+
+
+     @*$("#replysql").click(function () {
+        let rpcontent = $("#replycontent").val();
+        let articleID = @Model.Article.ArticleID;
+         if (rpcontent == "") {
+             alert("請輸入留言");
+         }
+         else {
+             $.ajax({
+                 type: "post",
+                 url: "@Url.Action("forum_content")",
+                 data: { content: rpcontent, articleID: articleID },
+                 success: function (data) {
+                     if (data != "成功") {
+                         alert(data);
+                         window.location.href = 'http://localhost:49949/Login/Login';
+                     }
+                     else {
+                         alert(data);
+                         $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID");
+                         $("#replycontent").val("");
+                     }
+                 }
+             });
+         }
+
+    });*@
 
     function reportReason_article() {
         let reportId = $('#articleReportReason').val();
@@ -220,7 +333,8 @@
                  if (data != "成功") {
                      alert(data);
                      window.location.href = 'http://localhost:49949/Login/Login';
-                 } else{
+                 } else {
+                     document.getElementById('Modal').style.display = 'none';
                      alert("檢舉" + data);
                  }
         }
@@ -233,7 +347,6 @@
         let likebtn = document.getElementById('actionlike_a');
         let dislikebtn = document.getElementById('actiondislike_a');
         let ActionId = 1;
-        console.log("like");
         if (dislikebtn.className == 'bpclick') {
             alert("此篇留言你已點了不喜歡。");
         }
@@ -249,6 +362,8 @@
                         if (data != "成功") {
                             alert(data);
                             window.location.href = 'http://localhost:49949/Login/Login';
+                        } else {
+                            $("#goodpoint").text(parseInt($("#goodpoint").text()) + 1);
                         }
                     },
                     error: function (data) {
@@ -262,6 +377,7 @@
                     url: "@Url.Action("Article_EmotionAction_Cancel")",
                     data: { ArticleID: @Model.Article.ArticleID},
                     success: function (data) {
+                        $("#goodpoint").text(parseInt($("#goodpoint").text()) - 1);
                     },
                     error: function (data) {
                     }
@@ -273,7 +389,6 @@
         let likebtn = document.getElementById('actionlike_a');
         let dislikebtn = document.getElementById('actiondislike_a');
         let ActionId = 2;
-        console.log("dislike");
         if (likebtn.className == 'gpclick') {
             alert("此篇留言你已點了喜歡。");
         }
@@ -289,6 +404,8 @@
                         if (data != "成功") {
                             alert(data);
                             window.location.href = 'http://localhost:49949/Login/Login';
+                        } else {
+                            $("#badpoint").text(parseInt($("#badpoint").text()) + 1);
                         }
                     },
                     error: function (data) {
@@ -302,11 +419,46 @@
                     url: "@Url.Action("Article_EmotionAction_Cancel")",
                     data: { ArticleID: @Model.Article.ArticleID},
                     success: function (data) {
+                        $("#badpoint").text(parseInt($("#badpoint").text()) - 1);
                     },
                     error: function (data) {
                     }
                 });
             }
         }
+    }
+    $(function () {
+        $('#BackTop').click(function () {
+            $('html,body').animate({ scrollTop: 0 }, 333);
+        });
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 300) {
+                $('#BackTop').fadeIn(222);
+            } else {
+                $('#BackTop').stop().fadeOut(222);
+            }
+        }).scroll();
+    });
+
+    //獲得活動的次詳細頁
+    function getActivitySubDetailPage(activityId) {
+        $.ajax({
+            type: "get",
+            url: "@Url.Action("GetActivitySubDetailPage")",
+            data: { activityId: activityId },
+            success: function (result) {
+                $("#showActivity").html(result);
+                $("#activityListPageRight").hide(0, "swing", function () {
+                    $(document).scrollTop(0);
+                });
+            }
+        });
+    }
+
+    function reply_quote(replyId) {
+        let rpcontent = document.getElementById("replyshow_content_" + replyId);
+        //let msg = "<h1>Test Title</h1><p>aaaaaa</p><p>bbbbbbbbbb</p>";
+        editor.setData("<strong>" + rpcontent.innerHTML + "</strong><br />");
+
     }
 </script>

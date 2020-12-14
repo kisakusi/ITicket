@@ -1402,7 +1402,7 @@ namespace prjITicket.Controllers
             {
                 TicketGroupName = ticketGroupName,
                 TicketGroupDiscount = discount,
-                Status = true
+                Status = false
             };
             db.TicketGroups.Add(ticketGroup);
             foreach(int activityId in activityIds)

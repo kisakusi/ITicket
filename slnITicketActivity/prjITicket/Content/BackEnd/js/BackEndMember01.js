@@ -3,50 +3,69 @@ const members = []
 const emails = []
 
 function AjaxMemberList() {
-    $('#ctrlSearch').val($('#fKeyword').val())
+    let url
+    switch (parseInt($('#fRoleId').val())) {
+        case 0:
+            url = '/BackEndMember/BanMemberList'
+            break
+        case 1:
+        case 2:
+        case 9:
+            url = '/BackEndMember/GeneralList'
+            break
+        case 3:
+            url = '/BackEndMember/MerchantList'
+            break
+        default:
+            url = '/BackEndMember/GeneralList'
+            break
+    }
     $.ajax({
-        url: '/BackEndMember/MemberList',
+        url: url,
         type: 'post',
         data: $('#ctrlForm').serialize(),
         success: function (data) {
-            maxpage = data.length ? Math.ceil(data[0].Count / parseInt($('#fPageSize').val())) : 0
+            if (data.length && data[0].ChangePage != 0) {
+                $('#fPageCurrent').val(data[0].ChangePage)
+            }
+            maxpage = data.length ? Math.ceil(data[0].Count / parseInt($('#fPageSize').val())) : 1
+            $('#ctrlHint').text($('#fKeyword').val() == '' ? '' : `關鍵字: ${$('#fKeyword').val()}`)
             $('#ListBody').empty()
             $.each(data, function (i, e) {
+                let btnFile = `<button type="button" data-id="${e.MemberID}" data-email="${e.Email}" class="btn btn-info btn-sm text-white mr-2 customFile">資料</button>`
+                let btnVerify = `<button type="button" data-id="${e.MemberID}" data-email="${e.Email}" class="btn btn-warning btn-sm text-white mr-2 customVerify">審核</button>`
                 let btnBan = `<button type="button" data-id="${e.MemberID}" data-email="${e.Email}" class="btn btn-danger btn-sm mr-2 customBan">停權</button>`
                 let btnUnBan = `<button type="button" data-id="${e.MemberID}" data-email="${e.Email}" class="btn btn-secondary btn-sm mr-2 customUnBan">解除</button>`
                 let btnInfo = `<span>停權至 ${e.EndTime} <a href="javascript:" onclick="theReason('${e.Reason}')">停權原因</a></span>`
-                $('#ListBody').append(
-                    `<tr class="${e.Reason === null ? 'text-body' : 'text-danger'}" style="background-color: ${members.includes(e.MemberID) ? 'lightyellow' : 'white'}">
-                        <td data-id="${e.MemberID}" data-email="${e.Email}" class="pt-2 pb-1 text-body customSelectUser">${members.includes(e.MemberID) ? '<i class="far fa-check-square"></i>' : '<i class="far fa-square"></i>'}</td>
-                        <td class="pt-2 pb-1"><a href="javascript:" onclick="theDetail(${e.MemberID})">${keyHighlight(e.Email.split('@', 2)[0], $('#fKeyword').val())}</a><br><sup class="text-secondary">&nbsp;&nbsp;&nbsp;@${e.Email.split('@', 2)[1]}</sup></td>
-                        <td class="pt-2 pb-1">${keyHighlight(e.NickName, $('#fKeyword').val())}</td>
-                        <td class="pt-2 pb-1">${keyHighlight(e.Name, $('#fKeyword').val())}</td>
-                        <td class="pt-2 pb-1">${keyHighlight(e.Phone === null ? '' : e.Phone, $('#fKeyword').val())}</td>
-                        <td class="pt-2 pb-1">${e.MemberRoleName}${e.Reason === null ? '' : '<span class="badge badge-danger ml-1">停權中</span>'}</td>
-                        <td class="pt-2 pb-1">${e.Reason === null ? btnBan : btnUnBan + btnInfo}</td>
-                    </tr>`
-                )
+                $('#ListBody').append(`<tr class="${e.Reason === null ? 'text-body' : 'text-danger'}" style="background-color: ${members.includes(e.MemberID) ? 'lightyellow' : 'white'}">
+                    <td data-id="${e.MemberID}" data-email="${e.Email}" class="pt-2 pb-1 text-body customSelectUser" style="cursor: pointer">${members.includes(e.MemberID) ? '<i class="far fa-check-square"></i>' : '<i class="far fa-square"></i>'}</td>
+                    <td class="pt-2 pb-1"><a href="javascript:" onclick="theDetail(${e.MemberID})">${keyHighlight(e.Email.split('@', 2)[0], $('#fKeyword').val())}</a><br><sup class="text-secondary">&nbsp;&nbsp;&nbsp;@${e.Email.split('@', 2)[1]}</sup></td>
+                    <td class="pt-2 pb-1">${keyHighlight(e.NickName, $('#fKeyword').val())}</td>
+                    <td class="pt-2 pb-1">${keyHighlight(e.Name, $('#fKeyword').val())}</td>
+                    <td class="pt-2 pb-1">${keyHighlight(e.Phone === null ? '' : e.Phone, $('#fKeyword').val())}</td>
+                    <td class="pt-2 pb-1">${e.MemberRoleName}${e.Reason === null ? '' : '<span class="badge badge-danger ml-1">停權中</span>'}${e.MerchantNull === 'Null' ? '<span class="badge badge-warning text-white ml-1">未審核</span>' : ''}</td>
+                    <td class="pt-2 pb-1">${e.MerchantNull === 'Null' ? btnFile + btnVerify : ''} ${e.MemberRoleId === 4 ? '' : e.Reason === null ? btnBan : btnUnBan + btnInfo}</td>
+                </tr>`)
             })
             let pagecurrent = parseInt($('#fPageCurrent').val())
-            $(`#ctrlPage1 li`).not('.default').remove().end().removeClass('disabled')
-            $(`#ctrlPage2 li`).not('.default').remove().end().removeClass('disabled')
+            $(`#pageTop li`).not('.default').remove().end().removeClass('disabled')
+            $(`#pageBottom li`).not('.default').remove().end().removeClass('disabled')
             if (pagecurrent === 1) {
-                $(`#ctrlPage1 li`).first().addClass('disabled')
-                $(`#ctrlPage2 li`).first().addClass('disabled')
+                $(`#pageTop li`).first().addClass('disabled')
+                $(`#pageBottom li`).first().addClass('disabled')
             }
             if (pagecurrent === maxpage) {
-                $(`#ctrlPage1 li`).last().addClass('disabled')
-                $(`#ctrlPage2 li`).last().addClass('disabled')
+                $(`#pageTop li`).last().addClass('disabled')
+                $(`#pageBottom li`).last().addClass('disabled')
             }
             let showpage = [1, 2, pagecurrent - 2, pagecurrent - 1, pagecurrent, pagecurrent + 1, pagecurrent + 2, maxpage - 1, maxpage]
-            let pointer1 = $(`#ctrlPage1 li`).first()
-            let pointer2 = $(`#ctrlPage2 li`).first()
+            let pointer1 = $(`#pageTop li`).first()
+            let pointer2 = $(`#pageBottom li`).first()
             let flag = false
             for (let i = 1; i <= maxpage; i++) {
                 if (!showpage.includes(i) && flag) {
                     continue
                 }
-
                 if (!showpage.includes(i)) {
                     pointer1.after(
                         `<li class="page-item"><a class="page-link text-secondary customGotoNewPage" href="javascript:">…</a></li>`
@@ -59,7 +78,6 @@ function AjaxMemberList() {
                     flag = true
                     continue
                 }
-
                 pointer1.after(
                     `<li class="page-item"><a data-id="${i}" class="page-link customGotoPage" href="javascript:" style="background-color: ${pagecurrent === i ? 'lightyellow' : 'transparent'}">${i}</a></li>`
                 )
@@ -72,13 +90,16 @@ function AjaxMemberList() {
             }
             let begin = ($('#fPageCurrent').val() - 1) * $('#fPageSize').val() + 1
             let ending = ($('#fPageCurrent').val() - 1) * $('#fPageSize').val() + data.length
-            $('#ctrlPage0').text(begin <= ending ? `顯示第 ${begin} 筆到第 ${ending} 筆資料` : `查無資料`)
+            $('#pageMessage').text(begin <= ending ? `顯示第 ${begin} 筆到第 ${ending} 筆資料` : `沒有符合的資料`)
+            if ($(window).scrollTop() > 225) {
+                $(window).scrollTop(225)
+            }
         }
     })
 }
 
 function theReason(reason) {
-
+    swal('停權原因', reason, 'info')
 }
 
 function theDetail(id) {
@@ -100,9 +121,9 @@ function theDetail(id) {
         'TaxIDNumber': '統編',
         'SellerHomePage': '商家網站主頁',
         'SellerPhone': '商家聯絡資訊',
-        'SellerDiscription': '商家描述資訊'
+        'SellerDiscription': '商家描述資訊',
+        'fPass': '審核狀態'
     }
-
     $.ajax({
         url: '/BackEndMember/MemberDetail',
         type: 'post',
@@ -114,11 +135,27 @@ function theDetail(id) {
                     rows += `<tr class="bg-dark"><td colspan="2"></td></tr>`
                     continue
                 }
+                if (field == 'fPass') {
+                    let fPassClass
+                    switch (data[field]) {
+                        case '審核通過':
+                            fPassClass = 'text-success'
+                            break
+                        case '審核不通過':
+                            fPassClass = 'text-danger'
+                            break
+                        default:
+                            fPassClass = 'text-warning'
+                            break
+                    }
+                    rows += `<tr><th>${displayName[field]}</th><td class="${fPassClass}">${data[field] === null ? '' : data[field]}</td></tr>`
+                    continue
+                }
                 rows += `<tr><th>${displayName[field]}</th><td>${data[field] === null ? '' : data[field]}</td></tr>`
             }
             let html = (`
                 <div class="table-responsive text-body bg-white">
-                    <table class="table table-bordered table-striped" width="100%" cellspacing="0">
+                    <table class="table table-bordered table-striped" style="width: 100%;">
                         ${rows}
                     <table>
                 </div>
@@ -137,14 +174,12 @@ function thePrev() {
     let pagecurrent = parseInt($('#fPageCurrent').val())
     $('#fPageCurrent').val(Math.max(1, pagecurrent - 1))
     AjaxMemberList()
-    $(window).scrollTop(225)
 }
 
 function theNext() {
     let pagecurrent = parseInt($('#fPageCurrent').val())
     $('#fPageCurrent').val(Math.min(pagecurrent + 1, maxpage))
     AjaxMemberList()
-    $(window).scrollTop(225)
 }
 
 function keyHighlight(text, keyword) {
@@ -165,54 +200,77 @@ function keyHighlight(text, keyword) {
     return text
 }
 
-function ResizeInitial() {
-    $('#ctrlBtn').css('z-index', $(window).innerWidth() > 800 ? '1500' : '1')
-    $('#ctrlBtn1').html($(this).innerWidth() > 1070 ? '<i class="far fa-bell"></i> 發送系統通知' : '<i class="far fa-bell"></i>')
-    $('#ctrlBtn2').html($(this).innerWidth() > 1070 ? '<i class="fas fa-user-cog"></i> 設定查詢條件' : '<i class="fas fa-user-cog"></i>')
-    $('#ctrlBtn3').html($(this).innerWidth() > 1070 ? '<i class="fas fa-ban"></i> 停權會員' : '<i class="fas fa-ban"></i>')
-    $('#ctrlSubmit').html($(this).innerWidth() > 1150 ? '<i class="fas fa-search"></i> 搜尋' : '<i class="fas fa-search"></i>')
-        .css('visibility', $(this).innerWidth() > 580 ? 'visible' : 'hidden')
-    $('#ctrlReset').html($(this).innerWidth() > 1150 ? '<i class="fas fa-power-off"></i> 重設' : '<i class="fas fa-power-off"></i>')
-        .css('visibility', $(this).innerWidth() > 580 ? 'visible' : 'hidden')
+function keyInput() {
+    $('#fKeyword').val($('#searchbox').val().toLowerCase().trim())
+    $('#fPageCurrent').val(1)
+    $('#fPageSize').val(10)
+    $('#fSortRule').val("0")
+    $('#pageAmount').prop('selectedIndex', 0)
+    MemberRoleInfoFont($('#fSortRule').val())
+    AjaxMemberList()
 }
 
 function MemberRoleInfoFont(value) {
-    const fonts = [$('#ListHead1 span'), $('#ListHead2 span'), $('#ListHead3 span'), $('#ListHead4 span'), $('#ListHead5 span')]
+    const fonts = [$('#ListHead1 span'), $('#ListHead2 span'), $('#ListHead3 span'), $('#ListHead4 span')]
     for (let font of fonts) {
         font.html('<i class="fas fa-sort"></i>').closest('th').css('color', 'black')
     }
     switch (value) {
         case '1a':
             fonts[0].html('<i class="fas fa-sort-down"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '1d':
             fonts[0].html('<i class="fas fa-sort-up"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '2a':
             fonts[1].html('<i class="fas fa-sort-down"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '2d':
             fonts[1].html('<i class="fas fa-sort-up"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '3a':
             fonts[2].html('<i class="fas fa-sort-down"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '3d':
             fonts[2].html('<i class="fas fa-sort-up"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '4a':
             fonts[3].html('<i class="fas fa-sort-down"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         case '4d':
             fonts[3].html('<i class="fas fa-sort-up"></i>').closest('th').css('color', 'orangered')
-            break
-        case '5a':
-            fonts[4].html('<i class="fas fa-sort-down"></i>').closest('th').css('color', 'orangered')
-            break
-        case '5d':
-            fonts[4].html('<i class="fas fa-sort-up"></i>').closest('th').css('color', 'orangered')
+            $('#ctrlBtn5').removeClass('d-none')
             break
         default:
+            $('#ctrlBtn5').addClass('d-none')
             break
     }
+}
+
+function SendMessageTask(state, members, message) {
+    $.ajax({
+        url: '/BackEndMember/SendMessageAsync',
+        type: 'post',
+        data: {
+            state: state,
+            members: members,
+            message: message
+        },
+        timeout: 20000,
+        success: function (data) {
+            swal('發送系統通知提示', data, 'success')
+        },
+        error: function (xmlhttprequest, textstatus, message) {
+            swal('發送系統通知提示', textstatus === 'timeout' ? '超時: 超過了 20 秒' : textstatus, 'error', {
+                button: false
+            })
+        }
+    })
 }

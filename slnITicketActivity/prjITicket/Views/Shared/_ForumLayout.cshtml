@@ -1,4 +1,19 @@
 ﻿@using prjITicket.Models
+@{
+    TicketSysEntities db = new TicketSysEntities();
+    Seller memberseller = null;
+    int pass = 0;
+    try
+    {
+        if (Session[CDictionary.SK_Logined_Member] != null && (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId == 3)
+        {
+            int memberid = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+            memberseller = db.Seller.Where(x => x.MemberId == memberid).FirstOrDefault();
+            pass = memberseller.fPass == true ? 1 : 0;
+        }
+    }
+    catch { }
+}
 <!DOCTYPE html>
 <html>
 <head>
@@ -98,6 +113,24 @@
                 }
             });
         }
+        //商家中心審核判斷
+        function alertshow() {
+            if (@pass!= 1) {
+                swal({
+                    title: "審核尚未通過,請到會員中心=>公司資料查看",
+                    text: "請點擊",
+                    icon: "error",
+                    closeOnConfirm: true,
+                    button: { className: "btn-outline-light", text: "確定" }, closeOnClickOutside: false, closeOnEsc: false,
+                }).then(x => {
+                    if (x) { location.href = "/Activity/ActivityList" }
+                });
+            }
+            else
+            {
+                location.href = "/SellerCenter/ManagementCenter"
+            }
+        }
     </script>
     <style>
         /*子菜單滑出樣式*/
@@ -122,11 +155,21 @@
                             Home
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("MemberList","BackEnd")">
-                            後台
-                        </a>
-                    </li>
+                    @{
+                        Member admin = Session[CDictionary.SK_Logined_Member] as Member;
+                        try
+                        {
+                            if (admin != null && admin.MemberRoleId == 4)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("MemberList","BackEndMember")">
+                                        後台
+                                    </a>
+                                </li>
+                            }
+                        }
+                        catch { }
+                    }
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("ActivityList","Activity")">商品一覽</a>
                     </li>
@@ -136,10 +179,45 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <div class="dropdown ml-auto mr-auto">
+                            <button style="width:35px;height:35px;text-align:center" class="btn btn-cart btn-sm" type="button" id="dropdownMessageButton" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-bell" style="color:white;font-size:2em;line-height:35px;width:35px;display:inline-block;margin-left:-10px"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px" aria-labelledby="dropdownMenuButton">
+                                <div class="p-6">
+                                    <h5 style="text-align:center">短消息</h5>
+                                    <table class="table">
+                                        @{
+                                            Member member = Session[CDictionary.SK_Logined_Member] as Member;
+                                            if (member != null)
+                                            {
+                                                var msgs = member.ShortMessage.OrderByDescending(s => s.ShortMessageID).Take(5).ToList();
+                                                foreach (ShortMessage msg in msgs)
+                                                {
+                                                    <tr>
+                                                        <td>@msg.MessageContent</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
                         <div class="dropdown ml-auto">
                             <button style="width:35px;height:35px" class="btn btn-cart btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
-                                <i style="content:url(../../images/Layout/login_icon.jpg);width:27px;height:27px;transform:translate(-5px,0px);border-radius:50%"></i>
+                                @if (Session[CDictionary.SK_Logined_Member] != null && (Session[CDictionary.SK_Logined_Member] as Member).Icon != null)
+                                {
+                                    <i id="layoutimg" style="content:url(@Url.Content("~/images/Login/Upload/"+(Session[CDictionary.SK_Logined_Member]as Member).Icon));width:35px;height:35px;transform:translate(-6px,-3px);border-radius:50%"></i>
+                                }
+                                else
+                                {
+                                    <i style="content:url(../../images/Login/Layout/bar.png);width:35px;height:35px;transform:translate(-6px,-3px);border-radius:50%"></i>
+                                }
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px" aria-labelledby="dropdownMenuButton">
                                 <div class="p-3">
@@ -148,18 +226,33 @@
                                         <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("Login", "Login")">登入</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Register", "Login")">註冊</a>
                                     }
-                                    else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "未驗證" ||
-                                        (Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "普通會員")
+
+
+                                    else if ((Session[CDictionary.SK_Logined_Member] as Member).provider == "facebook" ||
+                                        (Session[CDictionary.SK_Logined_Member] as Member).provider == "google")
                                     {
-                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">修改會員</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">會員中心</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a>
+
+                                    }
+                                    else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "普通會員" ||
+                                        (Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "未驗證")
+                                    {
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">會員中心</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a>
 
                                     }
                                     else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "商家")
                                     {
-                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("BussEdit", "Login")">修改會員</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("BussEdit", "Login")">會員中心</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a>
-                                        <a class="btn btn-block btn-primary btn-sm text-white" href="javescript:;">上傳</a>
+                                        <a onclick="alertshow()" class="btn btn-block btn-primary btn-sm text-white" href="javascript:;">商家中心</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("CustomerSupport","Activity")">客服專用</a>
+                                    }
+                                    else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "管理者")
+                                    {
+                                        <a class="btn btn-block btn-primary btn-sm text-white btnshow" href="@Url.Action("Logout", "Login")">登出</a>
+                                        <a class="btn btn-block  btn-primary btn-sm text-white btnshow" href="@Url.Action("MemberEdit", "Login")">會員中心</a>
                                     }
                                 </div>
                             </div>
@@ -192,8 +285,8 @@
 
         </div>
     </nav>
-    <!--你的View在這裡-->   
-        @RenderBody()         
+    <!--你的View在這裡-->
+    @RenderBody()
     <!-- Footer -->
     <footer class="py-5 bg-white">
         <div class="container">

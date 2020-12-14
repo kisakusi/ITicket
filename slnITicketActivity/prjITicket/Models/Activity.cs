@@ -23,6 +23,7 @@ namespace prjITicket.Models
             this.Tickets = new HashSet<Tickets>();
             this.TicketTimes = new HashSet<TicketTimes>();
             this.ActivityFavourite = new HashSet<ActivityFavourite>();
+            this.Ad_Article_Activity = new HashSet<Ad_Article_Activity>();
         }
     
         public int ActivityID { get; set; }
@@ -54,5 +55,7 @@ namespace prjITicket.Models
         public virtual ICollection<TicketTimes> TicketTimes { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ActivityFavourite> ActivityFavourite { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Ad_Article_Activity> Ad_Article_Activity { get; set; }
     }
 }
