@@ -129,6 +129,7 @@
     <EntitySetMapping Name="Member">
       <EntityTypeMapping TypeName="TicketSysModel.Member">
         <MappingFragment StoreEntitySet="Member">
+          <ScalarProperty Name="fRegister_time" ColumnName="fRegister_time" />
           <ScalarProperty Name="MemberID" ColumnName="MemberID" />
           <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="Name" ColumnName="Name" />

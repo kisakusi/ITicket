@@ -168,6 +168,7 @@
     <Property Name="provider" Type="nvarchar" MaxLength="50" />
     <Property Name="providerFB" Type="bit" />
     <Property Name="providerGO" Type="bit" />
+    <Property Name="fRegister_time" Type="datetime" />
   </EntityType>
   <EntityType Name="MemberRole">
     <Key>

@@ -829,24 +829,40 @@ namespace prjITicket.Controllers
         //ActivityDetail的View中實時得到票價的Ajax調用的方法
         public string getTicketPrice(int ticketCategoryId, int ticketTimeId)
         {
+            string result1 = "";
             Tickets ticket = db.Tickets.FirstOrDefault(t => t.TicketCategoryId == ticketCategoryId && t.TicketTimeId == ticketTimeId);
             if (ticket == null)
             {
-                return "暫無提供";
+                result1= "暫無提供";
             }
             else if (ticket.UnitsInStock == 0)
             {
-                return "已售完";
+                result1= "已售完";
             }
             else
             {
-                return JsonConvert.SerializeObject(new { ticket.Price, ticket.Discount, ticket.UnitsInStock });
+                result1 = JsonConvert.SerializeObject(new { ticket.Price, ticket.Discount, ticket.UnitsInStock });
             }
+            string result2 = getTicketTable(ticketCategoryId);
+            List<string> result = new List<string>() { result1, result2 };
+            return JsonConvert.SerializeObject(result);
         }
-        //Activity獲取場次表的函數////////////////////////////////////////////////
+        //獲取場次表的函數
         public string getTicketTable(int ticketCategoryId)
         {
-            var tickets = db.Tickets.AsEnumerable().Where(t => t.TicketCategoryId == ticketCategoryId).Select(t => new { Time=t.TicketTimes.TicketTime.ToString("yyyy/MM/dd HH:mm"), t.Price, t.UnitsInStock }).ToList();
+            var tickets = db.TicketCategory.FirstOrDefault(tc => tc.TicketCategoryId == ticketCategoryId).Activity.TicketTimes.
+                Select(tt =>
+                {
+                    Tickets ticket = db.Tickets.FirstOrDefault(t => t.TicketCategoryId == ticketCategoryId && t.TicketTimeId == tt.TicketTimeId);
+                    if (ticket == null)
+                    {
+                        return new { Time = tt.TicketTime.ToString("yyyy/MM/dd HH:mm"), Price = "暫無提供", UnitsInStock = "暫無提供" };
+                    }
+                    else
+                    {
+                        return new { Time = tt.TicketTime.ToString("yyyy/MM/dd HH:mm"), Price = Math.Round(ticket.Price * (1 - ticket.Discount), 0).ToString(), UnitsInStock=ticket.UnitsInStock.ToString() };
+                    }
+                }).ToList();
             return JsonConvert.SerializeObject(tickets);
         }
         //ActivityList中Ajax調用獲得城市資訊的函數

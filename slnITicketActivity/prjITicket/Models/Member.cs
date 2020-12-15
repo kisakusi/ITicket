@@ -54,6 +54,7 @@ namespace prjITicket.Models
         public string provider { get; set; }
         public Nullable<bool> providerFB { get; set; }
         public Nullable<bool> providerGO { get; set; }
+        public Nullable<System.DateTime> fRegister_time { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Article> Article { get; set; }

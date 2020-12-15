@@ -192,6 +192,7 @@
     <NavigationProperty Name="Subscribes" Relationship="Self.FK_Subscribes_Member" FromRole="Member" ToRole="Subscribes" />
     <NavigationProperty Name="ActivityFavourite" Relationship="TicketSysModel.FK_ActivityFavourite_Member" FromRole="Member" ToRole="ActivityFavourite" />
     <NavigationProperty Name="CommentReport" Relationship="TicketSysModel.FK_CommentReport_Member" FromRole="Member" ToRole="CommentReport" />
+    <Property Name="fRegister_time" Type="DateTime" Precision="3" />
   </EntityType>
   <EntityType Name="MemberRole">
     <Key>
