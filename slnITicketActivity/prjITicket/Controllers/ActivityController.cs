@@ -843,6 +843,12 @@ namespace prjITicket.Controllers
                 return JsonConvert.SerializeObject(new { ticket.Price, ticket.Discount, ticket.UnitsInStock });
             }
         }
+        //Activity獲取場次表的函數////////////////////////////////////////////////
+        public string getTicketTable(int ticketCategoryId)
+        {
+            var tickets = db.Tickets.AsEnumerable().Where(t => t.TicketCategoryId == ticketCategoryId).Select(t => new { Time=t.TicketTimes.TicketTime.ToString("yyyy/MM/dd HH:mm"), t.Price, t.UnitsInStock }).ToList();
+            return JsonConvert.SerializeObject(tickets);
+        }
         //ActivityList中Ajax調用獲得城市資訊的函數
         public string getAllCity()
         {
@@ -1429,6 +1435,21 @@ namespace prjITicket.Controllers
             Member member = Session[CDictionary.SK_Logined_Member] as Member;
             if (member == null || member.MemberRoleId != 3) return RedirectToAction("Login", "Login");
             return View();
+        }
+        public void ReportComment(int commentId,int memberId,string reason)
+        {
+            CommentReport report = new CommentReport()
+            {
+                CommentId = commentId,
+                MemberId = memberId,
+                ReportReason = reason,
+            };
+            db.CommentReport.Add(report);
+            db.SaveChanges();
+        }
+        public bool CheckRepeatReport(int commentId, int memberId)
+        {
+            return db.CommentReport.Any(cr => cr.CommentId == commentId && cr.MemberId == memberId);
         }
     }
 }

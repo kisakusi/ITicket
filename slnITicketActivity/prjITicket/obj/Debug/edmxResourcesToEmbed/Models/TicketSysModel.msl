@@ -98,6 +98,7 @@
     <EntitySetMapping Name="Comment">
       <EntityTypeMapping TypeName="TicketSysModel.Comment">
         <MappingFragment StoreEntitySet="Comment">
+          <ScalarProperty Name="IsBaned" ColumnName="IsBaned" />
           <ScalarProperty Name="CommentID" ColumnName="CommentID" />
           <ScalarProperty Name="CommentMemberID" ColumnName="CommentMemberID" />
           <ScalarProperty Name="CommentActivityId" ColumnName="CommentActivityId" />
@@ -359,6 +360,16 @@
           <ScalarProperty Name="ActivityID" ColumnName="ActivityID" />
           <ScalarProperty Name="ArticleID" ColumnName="ArticleID" />
           <ScalarProperty Name="AdID" ColumnName="AdID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CommentReport">
+      <EntityTypeMapping TypeName="TicketSysModel.CommentReport">
+        <MappingFragment StoreEntitySet="CommentReport">
+          <ScalarProperty Name="ReportReason" ColumnName="ReportReason" />
+          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+          <ScalarProperty Name="CommentId" ColumnName="CommentId" />
+          <ScalarProperty Name="CommentReportId" ColumnName="CommentReportId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

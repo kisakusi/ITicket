@@ -118,6 +118,16 @@
     <Property Name="CommentContent" Type="nvarchar" MaxLength="300" Nullable="false" />
     <Property Name="CommentScore" Type="int" Nullable="false" />
     <Property Name="CommentDate" Type="datetime" Nullable="false" />
+    <Property Name="IsBaned" Type="bit" Nullable="false" />
+  </EntityType>
+  <EntityType Name="CommentReport">
+    <Key>
+      <PropertyRef Name="CommentReportId" />
+    </Key>
+    <Property Name="CommentReportId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CommentId" Type="int" Nullable="false" />
+    <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="ReportReason" Type="nvarchar" MaxLength="50" Nullable="false" />
   </EntityType>
   <EntityType Name="Districts">
     <Key>
@@ -531,6 +541,30 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK_CommentReport_Comment">
+    <End Role="Comment" Type="Self.Comment" Multiplicity="1" />
+    <End Role="CommentReport" Type="Self.CommentReport" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Comment">
+        <PropertyRef Name="CommentID" />
+      </Principal>
+      <Dependent Role="CommentReport">
+        <PropertyRef Name="CommentId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CommentReport_Member">
+    <End Role="Member" Type="Self.Member" Multiplicity="1" />
+    <End Role="CommentReport" Type="Self.CommentReport" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Member">
+        <PropertyRef Name="MemberID" />
+      </Principal>
+      <Dependent Role="CommentReport">
+        <PropertyRef Name="MemberId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_Districts_Districts">
     <End Role="Cities" Type="Self.Cities" Multiplicity="1" />
     <End Role="Districts" Type="Self.Districts" Multiplicity="*" />
@@ -941,6 +975,7 @@
     <EntitySet Name="Categories" EntityType="Self.Categories" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Cities" EntityType="Self.Cities" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="CommentReport" EntityType="Self.CommentReport" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Districts" EntityType="Self.Districts" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="EmotionAction" EntityType="Self.EmotionAction" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Member" EntityType="Self.Member" Schema="dbo" store:Type="Tables" />
@@ -1029,6 +1064,14 @@
     <AssociationSet Name="FK_Comment_Member" Association="Self.FK_Comment_Member">
       <End Role="Member" EntitySet="Member" />
       <End Role="Comment" EntitySet="Comment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CommentReport_Comment" Association="Self.FK_CommentReport_Comment">
+      <End Role="Comment" EntitySet="Comment" />
+      <End Role="CommentReport" EntitySet="CommentReport" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CommentReport_Member" Association="Self.FK_CommentReport_Member">
+      <End Role="Member" EntitySet="Member" />
+      <End Role="CommentReport" EntitySet="CommentReport" />
     </AssociationSet>
     <AssociationSet Name="FK_Districts_Districts" Association="Self.FK_Districts_Districts">
       <End Role="Cities" EntitySet="Cities" />

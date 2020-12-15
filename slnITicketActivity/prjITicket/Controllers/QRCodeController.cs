@@ -18,7 +18,7 @@ namespace prjITicket.Controllers
         }
 
         // GET api/<controller>/5
-        public string Get(string qrCodeContent)
+        public ActivityData Get(string qrCodeContent)
         {
             TicketSysEntities db = new TicketSysEntities();
             ActivityData activityData = db.TicketQRCodes.AsEnumerable().Where(tqrc => tqrc.QRCode == qrCodeContent).
@@ -29,18 +29,11 @@ namespace prjITicket.Controllers
                     {
                         ActivityName = order_Detail.Tickets.Activity.ActivityName,
                         TicketCategoryName = order_Detail.Tickets.TicketCategory.TicketCategoryName,
-                        TicketTime = order_Detail.Tickets.TicketTimes.TicketTime.ToString("yyyy/MM/dd HH:mm")
+                        TicketTime = order_Detail.Tickets.TicketTimes.TicketTime.ToString("yyyy/MM/dd HH:mm"),
+                        MemberName = tqrc.Order_Detail.Orders.Name
                     };
                 }).FirstOrDefault();
-            if (activityData != null)
-            {
-                string json = JsonConvert.SerializeObject(activityData);
-                return json;
-            }
-            else
-            {
-                return "false";
-            }
+            return activityData;
         }
         public class ActivityData
         {

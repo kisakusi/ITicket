@@ -2,6 +2,9 @@
 @using PagedList.Mvc;
 @using prjITicket.Models;
 @model Activity
+@{
+    Member member = Session[CDictionary.SK_Logined_Member] as Member;
+}
 <link href="~/Content/PagedList.css" rel="stylesheet" />
 <div class="card mt-4">
     <img class="card-img-top img-fluid" src="@Url.Content("~/images/Activity/"+Model.Picture)" alt="">
@@ -103,11 +106,21 @@
                 <link href="@Url.Content("~/Content/Activity/CommentStar.css")" rel="stylesheet" />
                 <div class="commentStar">
                     <ul id="commentStars">
-                        <li><img src="/images/Activity/CommentStar/star.gif" alt=""></li>
-                        <li><img src="/images/Activity/CommentStar/star.gif" alt=""></li>
-                        <li><img src="/images/Activity/CommentStar/star.gif" alt=""></li>
-                        <li><img src="/images/Activity/CommentStar/star.gif" alt=""></li>
-                        <li><img src="/images/Activity/CommentStar/star.gif" alt=""></li>                       
+                        <li>
+                            <img src="/images/Activity/CommentStar/star.gif" alt="">
+                        </li>
+                        <li>
+                            <img src="/images/Activity/CommentStar/star.gif" alt="">
+                        </li>
+                        <li>
+                            <img src="/images/Activity/CommentStar/star.gif" alt="">
+                        </li>
+                        <li>
+                            <img src="/images/Activity/CommentStar/star.gif" alt="">
+                        </li>
+                        <li>
+                            <img src="/images/Activity/CommentStar/star.gif" alt="">
+                        </li>
                     </ul>
                 </div>
                 <!---->
@@ -118,11 +131,12 @@
         </div>
     </div>
 </div>
-<script>   
+<script>
+
     //Ajax上傳評論後刷新評論頁面查看剛上傳的評論
-    $("#btnComment").on("click", function () {       
+    $("#btnComment").on("click", function () {
         let content = $("textarea").val();
-        let starCount = $("#commentStars img[src='/images/Activity/CommentStar/chngstar.gif']").length;       
+        let starCount = $("#commentStars img[src='/images/Activity/CommentStar/chngstar.gif']").length;
         $.ajax({
             type: "post",
             url: "@Url.Action("AddActivityComment")",
@@ -144,11 +158,11 @@
                     $("#addCommentError").html(result);
                 }
             }
-        });       
+        });
     });
     //默認啓動星星
     setStarsActive();
-    //啓動星星評價的方法    
+    //啓動星星評價的方法
     function setStarsActive() {
         $("#commentStars img").attr("src", "/images/Activity/CommentStar/star.gif");
         $("#commentStars img").mouseenter(function () {
@@ -162,7 +176,7 @@
             $("#commentStars img").off();
             $("#commentStars").off();
         });
-    }   
+    }
     //textarea輸入的時候實時提供當前字數
     $('textarea').on('input propertychange', function () {
         $("#addCommentError").html("");
@@ -175,4 +189,58 @@
         }
         $('.font_num').html(length);
     });
+    //按下舉報要做的事
+    function reportComment(commentId) {
+        let memberId;
+        @if (member != null)
+        {
+            @:memberId=@member.MemberID;
+        }
+        if (memberId) {
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("CheckRepeatReport")",
+                data: { commentId: commentId, memberId: memberId },
+                success: function (result) {
+                    if (result=="True") {
+                        Swal.fire('不可重複舉報', '', 'error');
+                    }
+                    else {
+                        Swal.fire({
+                            title: '填寫舉報理由',
+                            html: '<textarea id="txtReason" style="width:400px;resize:none;height:100px" maxlength="50">',
+                            showCancelButton: true,
+                            confirmButtonText: `提交`
+                        }).then((result) => {
+                            /* Read more about isConfirmed, isDenied below */
+                            if (result.isConfirmed) {
+                                let reason = $("#txtReason").val().trim();
+                                if (reason) {
+                                    $.ajax({
+                                        type: "post",
+                                        url: "@Url.Action("ReportComment","Activity")",
+                                        data: { commentId: commentId, memberId: memberId, reason: reason },
+                                        success: function () {
+                                            Swal.fire('舉報成功', '', 'success');
+                                        }
+                                    });
+                                }
+                                else {
+                                    Swal.fire('必須填寫理由', '', 'info');
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        else {
+            Swal.fire({
+                icon: 'error',
+                title: "舉報失敗",
+                text: '舉報前必須先登錄',
+                footer: '<a href="@Url.Action("Login","Login")">前往登錄頁面</a>'
+            });
+        }
+    }
 </script>

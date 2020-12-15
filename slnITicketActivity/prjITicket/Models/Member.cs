@@ -32,6 +32,7 @@ namespace prjITicket.Models
             this.ShortMessage = new HashSet<ShortMessage>();
             this.Subscribes = new HashSet<Subscribes>();
             this.ActivityFavourite = new HashSet<ActivityFavourite>();
+            this.CommentReport = new HashSet<CommentReport>();
         }
     
         public int MemberID { get; set; }
@@ -86,5 +87,7 @@ namespace prjITicket.Models
         public virtual ICollection<Subscribes> Subscribes { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ActivityFavourite> ActivityFavourite { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<CommentReport> CommentReport { get; set; }
     }
 }

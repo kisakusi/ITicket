@@ -701,6 +701,9 @@
     <Compile Include="Models\Comment.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\CommentReport.cs">
+      <DependentUpon>TicketSysModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\COrderDetailByTicketGroup.cs" />
     <Compile Include="Models\CShoppingCart.cs" />
     <Compile Include="Models\Districts.cs">

@@ -7,6 +7,8 @@
 <link href="~/Content/PagedList.css" rel="stylesheet" />
 <link href="~/Content/Activity/MultiRange/nouislider.min.css" rel="stylesheet" />
 <script src="~/Content/Activity/MultiRange/nouislider.min.js"></script>
+<!--引用漂亮彈框-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <style>
     #min, #max {
         width: 70px;
@@ -472,32 +474,32 @@
         padding-left: 0
     }
 
-    .ranking li {
-        margin-bottom: 5px
-    }
+        .ranking li {
+            margin-bottom: 5px
+        }
 
-    .ranking .rankItemName {
-        display: inline-block;
-        line-height: 20px;
-        height: 20px;
-        width: 60%;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap
-    }
+        .ranking .rankItemName {
+            display: inline-block;
+            line-height: 20px;
+            height: 20px;
+            width: 60%;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap
+        }
 
-    .ranking .rankNumber {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        text-align: center;
-        margin-right: 15px;
-        color: #999;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap
-    }
+        .ranking .rankNumber {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            margin-right: 15px;
+            color: #999;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap
+        }
 
     .sellCount {
         color: #999;
@@ -514,8 +516,28 @@
         text-decoration: none;
         color: #0080FF
     }
-    .ranking a{
-        color:black
+
+    .ranking a {
+        color: black
+    }
+    .headings {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        padding: 2em 0 0 0;
+    }
+
+    .title {
+        margin: 0;
+        font-weight:bold;
+    }
+
+    .hr {
+        display: block;
+        flex: 1;
+        margin: 0 30px;
+        height: 3px;
+        background: #D4D4D4;
     }
 </style>
 <!-- Page Content -->
@@ -536,7 +558,7 @@
                             <span class="rankItemName"><a href="@Url.Action("ActivityDetail",new { activityId = Model.Best10[i].ActivityId})">@Model.Best10[i].ActivityName</a></span>
                             <span class="sellCount">售出@(totalSell>999?"999":totalSell.ToString())</span>
                         </li>
-                    }                   
+                    }
                 </ul>
             </div>
         </div>
@@ -592,7 +614,7 @@
                 </div>
                 @foreach (Categories categories in Model.Categories)
                 {
-                    int categoryActivityCount = categories.SubCategories.Sum(sc => sc.Activity.Where(a=>a.ActivityStatusID==1).Count());
+                    int categoryActivityCount = categories.SubCategories.Sum(sc => sc.Activity.Where(a => a.ActivityStatusID == 1).Count());
                     <!--循環顯示大類-->
                     <div class="btn-group dropright">
                         <button onclick="categoryClick(@categories.CategoryID)" type="button" class="btn btn-default dropdown-toggle categoryHover" aria-haspopup="true" aria-expanded="false">
@@ -603,7 +625,7 @@
                             <!--循環顯示大類下面的子類,通過右邊滑出菜單展示-->
                             @foreach (SubCategories subCategories in categories.SubCategories)
                             {
-                                int subcategoryActivityCount = subCategories.Activity.Where(a=>a.ActivityStatusID==1).Count();
+                                int subcategoryActivityCount = subCategories.Activity.Where(a => a.ActivityStatusID == 1).Count();
                                 <a href="javascript:;" onclick="subCategoryClick(@subCategories.SubCategoryId)" class="dropdown-item">
                                     @subCategories.SubCategoryName
                                     <span class="badge" style="font-size:5px;background-color:#84C1FF;color:white">@(subcategoryActivityCount>99?"99+":subcategoryActivityCount.ToString())</span>
@@ -648,6 +670,11 @@
     <!-- /.col-lg-3 -->
     <!-- col-lg-9 -->
     <div id="activityListPageRight" class="col-lg-9">
+        <div class="headings">
+            <span class="hr"></span>
+            <h2 class="title">最新活動</h2>
+            <span class="hr"></span>
+        </div>
         <div id="carouselExampleIndicators" class="carousel slide mt-4" data-ride="carousel">
             <ol class="carousel-indicators">
                 <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -673,6 +700,11 @@
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
+        </div>
+        <div class="headings">
+            <span class="hr"></span>
+            <h2 class="title">活動列表</h2>
+            <span class="hr"></span>
         </div>
         <!--順序,價格篩選器-->
         <div class="row">

@@ -14,14 +14,23 @@ namespace prjITicket.Models
     
     public partial class Comment
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Comment()
+        {
+            this.CommentReport = new HashSet<CommentReport>();
+        }
+    
         public int CommentID { get; set; }
         public int CommentMemberID { get; set; }
         public int CommentActivityId { get; set; }
         public string CommentContent { get; set; }
         public int CommentScore { get; set; }
         public System.DateTime CommentDate { get; set; }
+        public bool IsBaned { get; set; }
     
         public virtual Activity Activity { get; set; }
         public virtual Member Member { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<CommentReport> CommentReport { get; set; }
     }
 }
