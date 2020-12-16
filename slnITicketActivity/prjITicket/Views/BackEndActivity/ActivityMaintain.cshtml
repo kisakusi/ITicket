@@ -1,6 +1,5 @@
 ﻿@using BackEnd.ViewModel
 @model List<BackEnd.ViewModel.CBackEndActivity>
-
 @{
     /**/
 
@@ -11,18 +10,17 @@
 <!--Sweet Alert CDN-->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-<h1 class="mt-4">活動列表</h1>
-<div class="container-fluid">
-    <h1 class="mt-4"></h1>
 
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item">
-            後台
-        </li>
-        <li class="breadcrumb-item active">
-            活動列表
-        </li>
-    </ol>
+<h1 class="mt-4">活動列表</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="@Url.Action("BackEndIndex","BackEndMain")">後台</a></li>
+    <li class="breadcrumb-item active">活動列表</a>
+    </li>
+</ol>
+
+
+<div class="container-fluid">
+
     @using (Html.BeginForm())
     {
 
@@ -32,21 +30,20 @@
             <div class="card-body">
                 <div class="card-title">
                     查詢條件
+
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroup-sizing-default">活動名稱</span>
                     </div>
-                    <input type="text" id="txt_ActivityName" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                    <input type="text" id="txt_ActivityName" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroup-sizing-default">商家名稱</span>
                     </div>
-                    <input type="text" id="txt_CompanyName" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                    <input type="text" id="txt_CompanyName" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
                 </div>
-
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="inputGroup-sizing-default" style="margin-right:1%">活動狀態</span>
-
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" id="ckbox0" value="0" checked>
                         <label class="form-check-label" for="ckbox0" id="label0">未審核</label>
@@ -59,19 +56,17 @@
                         <input class="form-check-input" type="checkbox" id="ckbox2" value="2">
                         <label class="form-check-label" for="ckbox2" id="label2">下架</label>
                     </div>
+                    <button type="button" class="btn btn-outline-light" id="iddemo">Demo</button>
 
                 </div>
                 <button type="button" id="btn_search" class="btn btn-primary" style="width:100%"><i class="fas fa-search"></i> 查詢</button>
             </div>
-
         </div>
 
     }
-
     <!--中間一條沒有意義的線-->
     <div class="card mb-4">
     </div>
-
     <!--查詢結果-->
     <div class="card mb-4">
         <div class="card-header">
@@ -84,7 +79,6 @@
         </div>
     </div>
 </div>
-
 
 <script type="text/javascript">
     $(function () {
@@ -207,5 +201,10 @@
             text: '至少需選擇一種活動狀態',
         })
     }
-</script>
 
+    $("#iddemo").click(function () {
+        $("#txt_ActivityName").val("冰雪")
+        $("#ckbox0").prop("checked", false)
+        $("#ckbox1").prop("checked",true)
+    })
+</script>

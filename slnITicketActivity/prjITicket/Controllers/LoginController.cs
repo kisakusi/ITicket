@@ -25,7 +25,7 @@ namespace prjITicket.Controllers
         TicketSysEntities db = new TicketSysEntities();
         //實體化MailService，以引用內部方法進行Email驗證
         MailService mailService = new MailService();
-
+        #region 第三方登入
         //第三方登入=======
         public string FBLogin(string returnUrl)
         {
@@ -40,6 +40,7 @@ namespace prjITicket.Controllers
                 m.NickName = ms.name;
                 m.MemberRoleId = 2;
                 m.Point = 0;
+                m.fRegister_time = DateTime.Now;
                 m.providerFB = true;
                 db.Member.Add(m);
                 db.SaveChanges();
@@ -85,6 +86,7 @@ namespace prjITicket.Controllers
                 m.MemberRoleId = 2;
                 m.Point = 0;
                 m.providerGO = true;
+                m.fRegister_time = DateTime.Now;
                 db.Member.Add(m);
                 db.SaveChanges();
                 member = db.Member.Where(x => x.Email == ms.du).FirstOrDefault();
@@ -114,7 +116,9 @@ namespace prjITicket.Controllers
 
         }
         //第三方登入End=======
+        #endregion
 
+        #region 登入與登出
         //登入
         public ActionResult Login()
         {
@@ -124,28 +128,14 @@ namespace prjITicket.Controllers
         [HttpPost]
         public ActionResult Login(string Email, string Password,FormCollection form)
         {
-            //string admin = "admin";
-            //int time = (DateTime.Now.Month * DateTime.Now.Day) + 2;
-            //string adminPassword = "msit128" + time.ToString();
-
-            //CAdmin ad = new CAdmin();            
-            //ad.Admin = admin;
-            //ad.AdminPassword = adminPassword;
-            //List<CAdmin> AdMember = new List<CAdmin>();
-            //AdMember.Add(ad);
-            //if (Email==admin && Password==adminPassword)
-            //{
-            //    Session[CDictionary.SK_Admin_Logined_Member] = AdMember;
-            //    return RedirectToAction("ActivityList", "Activity");
-            //}
-          
+            
             var isVerify = new GoogleReCaptcha().GetCaptchaResponse(form["g-recaptcha-response"]);
             if (isVerify)
             {
                 var member = db.Member
                     .Where(m => m.Email == Email && m.Password == Password)
                     .FirstOrDefault();
-
+                //var banmember = db.BanLIst.Where(x => x.BanMemberId == member.MemberID&&x.EndTime> DateTime.Now).FirstOrDefault();               
                 //若member為null，表示會員未註冊
                 if (member == null)
                 {
@@ -158,14 +148,9 @@ namespace prjITicket.Controllers
                     return View();
                 }
 
-                //if (member.MemberRole.MemberRoleName == "管理者")
-                //{
-                //    Session[CDictionary.SK_Admin_Logined_Member] = member;
-                //}
-                //else
-                //{
-                    Session[CDictionary.SK_Logined_Member] = member;
-                //}
+                
+                 Session[CDictionary.SK_Logined_Member] = member;
+               
             }
             else {
                 ViewBag.Message = "請勾選驗證機器人";
@@ -174,18 +159,15 @@ namespace prjITicket.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
-        [HttpPost]
-        public string ValidateReCAPTCHA(string response)
+        //登出
+        public ActionResult Logout()
         {
-            var SECRET_KEY = "6LdLEP8ZAAAAAINndsRWW6iVg5w6-XsLJN841xfk";
-            var client = new WebClient();
-            var reply =
-                client.DownloadString(
-                    string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", SECRET_KEY, response));
-            return reply;
+            Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
+        #endregion
 
+        #region 收取驗證信
         //接收驗證信連接密碼修改頁面
         //==================================================
         public ActionResult PasswordValidate(string UserName, string RegisterCheckCode)
@@ -206,6 +188,18 @@ namespace prjITicket.Controllers
             return RedirectToAction("Login","Login");
         }
 
+        //接收驗證信連接傳進來的Action
+        //==================================================
+        public ActionResult EmailValidate(string UserName, string RegisterCheckCode)
+        {
+            Member member = db.Member.Where(m => m.Email == UserName).FirstOrDefault();
+            UserName = member.Email;
+            ViewBag.EmailValidate = mailService.EmailValidate(UserName, RegisterCheckCode);
+            return View();
+        }
+        #endregion
+
+        #region 忘記密碼
         public ActionResult Forget()
         {
             return View();
@@ -242,15 +236,9 @@ namespace prjITicket.Controllers
             return "成功";//RedirectToAction("Login", "Login");
         }
 
+        #endregion
 
-        //登出
-        public ActionResult Logout()
-        {
-            Session.Clear();  
-            return RedirectToAction("Index", "Home");
-        }
-
-
+        #region 註冊會員與檢查email有無衝突(ajax)
         //註冊會員
         public ActionResult Register()
         {            
@@ -301,6 +289,7 @@ namespace prjITicket.Controllers
                 m.MemberRoleId = 1;
                 m.Point = 0;
                 m.RegisterCheckCode = RegisterCheckCode;
+                m.fRegister_time = DateTime.Now;
                 db.Member.Add(m);
                 db.SaveChanges();
                 //取得寫好的驗證範本內容
@@ -328,16 +317,33 @@ namespace prjITicket.Controllers
 
         }
 
-        //接收驗證信連接傳進來的Action
-        //==================================================
-        public ActionResult EmailValidate(string UserName, string RegisterCheckCode)
+        public string IsHasMember(string Email)
         {
-            Member member = db.Member.Where(m => m.Email == UserName).FirstOrDefault();
-            UserName = member.Email;
-            ViewBag.EmailValidate = mailService.EmailValidate(UserName, RegisterCheckCode);
-            return View();
-        }
+            var member = db.Member
+                .Where(m => m.Email == Email)
+                .FirstOrDefault();
+            //[a-zA-Z0-9._%+-]+@[a-zA-z0-9.-]+\.[a-zA-Z]{2,}$
+            if (!Regex.IsMatch(Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-z0-9.-]+\.[a-zA-Z]{2,}$"))
+            {
+                return "請輸入email格式";
+            }
+            if (Email == "")
+            {
+                return "請輸入帳號";
+            }
+            else if (member == null)
+            {
+                return "\u2705 可以使用此帳號";
+            }
+            else
+            {
+                return "此帳號己有人使用";
+            }
 
+        }
+        #endregion
+
+        #region 企業註冊會員
         public ActionResult BussRegister()
         {
           
@@ -384,7 +390,7 @@ namespace prjITicket.Controllers
             //若member為null，表示會員未註冊
             if (bussmember == null)
             {
-                FileSave.SaveAs(Server.MapPath("~/Content/Login/SellerImage")+"/" + FileSave.FileName);
+                
                 Member m = new Member();
                 m.Email = formData.Email;
                 m.Password = formData.Password;
@@ -393,6 +399,7 @@ namespace prjITicket.Controllers
                 m.RegisterCheckCode = RegisterCheckCode;
                 m.MemberRoleId = 1;
                 m.Point = 0;
+                m.fRegister_time = DateTime.Now;
                 
                 db.Member.Add(m);
                 db.SaveChanges();
@@ -403,10 +410,10 @@ namespace prjITicket.Controllers
                 s.CompanyName = formData.CompanyName;
                 s.TaxIDNumber = formData.TaxIDNumber;
                 s.fPass = false;
-                s.fFileName = FileSave.FileName;
+                s.fFileName = $"abc{m.MemberID:D4}" + FileSave.FileName;
                 db.Seller.Add(s);
                 db.SaveChanges();
-
+                FileSave.SaveAs(Server.MapPath("~/Content/Login/SellerImage") + "/" + $"abc{m.MemberID:D4}" + FileSave.FileName);
                 //取得寫好的驗證範本內容
                 string TempMail = System.IO.File.ReadAllText(
                     Server.MapPath("~/Views/Shared/RegisterEmailTemplate.html"));
@@ -428,7 +435,9 @@ namespace prjITicket.Controllers
             ViewBag.Message = "此帳號己有人使用，註冊失敗";
             return View();
         }
+        #endregion
 
+        #region 提供企業下載範例檔案
         //提供下載檔案
         public ActionResult DemoDownload()
         {           
@@ -444,36 +453,99 @@ namespace prjITicket.Controllers
             return File(iStream, "application/msword", filename);
             //contentType The content type (MIME type)副檔名
         }
-        public ActionResult MemberEdit()
+        #endregion
+
+        #region (會員中心)一般會員與企業會員呈現目前個人資料
+        public ActionResult MemberEdit(string mode = "")
         {
-            
             if (Session[CDictionary.SK_Logined_Member] != null)
             {
                 string email = (Session[CDictionary.SK_Logined_Member] as Member).Email;
                 var member = db.Member.Where(x => x.Email == email).FirstOrDefault();
                 member.Password = "";
                 CMember c = new CMember { entity = member };
+                ViewBag.Mode = mode;
                 return View(c);
             }
+            ViewBag.Mode = mode;
             return View();
         }
-       
-        public ActionResult BussEdit()
+
+
+        public ActionResult BussEdit(string mode = "")
         {
             if (Session[CDictionary.SK_Logined_Member] != null)
             {
                 string email = (Session[CDictionary.SK_Logined_Member] as Member).Email;
-                int id=(Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+                int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
                 var member = db.Member.Where(x => x.Email == email).FirstOrDefault();
-                var seller=db.Seller.Where(x => x.MemberId == id).FirstOrDefault();
+                var seller = db.Seller.Where(x => x.MemberId == id).FirstOrDefault();
                 member.Password = "";
-                CBussMember buss = new CBussMember() { entity=member, BussEntity=seller };               
-                return View(buss); 
+                CBussMember buss = new CBussMember() { entity = member, BussEntity = seller };
+                ViewBag.Mode = mode;
+                return View(buss);
             }
+            ViewBag.Mode = mode;
             return View();
 
         }
+        #endregion
 
+        #region 企業會員資料修改與審核不通過再次上傳檔案(前後端ajax)
+        public string BussMemberSave(QBussMember b)
+        {
+            int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+
+            Seller prod = db.Seller.FirstOrDefault(t => t.MemberId == id);
+            if (prod != null)
+            {
+                if (b.CompanyName == null || b.TaxIDNumber == null || b.SellerPhone == null)
+                {
+                    return "必填欄位未填寫，修改失敗";
+                }
+                prod.CompanyName = b.CompanyName;
+                prod.TaxIDNumber = b.TaxIDNumber;
+                prod.SellerHomePage = b.SellerHomePage;
+                prod.SellerDeccription = b.SellerDeccription;
+                prod.SellerPhone = b.SellerPhone;
+                db.SaveChanges();
+                return "修改成功";
+            }
+            
+            return "修改失敗";   
+
+        }
+        public string FileSave(HttpPostedFileBase FileSave)
+        {
+            int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+            Seller prod = db.Seller.FirstOrDefault(t => t.MemberId == id);
+            if (FileSave != null)
+            {
+                prod.fPass = null;
+                prod.fFileName = FileSave.FileName;
+                db.SaveChanges();
+                FileSave.SaveAs(Server.MapPath("~/Content/Login/SellerImage") + "/" + FileSave.FileName);
+                return "上傳成功";
+            }
+            return "上傳失敗";
+        }
+        public string UpdatePass()
+        {
+            int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+            var seller=db.Seller.Where(x => x.MemberId == id).FirstOrDefault();
+            if (seller.fPass == null)
+            {
+                return "審核中";
+            }
+            else if (seller.fPass == true)
+            {
+                return "審核通過";
+            }
+            return "審核失敗";
+        }
+        #endregion
+
+        #region (ajax)會員資料修改與密碼修改
         public string MemberSave(QMember b)
         {
             
@@ -500,44 +572,8 @@ namespace prjITicket.Controllers
             return "修改失敗";
 
         }
-        [HttpPost]
-        public string FileSave(HttpPostedFileBase FileSave)
-        {
-            int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
-            Seller prod = db.Seller.FirstOrDefault(t => t.MemberId == id);
-            if (FileSave != null)
-            {
-                prod.fPass = null;
-                prod.fFileName = FileSave.FileName;
-                db.SaveChanges();
-                FileSave.SaveAs(Server.MapPath("~/Content/Login/SellerImage") + "/" + FileSave.FileName);               
-                return "上傳成功";
-            }
-            return "上傳失敗";
-        }
-
-        public string BussMemberSave(QBussMember b)
-        {
-            int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
-
-            Seller prod = db.Seller.FirstOrDefault(t => t.MemberId == id);
-            if (prod != null)
-            {
-                if (b.CompanyName == null || b.TaxIDNumber == null || b.SellerPhone == null)
-                {
-                    return "必填欄位未填寫，修改失敗";
-                }
-                prod.CompanyName = b.CompanyName;
-                prod.TaxIDNumber = b.TaxIDNumber;
-                prod.SellerHomePage = b.SellerHomePage;
-                prod.SellerDeccription = b.SellerDeccription;
-                prod.SellerPhone = b.SellerPhone;
-                db.SaveChanges();
-                return "修改成功";
-            }
-            return "修改失敗";
-
-        }
+        
+        
 
         //todo 12/13
         public string MemberPassSave(QMember b)
@@ -560,64 +596,9 @@ namespace prjITicket.Controllers
             return "原密碼輸入錯誤，修改失敗";
 
         }
+        #endregion
 
-        public string IsHasMember(string Email)
-        {
-            var member = db.Member
-                .Where(m => m.Email == Email)
-                .FirstOrDefault();
-            //[a-zA-Z0-9._%+-]+@[a-zA-z0-9.-]+\.[a-zA-Z]{2,}$
-            if (!Regex.IsMatch(Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-z0-9.-]+\.[a-zA-Z]{2,}$"))
-            {
-                return "請輸入email格式";
-            }
-            if (Email == "")
-            {
-                return "請輸入帳號";
-            }
-            else if (member == null)
-            {
-                return "\u2705 可以使用此帳號";
-            }
-            else
-            {
-                return "此帳號己有人使用";
-            }
 
-        }
-        public string IsPassword(string password)
-        {
-      
-            if (!Regex.IsMatch(password, @"^(?=.*[a-zA-Z])(?=.*\d).{8,12}$"))
-            {
-                return "請輸入8-12碼,至少一個英文及數字";
-            }           
-            else
-            {
-                return "\u2705 密碼格式正確";
-            }
-
-        }
-
-        public string TaxResult()
-        {
-            //using (WebClient server = new WebClient())
-            //{
-            //    try
-            //    {
-            //        server.Encoding = Encoding.UTF8;
-            //        server.Headers.Add(HttpRequestHeader.ContentType, "application/json");
-            //        var json = server.DownloadString("http://localhost:62254/api/FFoodpanda");
-            //        List<CProduct> list = JsonConvert.DeserializeObject<List<CProduct>>(json);
-            //        dataGridView1.DataSource = list;
-            //    }
-            //    catch (WebException ex)
-            //    {
-
-            //    }
-            //}
-            return "此統編認證正確";
-        }
 
         //上傳會員照片
         //=====================================================
@@ -693,13 +674,12 @@ namespace prjITicket.Controllers
             return postCode;
         }
 
-        //todo
-        //會員訂單管理查詢
+        //todo12/16會員訂單管理查詢
         public ActionResult getOrderbyMemberId(int memberId, int page = 1)
         {
             int pagesize = 5;
             int pagecurrent = page < 1 ? 1 : page;
-            List<Orders> order = db.Orders.Where(o => o.MemberID == memberId).ToList();
+            List<Orders> order = db.Orders.OrderByDescending(o => o.OrderDate).Where(o => o.MemberID == memberId).ToList();
             IPagedList<Orders> pagelist = order.ToPagedList(pagecurrent, pagesize);
             ViewBag.MemberId = memberId;
             return PartialView("getOrderbyMemberId", pagelist);
@@ -761,5 +741,22 @@ namespace prjITicket.Controllers
             return PartialView("getShortMassageByMemberId", pagelist);
         }
 
+        //todo 12/15
+        //會員我的訊息刪除
+        public string deleteShortmessage(int memberId, int shortmessageId)
+        {
+            ShortMessage sm = db.ShortMessage.FirstOrDefault(s => s.MemberID == memberId && s.ShortMessageID == shortmessageId);
+            db.ShortMessage.Remove(sm);
+            db.SaveChanges();
+            return "刪除成功";
+        }
+
+        //todo 12/15
+        //會員我的訊息圈圈數字改變
+        public int changeShortMessageNumber(int memberId)
+        {
+            int number = db.ShortMessage.Where(s => s.MemberID == memberId).Count();
+            return number;
+        }
     }
 }

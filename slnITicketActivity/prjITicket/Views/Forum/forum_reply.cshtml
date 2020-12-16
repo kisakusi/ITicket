@@ -17,14 +17,14 @@
 <script src="~/Scripts/jquery-1.10.2.min.js"></script>
 @foreach (var item in Model.Article.Reply)
 {
-    <div class="media mb-4">
-        <img class="reply_Profile" style="content:url(/images/Login/Upload/@item.Member.Icon); width:50px; height:50px;">
+    <div class="media mb-4 reply_css">
+        <img class="reply_Profile" src="/images/Login/Upload/@item.Member.Icon" style="width:50px; height:50px;" onerror="this.src='/images/Login/Layout/bar.png'">
         <div class="media-body">
             <div class="float-right">
                 <div class="w3-dropdown-hover w3-right" style="background-color:white">
                     <button class="btn"><i class="fa fa-bars"></i></button>
                     <div id="Dropdown@(count)" class="w3-dropdown-content w3-bar-block w3-border w3-animate-opacity" style="right:0;width:80px">
-                        <button onclick="reply_quote(@item.ReplyID)" class="emotion info">引用留言</button> @*Quote V.動詞 引用*@
+                        <button onclick="reply_quote(@item.ReplyID,'@item.Member.Name')" class="emotion info">引用留言</button> @*Quote V.動詞 引用*@
                         <button class="emotion info" onclick="showModal(@count)">檢舉留言</button>
                         @if (member != null && item.MemberID == member.MemberID)
                         {
@@ -105,68 +105,85 @@
             </footer>
         </div>
     </div>
-    
+
     count += 1;
 }
 
+
+@if (member != null && member.MemberID == Model.Article.MemberID)
+{
+    <script>
+    $(function () {
+            var Article = @Model.Article.ArticleID;
+        $.ajax({
+            type: "post",
+            url: "@Url.Action("reply_readed")",
+            data: { Article: Article },
+            success: function (data) {
+                    alert("已讀");
+                }
+    })
+})
+    </script>
+}
 <script>
     function replydelete(replyId) {
         $.ajax({
-                    type: "post",
+            type: "post",
                     url: "@Url.Action("Reply_Delete")",
                     data: { replyId: replyId ,ArticleID:@Model.Article.ArticleID},
             success: function (data) {
-                alert("刪除成功");
+                    alert("刪除成功");
                         $("#ajaxdemoshow").load(`/Forum/forum_reply?articleID=@Model.Article.ArticleID`);
-                    }
-                });
+                }
+            });
     }
 
     function txtReplyKeyDown(replyId) {
 
         if (window.event.keyCode == 13) {
-            let rpcontent = $("#replyEdit_content_"+ replyId).val();
+        let rpcontent = $("#replyEdit_content_"+ replyId).val();
 
-            if (rpcontent == "")
-            {
-                alert("請輸入留言");
-            }
-            else
-            {
+        if (rpcontent == "")
+        {
+            alert("請輸入留言");
+        }
+        else
+        {
                 $.ajax({
-                    type: "post",
+            type: "post",
                     url: "@Url.Action("Reply_Edit","Forum")",
                     data: { rpcontent: rpcontent, replyID: replyId },
                     success: function (data) {
-                        alert("成功")
+                    alert("成功")
                         $("#ajaxdemoshow").load(`@Url.Action("forum_reply","Forum",new { articleID =Model.Article.ArticleID})`);
-                    }
-                });
-            }
+                }
+            });
         }
+    }
         if(window.event.keyCode == 27){
-            let x = document.getElementById("replyEdit_content_" + replyId);
-            let y = document.getElementById("replyshow_content_" + replyId);
-            let z = document.getElementById("fnt_" + replyId);
+        let x = document.getElementById("replyEdit_content_" + replyId);
+        let y = document.getElementById("replyshow_content_" + replyId);
+        let z = document.getElementById("fnt_" + replyId);
 
-            x.style.display = 'none';
-            y.style.display = 'block';
-            z.style.display = 'none';
-           }
+        x.style.display = 'none';
+        y.style.display = 'block';
+        z.style.display = 'none';
+    }
     }
     function toggleEdit(replyId) {
         let x = document.getElementById("replyEdit_content_" + replyId);
         let y = document.getElementById("replyshow_content_" + replyId);
         let z = document.getElementById("fnt_" + replyId);
         if (x.style.display === 'none') {
-               x.style.display = 'block';
-               y.style.display = 'none';
-               z.style.display = 'block';
-           } else {
-               x.style.display = 'none';
-               y.style.display = 'block';
-               z.style.display = 'none';
-           }
+            x.style.display = 'block';
+            y.style.display = 'none';
+            z.style.display = 'block';
+        } else {
+            x.style.display = 'none';
+            y.style.display = 'block';
+            z.style.display = 'none';
+        }
     }
 
     function showModal(count) {
@@ -190,18 +207,18 @@
             type: "post",
              url: "@Url.Action("Reply_Report")",
              data: {
-                 ReportID: reportId, ReplyID: replyId},
+                ReportID: reportId, ReplyID: replyId},
              success: function (data) {
-                 if (data != "成功") {
-                     alert(data);
-                     window.location.href = 'http://localhost:49949/Login/Login';
-                 } else {
-                     Modal.style.display = 'none';
-                     alert("檢舉" + data);
-                 }
+                    if (data != "成功") {
+                        alert(data);
+                        window.location.href = 'http://localhost:49949/Login/Login';
+                    } else {
+                        Modal.style.display = 'none';
+                        alert("檢舉" + data);
+                    }
+                }
+            });
         }
-      });
-    }
     }
 
     function likeBtn(replyId) {
@@ -217,7 +234,7 @@
                 likebtn.className = 'gpclick';
 
                 $.ajax({
-                 type: "post",
+                type: "post",
                  url: "@Url.Action("Reply_EmotionAction")",
                     data: { ReplyID: replyId, ActionID: ActionId},
                     success: function (data) {
@@ -236,7 +253,7 @@
                 likebtn.className = 'gp';
 
                 $.ajax({
-                 type: "post",
+                type: "post",
                  url: "@Url.Action("Reply_EmotionAction_Cancel")",
                     data: { ReplyID: replyId},
                     success: function (data) {
@@ -261,16 +278,16 @@
                 dislikebtn.className = 'bpclick';
 
                   $.ajax({
-                 type: "post",
+                type: "post",
                  url: "@Url.Action("Reply_EmotionAction")",
                     data: { ReplyID: replyId, ActionID: ActionId},
                       success: function (data) {
-                          if (data != "成功") {
-                              alert(data);
-                              window.location.href = 'http://localhost:49949/Login/Login';
-                          } else {
-                              badpoint.innerText = parseInt(badpoint.innerText) + 1;
-                          }
+                        if (data != "成功") {
+                            alert(data);
+                            window.location.href = 'http://localhost:49949/Login/Login';
+                        } else {
+                            badpoint.innerText = parseInt(badpoint.innerText) + 1;
+                        }
                     },
                     error: function (data) {
                     }
@@ -279,7 +296,7 @@
             else {
                 dislikebtn.className = 'bp';
                 $.ajax({
-                 type: "post",
+                type: "post",
                  url: "@Url.Action("Reply_EmotionAction_Cancel")",
                     data: { ReplyID: replyId},
                     success: function (data) {
@@ -292,6 +309,7 @@
         }
     }
 
-   
+
+
 </script>
 

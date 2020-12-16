@@ -190,6 +190,7 @@
     <EntitySetMapping Name="Reply">
       <EntityTypeMapping TypeName="TicketSysModel.Reply">
         <MappingFragment StoreEntitySet="Reply">
+          <ScalarProperty Name="Readed" ColumnName="Readed" />
           <ScalarProperty Name="ReplyID" ColumnName="ReplyID" />
           <ScalarProperty Name="ReplyContent" ColumnName="ReplyContent" />
           <ScalarProperty Name="MemberID" ColumnName="MemberID" />

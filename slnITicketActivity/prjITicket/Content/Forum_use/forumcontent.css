@@ -10,9 +10,23 @@
     margin-right: 10px;
 }
 
-.itembtn{
 
+.發文者資訊及操作區欄位 {
+    box-shadow: 4px 3px 9px #D0D0D0
 }
+
+.reply_css {
+    padding-top: 10px;
+    margin-top: 50px;
+    transition: all 0.2s;
+    border-radius: 16px;
+}
+
+    .reply_css:hover {
+        box-shadow: 6px 6px 9px #D0D0D0;
+        border-radius: 16px
+    }
+
 
 .emotion {
     border: none;

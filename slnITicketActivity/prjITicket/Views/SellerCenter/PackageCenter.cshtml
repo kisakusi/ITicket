@@ -21,7 +21,7 @@
         </div>
     </div>
 </div>*@
-<table class="table table-active">
+<table class="table table-info">
     <tr class="text-center">
         <th>
             序號
@@ -98,11 +98,11 @@
             success: function (result)
             {
                 $("#showdetail").empty();
-                $("#showdetail").append(`<tr class="text-center"><th>序號</th><th>套票名稱</th><th>活動名稱</th><th>照片</th></tr>`);
+                $("#showdetail").append(`<tr class="text-center"><th>序號</th><th>套票名稱</th><th>活動名稱</th><th>庫存</th><th>照片</th></tr>`);
                 $.each(result, function (i, e) {
                     $("#showdetail").append(`
 
-<tr class="text-center"><td class="align-middle">${i + 1}</td><td class="align-middle">${e.TicketGroupName}</td><td class="align-middle">${e.ActivityName}</td><td><img style="width:200px" src='/images/Activity/${e.Picture}' alt="Alternate Text"/></td></tr>
+<tr class="text-center"><td class="align-middle">${i + 1}</td><td class="align-middle">${e.TicketGroupName}</td><td class="align-middle">${e.ActivityName}</td><td class="align-middle">${e.UnitsInStock}</td><td><img style="width:200px" src='/images/Activity/${e.Picture}' alt="Alternate Text"/></td></tr>
 `)
                 });
 

@@ -165,9 +165,16 @@
     <Content Include="Content\BackEnd\demo\chart-bar-demo.js" />
     <Content Include="Content\BackEnd\demo\chart-pie-demo.js" />
     <Content Include="Content\BackEnd\demo\datatables-demo.js" />
+    <Content Include="Content\BackEnd\image\ITicket_logo1.png" />
+    <Content Include="Content\BackEnd\image\ITicket_logo1_notext.png" />
+    <Content Include="Content\BackEnd\image\ITicket_Logo2.png" />
+    <Content Include="Content\BackEnd\image\ITicket_logo2_notext.png" />
     <Content Include="Content\BackEnd\js\BackEndArticle01.js" />
     <Content Include="Content\BackEnd\js\BackEndArticle02.js" />
+    <Content Include="Content\BackEnd\js\BackEndComment01.js" />
+    <Content Include="Content\BackEnd\js\BackEndComment02.js" />
     <Content Include="Content\BackEnd\js\BackEndDemoMA.js" />
+    <Content Include="Content\BackEnd\js\BackEndDemoMAC.js" />
     <Content Include="Content\BackEnd\js\BackEndMember01.js" />
     <Content Include="Content\BackEnd\js\BackEndMember02.js" />
     <Content Include="Content\BackEnd\js\scripts.js" />
@@ -374,6 +381,7 @@
     <Content Include="Content\Forum_use\ImageStore\2ee498cf-67ee-4210-bec0-3745413a49dd.jpg" />
     <Content Include="Content\Forum_use\ImageStore\306acb90-fc29-4d90-8b53-fffd6ee0cb84.jpg" />
     <Content Include="Content\Forum_use\ImageStore\3a9ba3f5-f46a-4b67-9f13-280069f41fa2.jpg" />
+    <Content Include="Content\Forum_use\ImageStore\404Error.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4bef9b91-f571-46db-bd1e-6eaa0041b8a4.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4cb018cc-309e-4d9c-977d-909f2e2a205e.jpg" />
     <Content Include="Content\Forum_use\ImageStore\4ed66f04-19e6-400a-8a51-f78fe7fdf5e5.jpg" />
@@ -467,6 +475,7 @@
     <Content Include="Content\Login\fonts\poppins\roboto-condensed-v16-latin-regular.svg" />
     <Content Include="Content\Login\footerstyle.css" />
     <Content Include="Content\Login\functionCS\ShowPassword.css" />
+    <Content Include="Content\Login\functionJS\dist\canvas-nest.js" />
     <Content Include="Content\Login\functionJS\GoogleReCaptchaAPI.js" />
     <Content Include="Content\Login\images\form-v1-1.png" />
     <Content Include="Content\Login\images\form-v1-2.png" />
@@ -481,6 +490,8 @@
     <Content Include="Content\Login\images\signup-image.jpg" />
     <Content Include="Content\Login\images\wizard-v4.jpg" />
     <Content Include="Content\Login\SellerImageSQL0907.sql" />
+    <Content Include="Content\Login\SellerImage\0830.txt" />
+    <Content Include="Content\Login\SellerImage\1007.txt" />
     <Content Include="Content\Login\SellerImage\2.jpg" />
     <Content Include="Content\Login\SellerImage\anonymous.jpg" />
     <Content Include="Content\Login\SellerImage\git版本控制解釋.txt" />
@@ -643,6 +654,8 @@
     <Compile Include="Controllers\ActivityController.cs" />
     <Compile Include="Controllers\BackEndActivityController.cs" />
     <Compile Include="Controllers\BackEndArticleController.cs" />
+    <Compile Include="Controllers\BackEndCommentController.cs" />
+    <Compile Include="Controllers\BackEndMainController.cs" />
     <Compile Include="Controllers\BackEndMemberController.cs" />
     <Compile Include="Controllers\BackEndOrderController.cs" />
     <Compile Include="Controllers\BackEndTicketGroupController.cs" />
@@ -685,6 +698,7 @@
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\BackEndArticleFactory.cs" />
+    <Compile Include="Models\BackEndCommentFactory.cs" />
     <Compile Include="Models\BackEndMemberFactory.cs" />
     <Compile Include="Models\BanLIst.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
@@ -800,6 +814,7 @@
     <Compile Include="ViewModel\BackEnd\CBackEndActivityDetailModel.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndActivityReason.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndActivityTimes.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndMain.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndOrderDetail.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndOrders.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndTicketGroupDetail.cs" />
@@ -886,6 +901,8 @@
     <Content Include="Views\Login\getOrderbyMemberId.cshtml" />
     <Content Include="Views\SellerCenter\PackageCenter.cshtml" />
     <Content Include="Views\SellerCenter\PackageCenterM.cshtml" />
+    <Content Include="Views\BackEndComment\CommentList.cshtml" />
+    <Content Include="Views\BackEndMain\BackEndIndex.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

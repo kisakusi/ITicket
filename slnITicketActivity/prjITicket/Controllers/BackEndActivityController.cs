@@ -15,12 +15,22 @@ namespace BackEnd.Controllers
         // GET: BackEndActivity
         public ActionResult ActivityMaintain()
         {
-
+            if (Session[CDictionary.SK_Logined_Member] == null ||
+              (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId != 4)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View("ActivityMaintain", "_BackEndLayoutPage");
         }
 
         public ActionResult ActivityDetail(int id)
         {
+            if (Session[CDictionary.SK_Logined_Member] == null ||
+              (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId != 4)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             CBackEndActivityDetailModel cBackEndActivityDetailModel = new CBackEndActivityDetailModel();
 
             TicketSysEntities ticket = new TicketSysEntities();

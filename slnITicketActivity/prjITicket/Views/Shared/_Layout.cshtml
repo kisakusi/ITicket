@@ -36,6 +36,8 @@
     <script src="~/Content/Layout/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!--Ajax換頁要引用的東西-->
     <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <!--footer-->
+    <link href="~/Content/Login/footerstyle.css" rel="stylesheet" />
     <script>
         $(function () {
             //阻止下拉菜單點擊自動關閉
@@ -162,7 +164,7 @@
                             if (admin != null && admin.MemberRoleId == 4)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="@Url.Action("MemberList","BackEndMember")">
+                                    <a class="nav-link" href="@Url.Action("BackEndIndex","BackEndMain")">
                                         後台
                                     </a>
                                 </li>
@@ -180,25 +182,59 @@
                     </li>
                     <li class="nav-item">
                         <div class="dropdown ml-auto mr-auto">
-                            <button style="width:35px;height:35px;text-align:center" class="btn btn-cart btn-sm" type="button" id="dropdownMessageButton" data-toggle="dropdown"
+                            <button style="width:35px;height:35px;text-align:center;position:relative;" class="btn btn-cart btn-sm" type="button" id="dropdownMessageButton" data-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
                                 <i class="far fa-bell" style="color:white;font-size:2em;line-height:35px;width:35px;display:inline-block;margin-left:-10px"></i>
+                                @{
+                                    Member member = Session[CDictionary.SK_Logined_Member] as Member;
+                                    if (member != null)
+                                    {
+                                        var msgcount = db.ShortMessage.Where(m => m.MemberID == member.MemberID).Count();
+                                        if (msgcount > 3)
+                                        {
+                                            <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">3<small style="position:absolute;top:0;">+</small></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">@msgcount</span>
+                                        }
+                                        @*<script>
+                            $("#dropdownMessageButton").click(function () {
+                                $(".shortmessage").remove();
+                            })
+                        </script>*@
+
+                                    }
+
+                                }
+
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px" aria-labelledby="dropdownMenuButton">
                                 <div class="p-6">
-                                    <h5 style="text-align:center">短消息</h5>
-                                    <table class="table">
+                                    <h6 style="text-align:center">最近收到的通知</h6>
+                                    <table id="shortmegs" class="table">
                                         @{
-                                            Member member = Session[CDictionary.SK_Logined_Member] as Member;
+
                                             if (member != null)
                                             {
-                                                var msgs = member.ShortMessage.OrderByDescending(s => s.ShortMessageID).Take(5).ToList();
+                                                var msgs = db.Member.FirstOrDefault(m => m.MemberID == member.MemberID).ShortMessage.OrderByDescending(s => s.ShortMessageID).Take(3).ToList();
                                                 foreach (ShortMessage msg in msgs)
                                                 {
                                                     <tr>
                                                         <td>@msg.MessageContent</td>
                                                     </tr>
                                                 }
+                                                <tr style="text-align:center;">
+                                                    @if (member.MemberRole.MemberRoleName == "商家")
+                                                    {
+                                                        <td><a href="@Url.Action("BussEdit","Login",new { mode="shortMessage"})">查看詳細內容</a></td>
+
+                                                    }
+                                                    else if (member.MemberRole.MemberRoleName == "普通會員")
+                                                    {
+                                                        <td><a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a></td>
+                                                    }
+                                                </tr>
                                             }
                                         }
                                     </table>
@@ -290,10 +326,41 @@
         @RenderBody()
     </div>
     <!-- Footer -->
-    <footer class="py-5 bg-white">
+    <!-- Footer -->
+    <div class="mt-5 pt-5 pb-5 footer">
         <div class="container">
-            <p class="m-0 text-center text-black-50">Copyright &copy; Your Website 2020</p>
+            <div class="row">
+                <div class="col-lg-5 col-xs-12 about-company">
+                    <h2>ITicket購票網</h2>
+                    <p class="pr-5 text-white-50">
+                        您現在所使用的瀏覽器為 Chrome
+                    </p>
+                    <p><a href="#"><i class="fa fa-facebook-square mr-1"></i></a><a href="#"><i class="fa fa-linkedin-square"></i></a></p>
+                </div>
+                <div class="col-lg-3 col-xs-12 links">
+                    <h4 class="mt-lg-0 mt-sm-3">購票網門市據點:</h4>
+                    <ul class="m-0 p-0">
+                        <li>- <a href="#">台北門市</a></li>
+                        <li>- <a href="#">新北門市</a></li>
+                        <li>- <a href="#">台中門市</a></li>
+                        <li>- <a href="#">高雄門市</a></li>
+                        <li>- <a href="#">桃園門市</a></li>
+                        <li>- <a href="#">台南門市</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-xs-12 location">
+                    <h4 class="mt-lg-0 mt-sm-4">聯絡地址:</h4>
+                    <p>台北市大安區復興路一段392號2F-2</p>
+                    <p class="mb-0"><i class="fa fa-phone mr-3"></i>(02) 754-3010</p>
+                    <p><i class="fa fa-envelope-o mr-3"></i>info@hsdf.com</p>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col copyright">
+                    <p class=""><small class="text-white-50">© 2019. All Rights Reserved.</small></p>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
 </body>
 </html>

@@ -198,7 +198,7 @@
                         return
                     }
                     $('#ReportInfo').append(`<div class="mx-3 my-2 p-2 rounded border border-danger bg-white">
-                        <p class="h6">#${i} 檢舉人: ${e.Member}</h3>
+                        <p class="h6">#${i} 檢舉人: ${e.Member}</p>
                         <p class="text-danger pl-2">理由: ${e.Reason}</p>
                     </div>`)
                 })
@@ -219,7 +219,7 @@
         }).then(x => {
             if (x === true) {
                 $('#ctrlCate').prop('selectedIndex', 0)
-                $('#ctrlReport').prop('selectedIndex', 0)
+                $('#ctrlDate').prop('selectedIndex', 0)
                 $('#ctrlReport').prop('selectedIndex', 0)
                 $('#searchbox').val('')
                 $('#fPageCurrent').val(1)

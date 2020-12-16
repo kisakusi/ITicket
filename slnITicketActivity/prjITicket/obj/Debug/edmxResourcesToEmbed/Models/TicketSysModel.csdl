@@ -246,6 +246,7 @@
     <NavigationProperty Name="Member" Relationship="Self.FK_Reply_Member" FromRole="Reply" ToRole="Member" />
     <NavigationProperty Name="Reply_Emotion" Relationship="Self.FK_Reply_Emotion_Reply" FromRole="Reply" ToRole="Reply_Emotion" />
     <NavigationProperty Name="Reply_Report" Relationship="Self.FK_Reply_Report_Reply" FromRole="Reply" ToRole="Reply_Report" />
+    <Property Name="Readed" Type="Boolean" Nullable="false" />
   </EntityType>
   <EntityType Name="Reply_Emotion">
     <Key>

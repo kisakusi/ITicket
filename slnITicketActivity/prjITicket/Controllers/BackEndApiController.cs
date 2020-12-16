@@ -60,7 +60,6 @@ namespace BackEnd.Controllers
 
         public string OrderID { get => orderID; set => orderID = value; }
     }
-
     public class TicketGroupList
     {
         private string ticketGroupName;//套票名稱
@@ -86,6 +85,14 @@ namespace BackEnd.Controllers
         private int activityID;
 
         public int ActivityID { get => activityID; set => activityID = value; }
+    }
+    public class getOrdersCount
+    {
+        private DateTime yesterdayOrderTime;
+        private DateTime beforeyesterdayOrderTime;
+
+        public DateTime YesterdayOrderTime { get => yesterdayOrderTime; set => yesterdayOrderTime = value; }
+        public DateTime BeforeyesterdayOrderTime { get => beforeyesterdayOrderTime; set => beforeyesterdayOrderTime = value; }
     }
 
     public class WebApiController : ApiController
@@ -449,5 +456,6 @@ namespace BackEnd.Controllers
 
             return ticketTimes;
         }
+
     }
 }

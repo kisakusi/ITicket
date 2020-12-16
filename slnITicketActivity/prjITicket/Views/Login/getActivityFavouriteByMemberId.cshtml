@@ -90,12 +90,12 @@
         ))
 
 <script>
-    
-
-    @*function deleteActivityFavourite(memberId, activityId) {
-        
+  
+    //sweet alert刪除收藏活動
+    function deletefavourite(memberId, activityId) {
         swal({
-            title: "確定要刪除嗎?",
+            title: "確定刪除收藏嗎?",
+            text: "",
             icon: "warning",
             buttons: {
                 cancel: {
@@ -105,38 +105,29 @@
                 },
                 confirm: {
                     text: "確定",
-                    value:"確定",
+                    value: "確定",
                     visible: true
                 }
             },
-            dangerMode: true
+            dangerMode: true,
         }).then((value) => {
-            if (value == "取消") { return; }
-            else {
-                $.ajax({
-                type: 'post',
-                url: "@Url.Action("deleteActivityFavouriteByActivityId")",
-                data: {
-                    memberId: memberId,
-                    activityId: activityId
-                },
-                success: function (result) {
-                    console.log(result)
-                    //swal("刪除成功!", "收藏活動已刪除!", "success");
-
+                
+            if (value=="確定") {
+                    deleteActivityFavourite(memberId, activityId);
+                    swal("刪除成功", {
+                        icon: "success",
+                    });
+                    //執行收藏refrash ajax
+                    loadActivityFavouriteByMemberId(memberId);
+                    //執行收藏圈圈數字ajax
+                    changeActivityFavouriteByMemberId(memberId);
                 }
-
+                
             });
-            };
-        });
-            
-            
-    }*@
+    }
     
     function deleteActivityFavourite(memberId, activityId) {
-        var yes = confirm("確定要刪除嗎?")
-        if (!yes) return;
-
+        
         $.ajax({
             type: 'post',
             url: "@Url.Action("deleteActivityFavouriteByActivityId")",
@@ -145,9 +136,7 @@
                 activityId: activityId
                 },
             success: function (result) {
-
-                alert(result);
-
+                console.log(result);
             }
 
         });

@@ -550,28 +550,51 @@
                     }
                 })
             } else if (x === true) {
-                swal('審核商家提示', '處理中!', 'info', {
-                    button: false,
-                    closeOnClickOutside: false,
-                    closeOnEsc: false,
-                })
-                $.ajax({
-                    url: '/BackEndMember/MerchantVerification',
-                    type: 'post',
-                    data: {
-                        id: id,
-                        fPass: false
-                    },
-                    timeout: 20000,
-                    success: function (data) {
-                        swal('審核商家提示', '審核駁回!', 'success', {
+                let html = (`
+                    <form id="AjaxBoxForm">
+                        <div class="form-group">
+                            <label for="AjaxBoxTextarea">駁回原因:</label>
+                            <textarea id="AjaxBoxTextarea" class="form-control" rows="3"></textarea>
+                        </div>
+                    </form>
+                `)
+                $('#AjaxBoxDemo').data('demo', 'fPassFalse')
+                $('#AjaxBox').modal({ backdrop: 'static', keyboard: false, show: true })
+                $('#AjaxBoxBody').html(html)
+                $('#AjaxBoxTitle').html(`審核駁回`)
+                $('#OK').off('click').on('click', function () {
+                    if ($('#AjaxBoxTextarea').val().trim() === '') {
+                        swal('無法進行審核操作', '請填寫駁回原因!', 'error', {
                             button: false
                         })
-                        AjaxMemberList()
-                    },
-                    error: function (xmlhttprequest, textstatus, message) {
-                        swal('審核商家提示', textstatus === 'timeout' ? '超時: 超過了 20 秒' : textstatus, 'error', {
-                            button: false
+                    } else {
+                        swal('審核商家提示', '處理中!', 'info', {
+                            button: false,
+                            closeOnClickOutside: false,
+                            closeOnEsc: false,
+                        })
+                        $.ajax({
+                            url: '/BackEndMember/MerchantVerification',
+                            type: 'post',
+                            data: {
+                                id: id,
+                                fPass: false,
+                                reason: $('#AjaxBoxTextarea').val().trim()
+                            },
+                            timeout: 20000,
+                            success: function (data) {
+                                swal('審核商家提示', '審核駁回!', 'success', {
+                                    button: false
+                                })
+                                AjaxMemberList()
+                                $('#OK').prev().click()
+                            },
+                            error: function (xmlhttprequest, textstatus, message) {
+                                swal('審核商家提示', textstatus === 'timeout' ? '超時: 超過了 20 秒' : textstatus, 'error', {
+                                    button: false
+                                })
+                                $('#OK').prev().click()
+                            }
                         })
                     }
                 })

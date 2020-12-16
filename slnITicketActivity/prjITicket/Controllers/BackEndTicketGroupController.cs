@@ -16,11 +16,22 @@ namespace prjITicket.Controllers
         // GET: BackEndTicketGroup
         public ActionResult TicketGroupMaintain()
         {
+            if (Session[CDictionary.SK_Logined_Member] == null ||
+               (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId != 4)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View("TicketGroupMaintain", "_BackEndLayoutPage");
         }
 
         public ActionResult TicketGroupDetail(int id)
         {
+            if (Session[CDictionary.SK_Logined_Member] == null ||
+              (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId != 4)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             CBackEndTicketGroupDetail TicketGroupDetail = new CBackEndTicketGroupDetail();
                        
             TicketGroupDetail.List = (from t in ticket.TicketGroups

@@ -15,6 +15,9 @@
         <th style="width:110px;">
             活動名稱
         </th>
+        <th style="width:70px;">
+            庫存
+        </th>
         <th style="width:90px;">
             地區
         </th>
@@ -48,6 +51,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ActivityName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tickets.FirstOrDefault().UnitsInStock)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Districts.DistrictName)

@@ -21,6 +21,7 @@ namespace prjITicket.ViewModel
         public int page { get; set; }
         public int ArticleCategoryID { get; set; }
         public List<Activity> activities { set; get; }
+        public List<string> A權限 { set; get; }
     }
 
 }

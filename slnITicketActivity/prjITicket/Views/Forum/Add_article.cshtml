@@ -32,11 +32,11 @@
                 </div>
                 <div class="toast-body">
                     <div>
-                        <select style="width:auto">
+                        <select id="ArticleCategorySelected" style="width:auto">
                             <option value="0">選擇討論版</option>
                             @foreach (var item in Model.ArticleCategories)
                             {
-                                <option value="0">
+                                <option value="@item.ArticleCategoryID">
                                     @item.ArticleCategoryName
                                 </option>
                             }
@@ -58,7 +58,7 @@
                         <hr />
                         @* 彈出視窗:Modal *@
                         <div class="modal fade" id="UploadImage" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-dialog modal-lg"  role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
@@ -98,38 +98,40 @@
                             
                         </textarea>
                     <div>
-                        @if (member.MemberRoleId == 2)
+                        @if (member.MemberRoleId == 3)
                         {
                             <div class="input-group my-4">
                                 <button style="width:300%" id="forSeller" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">加入商品</button>
                             </div>
                         }
                     </div>
-                    @* 彈出視窗:Modal *@
-                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    測試訊息
 
-                                    @foreach (var item in Model.activities)
-                                    {
-                                        <button class="emotion default" id="@item.ActivityID" onclick="AddActivity(this)">@item.ActivityName</button>
-                                    }
+                </div>
+            </div>
+            @* 彈出視窗:Modal *@
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+
+                            @foreach (var item in Model.activities)
+                            {
+                                <div style="line-height:20px;width:196px;display:inline-block;margin-left:auto;">
+                                    <button class="emotion default" id="@item.ActivityID" onclick="AddActivity(this)">@item.ActivityName</button>
+                                </div>
+                            }
 
 
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <input type="button" class="btn btn-primary" id="ButtonCrop" data-dismiss="modal" value="Save the Crop Image" />
-                                </div>
-                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="button" class="btn btn-primary" id="ButtonCrop" data-dismiss="modal" value="Save the Crop Image" />
                         </div>
                     </div>
                 </div>
@@ -172,7 +174,7 @@
     }
 
                 var imgFile;
-    $(document).ready(function () {
+    $(function () {
         $('img#Image1').imgAreaSelect(
             {
                     handles: false,
@@ -342,11 +344,12 @@
     $("#btnSubmit").click(function(){
         let title = $("#articleTitle").val();
         let content = editor.getData();
+        let ArticleCategoryID = $("#ArticleCategorySelected").val();
 
         $.ajax({
         type: "post",
         url: "@Url.Action("Add_article")",
-        data: { title: title, content: content, picPath: picPath, Activities: Activity},
+            data: { title: title, content: content, picPath: picPath, ArticleCategoryID: ArticleCategoryID, Activities: Activity},
         success: function (result) {
                 if (result == "OK") {
                     location.href ='@Url.Action("forum_mainblock")';

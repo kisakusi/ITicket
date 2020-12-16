@@ -211,6 +211,7 @@
     <Property Name="MemberID" Type="int" Nullable="false" />
     <Property Name="ReplyDate" Type="datetime" Nullable="false" />
     <Property Name="ArticleID" Type="int" Nullable="false" />
+    <Property Name="Readed" Type="bit" Nullable="false" />
   </EntityType>
   <EntityType Name="Reply_Emotion">
     <Key>

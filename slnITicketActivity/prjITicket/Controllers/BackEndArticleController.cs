@@ -136,7 +136,7 @@ namespace prjITicket.Controllers
         [HttpPost]
         public async Task<EmptyResult> ArticleReplyDelete(int id, string message, string type, int arid)
         {
-            int adminId = (Session[CDictionary.SK_Admin_Logined_Member] as Member).MemberID;
+            int adminId = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
             await ArticleCRUD.DeleteWithMessage(id, message, type, arid, adminId);
             return new EmptyResult();
         }
@@ -145,7 +145,7 @@ namespace prjITicket.Controllers
         public async Task<EmptyResult> ArticleReplyDeleteBan(int id, string message, string type, int arid, 
             string reason, DateTime endtime)
         {
-            int adminId = (Session[CDictionary.SK_Admin_Logined_Member] as Member).MemberID;
+            int adminId = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
             await ArticleCRUD.DeleteWithMessage(id, message, type, arid, adminId, reason, endtime);
             return new EmptyResult();
         }

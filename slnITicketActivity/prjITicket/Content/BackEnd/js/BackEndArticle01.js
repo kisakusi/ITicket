@@ -76,6 +76,7 @@ function AjaxArticleList() {
 
 function theDetail(id) {
     const displayName = {
+        'SplitLine1': '------------',
         'Email': 'Email',
         'Name': '姓名',
         'IDentityNumber': '身分證字號',
@@ -88,7 +89,7 @@ function theDetail(id) {
         'MemberRoleName': '角色權限',
         'Sex': '性別',
         'District': '城市',
-        'SplitLine': '------------',
+        'SplitLine2': '------------',
         'CompanyName': '公司名',
         'TaxIDNumber': '統編',
         'SellerHomePage': '商家網站主頁',
@@ -101,41 +102,101 @@ function theDetail(id) {
         type: 'post',
         data: { id: id },
         success: function (data) {
-            let rows = ''
+            $('#seller-tab').removeClass('d-none')
+            $('#member-tab').tab('show')
+            let part = 3
+            let reasons
+            let endtimes
+            let rows1 = ''
+            let rows2 = ''
+            let rows3 = ''
             for (let field in data) {
-                if (field == 'SplitLine') {
-                    rows += `<tr class="bg-dark"><td colspan="2"></td></tr>`
-                    continue
-                }
-                if (field == 'fPass') {
-                    let fPassClass
-                    switch (data[field]) {
-                        case '審核通過':
-                            fPassClass = 'text-success'
-                            break
-                        case '審核不通過':
-                            fPassClass = 'text-danger'
-                            break
-                        default:
-                            fPassClass = 'text-warning'
-                            break
+                if (part === 3) {
+                    if (field === 'Reasons') {
+                        reasons = data[field]
                     }
-                    rows += `<tr><th>${displayName[field]}</th><td class="${fPassClass}">${data[field] === null ? '' : data[field]}</td></tr>`
-                    continue
+                    if (field === 'EndTimes') {
+                        endtimes = data[field]
+                    }
+                    if (field === 'SplitLine1') {
+                        if (reasons.length) {
+                            for (let i = 0; i < reasons.length; i++) {
+                                rows3 += `<tr><td>${i + 1}</td><td>${reasons[i]}</td><td>${endtimes[i]}</td></tr>`
+                            }
+                            let html3 = (`
+                                <div class="table-responsive text-body bg-white">
+                                    <table class="table table-bordered table-striped mb-0" style="width: 100%;">
+                                        <tr><th>#</th><th>停權原因</th><th>結束時間</th></tr>
+                                        ${rows3}
+                                    <table>
+                                </div>
+                            `)
+                            $('#banlist').html(html3)
+                        } else {
+                            $('#banlist').html(`
+                                <div class="table-responsive text-body bg-white">
+                                    <table class="table table-bordered table-striped mb-0" style="width: 100%;">
+                                        <tr><th>#</th><th>停權原因</th><th>結束時間</th></tr>
+                                        <tr><td colspan="3">此會員沒有停權紀錄</td></tr>
+                                    <table>
+                                </div>
+                            `)
+                        }
+                        part = 1
+                        continue
+                    }
                 }
-                rows += `<tr><th>${displayName[field]}</th><td>${data[field] === null ? '' : data[field]}</td></tr>`
+                if (part === 1) {
+                    if (field !== 'SplitLine2') {
+                        rows1 += `<tr><th>${displayName[field]}</th>
+                            <td>${data[field] === null || data[field] === '' ? '<span class="text-danger">未填寫</span>' : data[field]}</td></tr>`
+                    } else {
+                        part = 2
+                        continue
+                    }
+                }
+                if (part === 2) {
+                    if (field !== 'fPass') {
+                        rows2 += `<tr><th>${displayName[field]}</th>
+                            <td>${data[field] === null || data[field] === '' ? '<span class="text-danger">未填寫</span>' : data[field]}</td></tr>`
+                    } else {
+                        let fPassClass
+                        switch (data['fPass']) {
+                            case '審核通過':
+                                fPassClass = 'text-success'
+                                break
+                            case '審核不通過':
+                                fPassClass = 'text-danger'
+                                break
+                            default:
+                                fPassClass = 'text-warning'
+                                break
+                        }
+                        rows2 += `<tr><th>${displayName[field]}</th><td class="${fPassClass}">${data[field]}</td></tr>`
+                    }
+                }
             }
-            let html = (`
+            let html1 = (`
                 <div class="table-responsive text-body bg-white">
-                    <table class="table table-bordered table-striped" style="width: 100%;">
-                        ${rows}
+                    <table class="table table-bordered table-striped mb-0" style="width: 100%;">
+                        ${rows1}
                     <table>
                 </div>
             `)
-            $('#AjaxBox').modal({ backdrop: 'static', keyboard: false, show: true })
-            $('#AjaxBoxBody').html(html)
-            $('#AjaxBoxTitle').html('會員資料查詢')
-            $('#OK').off('click').one('click', function () {
+            $('#member').html(html1)
+            let html2 = (`
+                <div class="table-responsive text-body bg-white">
+                    <table class="table table-bordered table-striped mb-0" style="width: 100%;">
+                        ${rows2}
+                    <table>
+                </div>
+            `)
+            $('#seller').html(html2)
+            if (part === 1) {
+                $('#seller-tab').addClass('d-none')
+            }
+            $('#AjaxDetail').modal({ backdrop: 'static', keyboard: false, show: true })
+            $('#DK').off('click').one('click', function () {
                 $(this).prev().click()
             })
         }

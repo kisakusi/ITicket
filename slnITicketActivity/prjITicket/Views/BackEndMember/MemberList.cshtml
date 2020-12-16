@@ -1,11 +1,9 @@
-﻿@{
-    Layout = "~/Views/Shared/_BackEndLayoutPage.cshtml";
-    ViewBag.Title = "會員管理";
-}
+﻿@{ Layout = "~/Views/Shared/_BackEndLayoutPage.cshtml";
+                ViewBag.Title = "會員管理"; }
 
 <h1 class="mt-4">會員管理</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="#">後台</a></li>
+    <li class="breadcrumb-item"><a href="/BackEndMain/BackEndIndex">後台</a></li>
     <li class="breadcrumb-item active">會員管理</li>
 </ol>
 
@@ -37,7 +35,7 @@
     </div>
     <div id="cardBody" class="card-body">
         <div class="row mb-1">
-            <div class="col">
+            <div class="col-4">
                 每頁顯示
                 <select id="pageAmount" class="custom-select-sm" style="cursor: pointer">
                     <option value="10" selected>10</option>
@@ -46,7 +44,7 @@
                     <option value="100">100</option>
                 </select> 筆資料
             </div>
-            <div class="col">
+            <div class="col-8">
                 <nav class="float-right" aria-label="...">
                     <ul id="pageTop" class="pagination">
                         <li class="default page-item">
@@ -94,10 +92,10 @@
         </table>
 
         <div class="row mt-1">
-            <div class="col">
+            <div class="col-4">
                 <span id="pageMessage"></span>
             </div>
-            <div class="col">
+            <div class="col-8">
                 <nav class="float-right" aria-label="...">
                     <ul id="pageBottom" class="pagination">
                         <li class="default page-item">
@@ -135,8 +133,44 @@
     </div>
 </div>
 
+<!-- AjaxDetail -->
+<div id="AjaxDetail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="AjaxBox" aria-hidden="true" style="z-index: 1600;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-dark">
+                <h5 class="modal-title">會員資料查詢</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body text-white bg-dark">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">會員資料</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="seller-tab" data-toggle="tab" href="#seller" role="tab" aria-controls="seller" aria-selected="false">商家資料</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="banlist-tab" data-toggle="tab" href="#banlist" role="tab" aria-controls="banlist" aria-selected="false">停權紀錄</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="member" role="tabpanel" aria-labelledby="member-tab"></div>
+                    <div class="tab-pane fade" id="seller" role="tabpanel" aria-labelledby="seller-tab"></div>
+                    <div class="tab-pane fade" id="banlist" role="tabpanel" aria-labelledby="banlist-tab"></div>
+                </div>
+            </div>
+            <div class="modal-footer text-white bg-dark">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button id="DK" type="button" class="btn btn-primary">確認</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- JavaScript -->
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="~/Content/BackEnd/js/BackEndMember01.js"></script>
 <script src="~/Content/BackEnd/js/BackEndMember02.js"></script>
-<script src="~/Content/BackEnd/js/BackEndDemoMA.js"></script>
+<script src="~/Content/BackEnd/js/BackEndDemoMAC.js"></script>

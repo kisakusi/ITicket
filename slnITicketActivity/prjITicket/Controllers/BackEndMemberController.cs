@@ -159,6 +159,7 @@ namespace prjITicket.Controllers
             {
                 SellerDetail json = new SellerDetail
                 {
+                    banlist = db.BanLIst.Where(x => x.BanMemberId == id),
                     member = member,
                     seller = db.Seller.FirstOrDefault(x => x.MemberId == id)
                 };
@@ -168,6 +169,7 @@ namespace prjITicket.Controllers
             {
                 MemberDetail json = new MemberDetail
                 {
+                    banlist = db.BanLIst.Where(x => x.BanMemberId == id),
                     member = member
                 };
                 return Json(json);
@@ -177,7 +179,7 @@ namespace prjITicket.Controllers
         [HttpPost]
         public async Task<EmptyResult> BanMember(int id, string reason, DateTime endtime)
         {
-            int adminId = (Session[CDictionary.SK_Admin_Logined_Member] as Member).MemberID;
+            int adminId = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
             await MemberCRUD.BanMemberWithMessage(id, adminId, reason, endtime);
             return new EmptyResult();
         }
@@ -190,9 +192,9 @@ namespace prjITicket.Controllers
         }
 
         [HttpPost]
-        public async Task<EmptyResult> MerchantVerification(int id, bool fPass)
+        public async Task<EmptyResult> MerchantVerification(int id, bool fPass, string reason = "")
         {
-            await MemberCRUD.MerchantVerificationWithMessage(id, fPass);
+            await MemberCRUD.MerchantVerificationWithMessage(id, fPass, reason);
             return new EmptyResult();
         }
 

@@ -107,7 +107,8 @@ namespace prjITicket.Controllers
                 {
                     TicketGroupName = detail[i].TicketGroups.TicketGroupName,
                     ActivityName = detail[i].Activity.ActivityName,
-                    Picture = detail[i].Activity.Picture
+                    Picture = detail[i].Activity.Picture,
+                    UnitsInStock = detail[i].Activity.Tickets.FirstOrDefault().UnitsInStock
 
 
                 });

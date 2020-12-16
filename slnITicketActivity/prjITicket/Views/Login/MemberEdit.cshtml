@@ -46,15 +46,18 @@
             let memberId = $(this).data("memberid")
             console.log(memberId)
             console.log(activityId);
-            
             //執行刪除ajax
-            deleteActivityFavourite(memberId, activityId);
-            //執行收藏refrash ajax
-            loadActivityFavouriteByMemberId(memberId);
-            //執行收藏圈圈數字ajax
-            changeActivityFavouriteByMemberId(memberId);
-            
+            deletefavourite(memberId, activityId);
+        });
 
+        //取得memberId、shortmessageId 刪除短訊息
+        $("#form1div").on("click", ".deleteMessage", function () {
+            let memberId = $(this).data("memberid");
+            let shortmessageId = $(this).data("messageid")
+            console.log(memberId);
+            console.log(shortmessageId);
+            //
+            deleteMessage(memberId, shortmessageId)
         });
 
         //找到orderid下的oreder_detail
@@ -112,7 +115,7 @@
                     <li><a href="~/Login/MemberEdit"><img src="~/images/Login/Layout/settings.png" style="margin-right:10px;" /><span>會員資料設定</span></a></li>
                     <li><img src="~/images/Login/Layout/money.png" style="margin-right:10px;" /><span>iTikect Points</span><span id="point" name="point" style="float:right; width:100px; text-align:right;"><strong style="color:#FFD306">@Model.Point</strong></span></li>
                     <li style="position:relative;"><a href="javascript:;" id="orderDetail"><img src="~/images/Login/Layout/check-list.png" style="margin-right:10px;" /><span>我的訂單<span class="badge badge-pill badge-danger" style="position:absolute;top:2px;">@Model.entity.Orders.Where(m => m.MemberID == Model.entity.MemberID).Count()</span></span></a></li>
-                    <li style="position:relative;"><a href="javascript:;" id="showMessage"><img src="~/images/Login/Layout/chat.png" style="margin-right:10px;" /><span>我的訊息<span class="badge badge-pill badge-danger" style="position:absolute;top:2px;">@Model.entity.ShortMessage.Where(m => m.MemberID == Model.MemberID).Count()</span></span></a></li>
+                    <li style="position:relative;"><a href="javascript:;" id="showMessage"><img src="~/images/Login/Layout/chat.png" style="margin-right:10px;" /><span>我的訊息<span id="shortMessageNumber" class="badge badge-pill badge-danger" style="position:absolute;top:2px;">@Model.entity.ShortMessage.Where(m => m.MemberID == Model.MemberID).Count()</span></span></a></li>
                     <li style="position:relative;"><a href="javascript:;" id="ActivityFavouriteDetail"><img src="~/images/Login/Layout/heart.png" style="margin-right:10px;" /><span>我的收藏<span id="activityFavourite" class="badge badge-pill badge-danger" style="position:absolute;top:2px;">@Model.entity.ActivityFavourite.Where(m => m.MemberId == Model.entity.MemberID).Count()</span></span></a></li>
                 </ul>
             </div>
@@ -126,138 +129,146 @@
             <div class="row">
                 <div class="col-md-9">
                     <div class="form-horizontal rounded border p-4" id="form1div" style="width:800px; background-color:white;">
-                        <div class="h1 text-center"><strong>會員資料</strong></div>
-                        <div class="row mt-3">
-                            <div class="col-12 col-md">
-                                <div class="alert alert-success alert-rounded text-center" role="alert" id="butport1">基本資料</div>
-                            </div>
-                            <div class="col-12 col-md" style="margin:0 20px 0 0" id="btnMemPassword">
-                                <div class="alert alert-light alert-rounded text-center" role="alert" id="butport2">會員密碼修改</div>
-                            </div>
-                        </div>
-                        <div class="row" style="background-color:white" id="port1">
-                            <div class="col-md-6">
-
-
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-8">
-                                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "txtName" } })
-                                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-                                    </div>
+                        @if (ViewBag.Mode == "shortMessage")
+                        {
+                            int memberId = Model.MemberID;
+                            Html.RenderAction("getShortMassageByMemberId", new { MemberId = memberId });
+                        }
+                        else
+                        {
+                            <div class="h1 text-center"><strong>會員資料</strong></div>
+                            <div class="row mt-3">
+                                <div class="col-12 col-md">
+                                    <div class="alert alert-success alert-rounded text-center" role="alert" id="butport1">基本資料</div>
                                 </div>
-
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.IDentityNumber, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-8">
-                                        @Html.EditorFor(model => model.IDentityNumber, new { htmlAttributes = new { @class = "form-control", id = "txtIDentityNumber" } })
-                                        <span></span>
-                                        @Html.ValidationMessageFor(model => model.IDentityNumber, "", new { @class = "text-danger" })
-                                    </div>
-                                </div>
-
-                                @*<div class="form-group">
-                                        @Html.LabelFor(model => model.Passport, htmlAttributes: new { @class = "control-label col-md-4" })
-                                        <div class="col-md-8">
-                                            @Html.EditorFor(model => model.Passport, new { htmlAttributes = new { @class = "form-control", id = "txtPassport" } })
-                                            @Html.ValidationMessageFor(model => model.Passport, "", new { @class = "text-danger" })
-                                        </div>
-                                    </div>*@
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Sex, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-5">
-                                        <select class="form-control" name="sex" id="txtSex">
-                                            @if (Model.Sex == false)
-                                            {
-                                                <option value="0">男性</option>
-                                                <option value="1">女性</option>
-                                            }
-                                            else if (Model.Sex == true)
-                                            {
-                                                <option value="1">女性</option>
-                                                <option value="0">男性</option>
-                                            }
-                                            else
-                                            {
-                                                <option>-請選擇-</option>
-                                                <option value="0">男性</option>
-                                                <option value="1">女性</option>
-                                            }
-
-                                        </select>
-                                    </div>
+                                <div class="col-12 col-md" style="margin:0 20px 0 0" id="btnMemPassword">
+                                    <div class="alert alert-light alert-rounded text-center" role="alert" id="butport2">會員密碼修改</div>
                                 </div>
                             </div>
+                            <div class="row" style="background-color:white" id="port1">
+                                <div class="col-md-6">
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.NickName, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-8">
-                                        @Html.EditorFor(model => model.NickName, new { htmlAttributes = new { @class = "form-control", id = "txtNickName" } })
-                                        @Html.ValidationMessageFor(model => model.NickName, "", new { @class = "text-danger" })
-                                    </div>
-                                </div>
 
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.BirthDate, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-8">
-                                        <input type="date" name="BirthDate" class="form-control" id="txtBirthDate" />
-                                        @if (Model.BirthDate != null)
-                                        {
-                                            DateTime birthDate = Model.BirthDate.Value;
-                                            <script>
-                                                    $("#txtBirthDate").val(`@birthDate.ToString("yyyy-MM-dd")`);
-                                            </script>
-                                        }
-                                        <span></span>
-                                        @*@Html.EditorFor(model => model.BirthDate, new { htmlAttributes = new { @class = "form-control" } })*@
-                                        @Html.ValidationMessageFor(model => model.BirthDate, "", new { @class = "text-danger" })
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-8">
-                                        @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", id = "txtPhone" } })
-                                        @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-4" })
-                                    <div class="col-md-12">
-                                        <table>
-                                            <tr>
-                                                <td>
-                                                    <select id="txtcity" class="form-control" style="width:100px; float:left; margin:0px 0px 3px 0px;"></select>
-                                                    <select id="txtdistrict" class="form-control" style="width:110px;float:left; margin:0px 0px 3px 15px;"></select>
-                                                    <input id="txtpostalcode" class="form-control" type="text" style="width:100px;float:left; margin:0px 0px 3px 15px;" placeholder="郵遞區號" readonly>
-
-                                                    <input id="txtaddress" class="form-control" type="text" style="width:320px;float:left; margin:0px 0px 3px 15px;">
-                                                    @if (Model.Address != null)
-                                                    {
-                                                        string address = Model.Address;
-                                                        <script>
-                                                                $("#txtaddress").val(`@address.ToString()`)
-                                                        </script>
-                                                    }
-
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
                                     <div class="form-group">
-                                        <div class="col-md-offset-2 col-md-10" style="margin:10px 0 0 0;">
-                                            <input id="btnMember" type="button" value="確認儲存" class="btn btn-success" />
-                                            <input id="demobtnMember" type="button" value="Demo鍵" class="btn btn-primary" />
+                                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "txtName" } })
+                                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.IDentityNumber, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.IDentityNumber, new { htmlAttributes = new { @class = "form-control", id = "txtIDentityNumber" } })
+                                            <span></span>
+                                            @Html.ValidationMessageFor(model => model.IDentityNumber, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    @*<div class="form-group">
+                        @Html.LabelFor(model => model.Passport, htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Passport, new { htmlAttributes = new { @class = "form-control", id = "txtPassport" } })
+                            @Html.ValidationMessageFor(model => model.Passport, "", new { @class = "text-danger" })
+                        </div>
+                    </div>*@
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Sex, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-5">
+                                            <select class="form-control" name="sex" id="txtSex">
+                                                @if (Model.Sex == false)
+                                                {
+                                                    <option value="0">男性</option>
+                                                    <option value="1">女性</option>
+                                                }
+                                                else if (Model.Sex == true)
+                                                {
+                                                    <option value="1">女性</option>
+                                                    <option value="0">男性</option>
+                                                }
+                                                else
+                                                {
+                                                    <option>-請選擇-</option>
+                                                    <option value="0">男性</option>
+                                                    <option value="1">女性</option>
+                                                }
+
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NickName, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.NickName, new { htmlAttributes = new { @class = "form-control", id = "txtNickName" } })
+                                            @Html.ValidationMessageFor(model => model.NickName, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.BirthDate, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            <input type="date" name="BirthDate" class="form-control" id="txtBirthDate" />
+                                            @if (Model.BirthDate != null)
+                                            {
+                                                DateTime birthDate = Model.BirthDate.Value;
+                                                <script>
+                                                    $("#txtBirthDate").val(`@birthDate.ToString("yyyy-MM-dd")`);
+                                                </script>
+                                            }
+                                            <span></span>
+                                            @*@Html.EditorFor(model => model.BirthDate, new { htmlAttributes = new { @class = "form-control" } })*@
+                                            @Html.ValidationMessageFor(model => model.BirthDate, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", id = "txtPhone" } })
+                                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-12">
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <select id="txtcity" class="form-control" style="width:100px; float:left; margin:0px 0px 3px 0px;"></select>
+                                                        <select id="txtdistrict" class="form-control" style="width:110px;float:left; margin:0px 0px 3px 15px;"></select>
+                                                        <input id="txtpostalcode" class="form-control" type="text" style="width:100px;float:left; margin:0px 0px 3px 15px;" placeholder="郵遞區號" readonly>
+
+                                                        <input id="txtaddress" class="form-control" type="text" style="width:320px;float:left; margin:0px 0px 3px 15px;">
+                                                        @if (Model.Address != null)
+                                                        {
+                                                            string address = Model.Address;
+                                                            <script>
+                                                                $("#txtaddress").val(`@address.ToString()`)
+                                                            </script>
+                                                        }
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-offset-2 col-md-10" style="margin:10px 0 0 0;">
+                                                <input id="btnMember" type="button" value="確認儲存" class="btn btn-success" />
+                                                <input id="demobtnMember" type="button" value="Demo鍵" class="btn btn-primary" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -471,7 +482,7 @@
             return "檢查碼不正確";
         return "格式正確";
     }
-
+    //todo
     //判斷出生日期不得大於現在日期
     let birthDate = document.getElementById("txtBirthDate");
 
@@ -685,6 +696,27 @@
             }
         });
     }
+
+      //todo 12/15藉由MemberId更改我的訊息圈圈數字
+    function changeShortMessageNumber() {
+        $.ajax({
+            type: 'get',
+            url: "@Url.Action("changeShortMessageNumber")",
+            data: { MemberId: "@Model.MemberID" },
+            success: function (result) {
+                $("#shortMessageNumber").html(result);
+                if (result > 3) {
+                    //$(".fa-bell").empty();
+                    $(".fa-bell").append($(`3<small style="position:absolute;top:0;">+</small>`));
+                }
+                else {
+                    $(".shortmessage").html(result);
+                }
+               
+            }
+        });
+    }
+
     //demo會員資料變更
     function loaddemoMember() {
         $("#txtName").val("王池田");
@@ -701,9 +733,9 @@
     }
     //demo會員密碼變更
     function loaddemoPassword() {
-        $("#txtPassword").val("123qweasd");
-        $("#txtNPassword").val("123qweasd");
-        $("#txtANPassword").val("123qweasd");
+        $("#txtPassword").val("gb0zWxjwido");
+        $("#txtNPassword").val("gb0zWxjwido");
+        $("#txtANPassword").val("gb0zWxjwido");
     }
 
 
@@ -803,7 +835,8 @@
                 url: "@Url.Action("CreateImage")",
                 data: { input: base64code },
                 success: function () {
-                    alert("success");
+                    swal("儲存成功!", "","success");
+                    
                 }
             })
         });

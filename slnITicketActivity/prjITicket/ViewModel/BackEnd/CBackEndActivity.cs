@@ -23,6 +23,8 @@ namespace BackEnd.ViewModel
         public string ActivityAddress { get { return this.ActivityEntity.Address; } }
         public string ActivityPicture { get { return this.ActivityEntity.Picture; } }
         public string ActivityMap { get { return this.ActivityEntity.Map; } }
+
+
         public string CompanyName { get { return this.Seller.CompanyName; } }
         public string StatusName { get { return this.ActivityStatus.ActivityStatusName; } }
         public int StatusID { get { return this.ActivityStatus.ActivityStatusID; } }

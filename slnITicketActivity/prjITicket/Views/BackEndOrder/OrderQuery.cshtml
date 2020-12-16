@@ -1,27 +1,24 @@
 ﻿
 @{
+    /**/
+
     ViewBag.Title = "OrderQuery";
 }
-
 <!--Sweet Alert CDN-->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <h1 class="mt-4">訂單查詢</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("BackEndIndex","BackEndMain")">後台</a>
+    </li>
+    <li class="breadcrumb-item active">
+        訂單查詢
+    </li>
+</ol>
 <div class="container-fluid">
-    <h1 class="mt-4"></h1>
-
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item">
-            後台
-        </li>
-        <li class="breadcrumb-item active">
-            訂單查詢
-        </li>
-    </ol>
-
     <!--查詢條件-->
-
-    <div class="card mb-4" >
+    <div class="card mb-4">
         <div class="card-body">
             <div class="card-title">
                 查詢條件
@@ -30,25 +27,21 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">訂單編號</span>
                 </div>
-                <input type="text" id="txtOrderGuid" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-
+                <input type="text" id="txtOrderGuid" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="inputGroup-sizing-default">訂購人姓名</span>
                 </div>
-                <input type="text" id="txtUserName" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-
+                <input type="text" id="txtUserName" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="inputGroup-sizing-default">訂購人email信箱</span>
                 </div>
-                <input type="text" id="txtUserEmail" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input type="text" id="txtUserEmail" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
-
 
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default" style="margin-right:1%">訂單狀態</span>
-
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="ckbox1" value="true" checked>
                     <label class="form-check-label" for="ckbox1" id="label1">已付款</label>
@@ -60,24 +53,19 @@
             </div>
             <button type="button" id="btn_Search" class="btn btn-primary" style="width:100%"><i class="fas fa-search"></i>  查詢</button>
         </div>
-
         <!--中間一條沒有意義的線-->
         <div class="card mb-4">
         </div>
-
         <!--查詢結果-->
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table mr-1"></i>
             </div>
-
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="OrderTable" style="width:100%;font-size:14px" cellspacing="0"></table>
-
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -148,7 +136,7 @@
                     "title": "場次時間",
                     "data": "TicketTime",
                     "render": function (data, type, row, meta) {
-                        return new Date().Format("yyyy-MM-dd hh:mm"); 
+                        return new Date().Format("yyyy-MM-dd hh:mm");
                     }
                 },
                 {
@@ -184,7 +172,6 @@
     }
 
 </script>
-
 
 <script type="text/javascript">
     $(function () {
@@ -228,7 +215,7 @@
 
                 //指定Server端的資料行繫結名稱
                 columns: [
-                    
+
                     {
                         "title": "訂單日期",
                         "data": "OrderDate",
@@ -319,11 +306,11 @@
 
     Date.prototype.Format = function (fmt) {
         var o = {
-            "M+": this.getMonth() + 1, //月份 
-            "d+": this.getDate(), //日 
-            "h+": this.getHours(), //小时 
-            "m+": this.getMinutes(), //分 
-            "s+": this.getSeconds() //秒 
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds() //秒
         };
         if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
         for (var k in o)

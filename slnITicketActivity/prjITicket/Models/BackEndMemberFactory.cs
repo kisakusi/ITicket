@@ -260,7 +260,7 @@ namespace prjITicket.Models
             catch { }
         }
 
-        public static async Task MerchantVerificationWithMessage(int id, bool fPass)
+        public static async Task MerchantVerificationWithMessage(int id, bool fPass, string reason)
         {
             try
             {
@@ -268,7 +268,8 @@ namespace prjITicket.Models
                 Seller seller = db.Seller.FirstOrDefault(x => x.MemberId == id);
                 seller.fPass = fPass;
                 db.SaveChanges();
-                await SendMessageToMember(id, $"iTicket 管理員已{(fPass ? "通過" : "駁回")}您的商家審核");
+                await SendMessageToMember(id, 
+                    $"iTicket 管理員已{(fPass ? "通過" : "駁回")}您的商家審核{(fPass ? "" : $", 原因是「{reason}」")}");
             }
             catch { }
         }
@@ -276,6 +277,10 @@ namespace prjITicket.Models
 
     public class MemberDetail
     {
+        public IEnumerable<BanLIst> banlist { private get; set; }
+        public IEnumerable<string> Reasons => banlist.Select(x => x.Reason);
+        public IEnumerable<string> EndTimes => banlist.Select(x => x.EndTime.ToString("yyyy-MM-dd"));
+        public bool SplitLine1 => true;
         public Member member { private get; set; }
         public string Email => member.Email;
         public string Name => member.Name;
@@ -294,6 +299,10 @@ namespace prjITicket.Models
 
     public class SellerDetail
     {
+        public IEnumerable<BanLIst> banlist { private get; set; }
+        public IEnumerable<string> Reasons => banlist.Select(x => x.Reason);
+        public IEnumerable<string> EndTimes => banlist.Select(x => x.EndTime.ToString("yyyy-MM-dd"));
+        public bool SplitLine1 => true;
         public Member member { private get; set; }
         public string Email => member.Email;
         public string Name => member.Name;
@@ -308,7 +317,7 @@ namespace prjITicket.Models
         public string Sex => member.Sex == null ? null : member.Sex.Value ? "男性" : "女性";
         public string District => member.DistrictId == null ?
             null : $"{member.Districts.DistrictName} (${member.Districts.Cities.CityName})";
-        public bool SplitLine => true;
+        public bool SplitLine2 => true;
         public Seller seller { private get; set; }
         public string CompanyName => seller?.CompanyName;
         public string TaxIDNumber => seller?.TaxIDNumber;
