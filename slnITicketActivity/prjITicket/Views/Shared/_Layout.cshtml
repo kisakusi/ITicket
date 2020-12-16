@@ -215,7 +215,7 @@
                                     <table id="shortmegs" class="table">
                                         @{
 
-                                            if (member != null)
+                                            if (Session[CDictionary.SK_Logined_Member] != null&&member != null)
                                             {
                                                 var msgs = db.Member.FirstOrDefault(m => m.MemberID == member.MemberID).ShortMessage.OrderByDescending(s => s.ShortMessageID).Take(3).ToList();
                                                 foreach (ShortMessage msg in msgs)

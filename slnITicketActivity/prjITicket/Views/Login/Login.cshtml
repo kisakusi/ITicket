@@ -52,9 +52,9 @@
                             <div class="g-recaptcha " data-sitekey="6LdLEP8ZAAAAALCj9nZjFMuqSQjxfT-eZvtQNV-n" data-theme="dark"></div>
                             @*<div>
 
-                                    @ViewFunc.ReCaptchaWidget(Html, "signin", Url.Action("ValidateReCAPTCHA", "Login"), "dark")
+                        @ViewFunc.ReCaptchaWidget(Html, "signin", Url.Action("ValidateReCAPTCHA", "Login"), "dark")
 
-                                </div>*@
+                    </div>*@
                             <div class="form-group form-button">
                                 <input type="submit" name="signin" id="signin" class="form-submit" value="登入" @*disabled*@ />
                             </div>
@@ -79,6 +79,8 @@
                 <a href="#" class="btn btn-secondary" id="mangeruser">管理員</a>
                 <a href="#" class="btn btn-secondary" id="user">一般使用者</a>
                 <a href="#" class="btn btn-secondary" id="bussuser">商家</a>
+                <a href="#" class="btn btn-secondary" id="testuser">一般會員登入</a>
+                <a href="#" class="btn btn-secondary" id="testbussuser">商家會員登入</a>
             </div>
         </section>
     </div>
@@ -95,6 +97,14 @@
     $("#bussuser").click(function () {
         $("#youremail").val("fantasysdo@yahoo.co.jp");
         $("#pwd").val("Aa1!admin");
+    });
+    $("#testuser").click(function () {
+        $("#youremail").val("iticketshopping1@gmail.com");
+        $("#pwd").val("zz010203");
+    });
+    $("#testbussuser").click(function () {
+        $("#youremail").val("iticket128@gmail.com");
+        $("#pwd").val("zz010203");
     });
 </script>
 <script>
@@ -262,4 +272,4 @@
         }
     }
 </script>
-<script type="text/javascript" color="255,0,0" opacity='1' zIndex="-10" count="200" src="~/Content/Login/functionJS/dist/canvas-nest.js"></script>
+<script type="text/javascript" color="255,0,0" opacity='1' zIndex="-10" count="76" src="~/Content/Login/functionJS/dist/canvas-nest.js"></script>

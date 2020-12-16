@@ -85,7 +85,7 @@ namespace prjITicket.Service
             if (ValidateMember != null)
             {
                 //判斷傳入驗證碼與資料庫中是否相同
-                if (ValidateMember.RegisterCheckCode == RegisterCheckCode && SellerMember != null)
+                if (ValidateMember.RegisterCheckCode == RegisterCheckCode.Split('?')[0] && SellerMember != null)
                 {
                     //將資料庫中的驗證碼設為空
                     ValidateMember.RegisterCheckCode = string.Empty;
@@ -94,7 +94,7 @@ namespace prjITicket.Service
                     db.SaveChanges();
                     ValidateStr = "帳號信箱驗證成功，現在可以登入了";
                 }
-                else if(ValidateMember.RegisterCheckCode == RegisterCheckCode)
+                else if(ValidateMember.RegisterCheckCode == RegisterCheckCode.Split('?')[0])
                 {
                     //將資料庫中的驗證碼設為空
                     ValidateMember.RegisterCheckCode = string.Empty;

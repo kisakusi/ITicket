@@ -493,8 +493,11 @@
     <Content Include="Content\Login\SellerImage\0830.txt" />
     <Content Include="Content\Login\SellerImage\1007.txt" />
     <Content Include="Content\Login\SellerImage\2.jpg" />
+    <Content Include="Content\Login\SellerImage\abc10142.jpg" />
+    <Content Include="Content\Login\SellerImage\abc1016anonymous.jpg" />
     <Content Include="Content\Login\SellerImage\anonymous.jpg" />
     <Content Include="Content\Login\SellerImage\git版本控制解釋.txt" />
+    <Content Include="Content\Login\SellerImage\個人照 %281%29.png" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\Site.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

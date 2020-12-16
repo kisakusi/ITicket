@@ -651,7 +651,7 @@
             url: `@Url.Action("getOrderbyMemberId")`,
             data: { memberId:"@Model.MemberID"},
             success: function (result) {
-
+                $("#form2div").hide();
                 $("#form1div").html(result);
             }
         })
@@ -664,7 +664,7 @@
             url: '@Url.Action("getActivityFavouriteByMemberId")',
             data: { MemberId: "@Model.MemberID" },
             success: function (result) {
-
+                $("#form2div").hide();
                 $("#form1div").html(result);
             }
         });
@@ -691,7 +691,7 @@
             url: '@Url.Action("getShortMassageByMemberId")',
             data: { MemberId: "@Model.entity.MemberID" },
             success: function (result) {
-                //console.log(result)
+                $("#form2div").hide();
                 $("#form1div").html(result);
             }
         });
