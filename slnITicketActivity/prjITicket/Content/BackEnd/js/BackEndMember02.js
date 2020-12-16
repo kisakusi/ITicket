@@ -245,7 +245,7 @@
         if (parseInt($('#fRoleId').val()) === 9) {
             return
         }
-        $(this).addClass('btn-outline-warning').siblings().removeClass('btn-outline-warning')
+        $(this).addClass('btn-outline-warning').siblings().removeClass('btn-outline-warning').removeClass('btn-outline-danger')
         $('#ctrlBtn6').addClass('d-none')
         $('#ctrlBtn7').removeClass('d-none')
         $('#fRoleId').val(9)
