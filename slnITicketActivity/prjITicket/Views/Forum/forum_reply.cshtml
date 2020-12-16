@@ -26,7 +26,7 @@
                     <div id="Dropdown@(count)" class="w3-dropdown-content w3-bar-block w3-border w3-animate-opacity" style="right:0;width:80px">
                         <button onclick="reply_quote(@item.ReplyID,'@item.Member.Name')" class="emotion info">引用留言</button> @*Quote V.動詞 引用*@
                         <button class="emotion info" onclick="showModal(@count)">檢舉留言</button>
-                        @if (member != null && item.MemberID == member.MemberID)
+                        @if (member != null && item.MemberID == member.MemberID || member.MemberRoleId==4)
                         {
                             <button onclick="toggleEdit(@item.ReplyID)" class="emotion info">編輯留言</button>
                             <button onclick="replydelete(@item.ReplyID)" class="emotion info">刪除留言</button>
@@ -113,17 +113,14 @@
 @if (member != null && member.MemberID == Model.Article.MemberID)
 {
     <script>
-    $(function () {
+        $(function () {
             var Article = @Model.Article.ArticleID;
-        $.ajax({
-            type: "post",
-            url: "@Url.Action("reply_readed")",
-            data: { Article: Article },
-            success: function (data) {
-                    alert("已讀");
-                }
-    })
-})
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("reply_readed")",
+                data: { Article: Article }
+            });
+        });
     </script>
 }
 <script>
@@ -140,7 +137,6 @@
     }
 
     function txtReplyKeyDown(replyId) {
-
         if (window.event.keyCode == 13) {
         let rpcontent = $("#replyEdit_content_"+ replyId).val();
 

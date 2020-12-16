@@ -345,7 +345,10 @@
         let title = $("#articleTitle").val();
         let content = editor.getData();
         let ArticleCategoryID = $("#ArticleCategorySelected").val();
-
+        if (ArticleCategoryID == "0") {
+            alert("必須選擇類別");
+            return;
+        }
         $.ajax({
         type: "post",
         url: "@Url.Action("Add_article")",

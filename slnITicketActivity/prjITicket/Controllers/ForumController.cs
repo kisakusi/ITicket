@@ -28,18 +28,18 @@ namespace 期末專題_討論版.Controllers
             if (member == null || member.MemberRoleId == 1) 
             {
                 Response.Write("<script>alert('您尚未登入！即將跳轉至登入頁面');" +
-                        "window.location.href='http://localhost:49949/Login/Login';</script> ");
+                        $"window.location.href='{Url.Action("Login","Login")}';</script>" );
             }
             else{
                 if (db.BanLIst.Where(n => n.EndTime > DateTime.Now).Select(n => n.BanMemberId).Contains(member.MemberID))
                 {
                     Response.Write("<script>alert('您被停權！無法使用此功能');" +
-                        "window.location.href='http://localhost:49949/Login/forum_mainblock';</script> ");
+                        $"window.location.href='{Url.Action("forum_mainblock","Forum")}';</script> ");
                 }
                 else
                 {
                     Response.Write("<script>" +
-                        "window.location.href='http://localhost:49949/Forum/Add_article';</script> ");
+                        $"window.location.href='{Url.Action("Add_article", "Forum")}';</script> ");
                 }
             }
         }

@@ -93,7 +93,7 @@
                         <a href="~/Forum/forum_content/?articleID=@item.ArticleID"><img id="img@(count)" class="img-fluid rounded mb-3 mb-md-0" style="width:600px;" src="@item.Picture" alt="" onerror="this.src='/Content/Forum_use/ImageStore/404Error.jpg'"></a>
                     </div>
                     <div class="col-xl-4 col-lg-6 col-md-10">
-                        @if (member != null && (member.MemberRoleId==3 || item.MemberID == member.MemberID))
+                        @if (member != null && (member.MemberRoleId==4 || item.MemberID == member.MemberID))
                         {
                             @Html.ActionLink(" 刪除 ", "Delete", "Forum", new { articleID = item.ArticleID }, null);
                             @Html.ActionLink(" 編輯 ", "before_Edit_article", "Forum", new { articleID = item.ArticleID }, null);

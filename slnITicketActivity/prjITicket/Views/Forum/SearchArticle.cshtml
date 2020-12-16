@@ -44,7 +44,7 @@
             </a>
         </div>
         <div class="col-xl-4 col-lg-6 col-md-10">
-            @if (member != null && item.MemberID == member.MemberID)
+            @if (member != null && (item.MemberID == member.MemberID || member.MemberRoleId ==4))
             {
                 @Html.ActionLink(" 刪除 ", "Delete", "Forum", new { articleID = item.ArticleID }, null);
                 @Html.ActionLink(" 編輯 ", "before_Edit_article", "Forum", new { articleID = item.ArticleID }, null);

@@ -150,7 +150,7 @@
                 </div>
             </div>
             <!-- Side Widget -->
-            @if (Model.Article.MemberID == member.MemberID || member.MemberRoleId==4)
+            @if (member!=null && (Model.Article.MemberID == member.MemberID || member.MemberRoleId==4))
             {
             <div class="card my-3 發文者資訊及操作區欄位">
                 <h5 class="card-header" style="background-color:coral">管理員/發文者才能看到的文章操作區</h5>
