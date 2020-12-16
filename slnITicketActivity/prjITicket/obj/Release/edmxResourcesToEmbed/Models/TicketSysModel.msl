@@ -4,7 +4,6 @@
     <EntitySetMapping Name="Activity">
       <EntityTypeMapping TypeName="TicketSysModel.Activity">
         <MappingFragment StoreEntitySet="Activity">
-          <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
           <ScalarProperty Name="ActivityID" ColumnName="ActivityID" />
           <ScalarProperty Name="ActivityName" ColumnName="ActivityName" />
           <ScalarProperty Name="SellerID" ColumnName="SellerID" />
@@ -16,6 +15,7 @@
           <ScalarProperty Name="Hostwords" ColumnName="Hostwords" />
           <ScalarProperty Name="Map" ColumnName="Map" />
           <ScalarProperty Name="ActivityStatusID" ColumnName="ActivityStatusID" />
+          <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -37,6 +37,26 @@
           <ScalarProperty Name="Date" ColumnName="Date" />
           <ScalarProperty Name="Picture" ColumnName="Picture" />
           <ScalarProperty Name="ArticleCategoryID" ColumnName="ArticleCategoryID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Article_Emotion">
+      <EntityTypeMapping TypeName="TicketSysModel.Article_Emotion">
+        <MappingFragment StoreEntitySet="Article_Emotion">
+          <ScalarProperty Name="ArticleEmotionId" ColumnName="ArticleEmotionId" />
+          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+          <ScalarProperty Name="ArticleId" ColumnName="ArticleId" />
+          <ScalarProperty Name="ActionId" ColumnName="ActionId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Article_Report">
+      <EntityTypeMapping TypeName="TicketSysModel.Article_Report">
+        <MappingFragment StoreEntitySet="Article_Report">
+          <ScalarProperty Name="Article_ReportId" ColumnName="Article_ReportId" />
+          <ScalarProperty Name="ArticleId" ColumnName="ArticleId" />
+          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+          <ScalarProperty Name="ReportId" ColumnName="ReportId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -78,6 +98,7 @@
     <EntitySetMapping Name="Comment">
       <EntityTypeMapping TypeName="TicketSysModel.Comment">
         <MappingFragment StoreEntitySet="Comment">
+          <ScalarProperty Name="IsBaned" ColumnName="IsBaned" />
           <ScalarProperty Name="CommentID" ColumnName="CommentID" />
           <ScalarProperty Name="CommentMemberID" ColumnName="CommentMemberID" />
           <ScalarProperty Name="CommentActivityId" ColumnName="CommentActivityId" />
@@ -97,16 +118,6 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="Emotion">
-      <EntityTypeMapping TypeName="TicketSysModel.Emotion">
-        <MappingFragment StoreEntitySet="Emotion">
-          <ScalarProperty Name="EmotionId" ColumnName="EmotionId" />
-          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
-          <ScalarProperty Name="ArticleId" ColumnName="ArticleId" />
-          <ScalarProperty Name="ActionId" ColumnName="ActionId" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="EmotionAction">
       <EntityTypeMapping TypeName="TicketSysModel.EmotionAction">
         <MappingFragment StoreEntitySet="EmotionAction">
@@ -118,6 +129,7 @@
     <EntitySetMapping Name="Member">
       <EntityTypeMapping TypeName="TicketSysModel.Member">
         <MappingFragment StoreEntitySet="Member">
+          <ScalarProperty Name="fRegister_time" ColumnName="fRegister_time" />
           <ScalarProperty Name="MemberID" ColumnName="MemberID" />
           <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="Name" ColumnName="Name" />
@@ -134,6 +146,9 @@
           <ScalarProperty Name="Sex" ColumnName="Sex" />
           <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
           <ScalarProperty Name="RegisterCheckCode" ColumnName="RegisterCheckCode" />
+          <ScalarProperty Name="provider" ColumnName="provider" />
+          <ScalarProperty Name="providerFB" ColumnName="providerFB" />
+          <ScalarProperty Name="providerGO" ColumnName="providerGO" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -159,8 +174,7 @@
     <EntitySetMapping Name="Orders">
       <EntityTypeMapping TypeName="TicketSysModel.Orders">
         <MappingFragment StoreEntitySet="Orders">
-          <ScalarProperty Name="OrderGuid" ColumnName="OrderGuid" />
-          <ScalarProperty Name="OrderStatus" ColumnName="OrderStatus" />
+          <ScalarProperty Name="PayPoint" ColumnName="PayPoint" />
           <ScalarProperty Name="OrderID" ColumnName="OrderID" />
           <ScalarProperty Name="MemberID" ColumnName="MemberID" />
           <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
@@ -168,17 +182,30 @@
           <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
           <ScalarProperty Name="Address" ColumnName="Address" />
+          <ScalarProperty Name="OrderStatus" ColumnName="OrderStatus" />
+          <ScalarProperty Name="OrderGuid" ColumnName="OrderGuid" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Reply">
       <EntityTypeMapping TypeName="TicketSysModel.Reply">
         <MappingFragment StoreEntitySet="Reply">
+          <ScalarProperty Name="Readed" ColumnName="Readed" />
           <ScalarProperty Name="ReplyID" ColumnName="ReplyID" />
           <ScalarProperty Name="ReplyContent" ColumnName="ReplyContent" />
           <ScalarProperty Name="MemberID" ColumnName="MemberID" />
           <ScalarProperty Name="ReplyDate" ColumnName="ReplyDate" />
           <ScalarProperty Name="ArticleID" ColumnName="ArticleID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Reply_Emotion">
+      <EntityTypeMapping TypeName="TicketSysModel.Reply_Emotion">
+        <MappingFragment StoreEntitySet="Reply_Emotion">
+          <ScalarProperty Name="ReplyEmotionId" ColumnName="ReplyEmotionId" />
+          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+          <ScalarProperty Name="ReplyId" ColumnName="ReplyId" />
+          <ScalarProperty Name="ActionId" ColumnName="ActionId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -203,6 +230,8 @@
     <EntitySetMapping Name="Seller">
       <EntityTypeMapping TypeName="TicketSysModel.Seller">
         <MappingFragment StoreEntitySet="Seller">
+          <ScalarProperty Name="fFileName" ColumnName="fFileName" />
+          <ScalarProperty Name="fPass" ColumnName="fPass" />
           <ScalarProperty Name="SellerID" ColumnName="SellerID" />
           <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
           <ScalarProperty Name="TaxIDNumber" ColumnName="TaxIDNumber" />
@@ -272,6 +301,7 @@
     <EntitySetMapping Name="TicketGroups">
       <EntityTypeMapping TypeName="TicketSysModel.TicketGroups">
         <MappingFragment StoreEntitySet="TicketGroups">
+          <ScalarProperty Name="Status" ColumnName="Status" />
           <ScalarProperty Name="TicketGroupId" ColumnName="TicketGroupId" />
           <ScalarProperty Name="TicketGroupName" ColumnName="TicketGroupName" />
           <ScalarProperty Name="TicketGroupDiscount" ColumnName="TicketGroupDiscount" />
@@ -306,6 +336,42 @@
           <ScalarProperty Name="TicketTimeId" ColumnName="TicketTimeId" />
           <ScalarProperty Name="TicketTime" ColumnName="TicketTime" />
           <ScalarProperty Name="ActivityId" ColumnName="ActivityId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ActivityFavourite">
+      <EntityTypeMapping TypeName="TicketSysModel.ActivityFavourite">
+        <MappingFragment StoreEntitySet="ActivityFavourite">
+          <ScalarProperty Name="ActivityId" ColumnName="ActivityId" />
+          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+          <ScalarProperty Name="ActivityFavouriteId" ColumnName="ActivityFavouriteId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ActivityFailedReason">
+      <EntityTypeMapping TypeName="TicketSysModel.ActivityFailedReason">
+        <MappingFragment StoreEntitySet="ActivityFailedReason">
+          <ScalarProperty Name="FailedReason" ColumnName="FailedReason" />
+          <ScalarProperty Name="ActivityFailedReasonID" ColumnName="ActivityFailedReasonID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Ad_Article_Activity">
+      <EntityTypeMapping TypeName="TicketSysModel.Ad_Article_Activity">
+        <MappingFragment StoreEntitySet="Ad_Article_Activity">
+          <ScalarProperty Name="ActivityID" ColumnName="ActivityID" />
+          <ScalarProperty Name="ArticleID" ColumnName="ArticleID" />
+          <ScalarProperty Name="AdID" ColumnName="AdID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CommentReport">
+      <EntityTypeMapping TypeName="TicketSysModel.CommentReport">
+        <MappingFragment StoreEntitySet="CommentReport">
+          <ScalarProperty Name="ReportReason" ColumnName="ReportReason" />
+          <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+          <ScalarProperty Name="CommentId" ColumnName="CommentId" />
+          <ScalarProperty Name="CommentReportId" ColumnName="CommentReportId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

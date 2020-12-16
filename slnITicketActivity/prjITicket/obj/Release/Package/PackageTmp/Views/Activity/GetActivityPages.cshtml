@@ -6,9 +6,30 @@
     @foreach (Activity activity in Model)
     {
         //循環讀取活動資料並塞入網頁
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="activityListItem col-lg-4 col-md-6 mb-4">
             <div class="card h-100">
-                <a href="javascript:;" onclick="getActivitySubDetailPage(@activity.ActivityID)"><img class="card-img-top" src="@Url.Content("~/images/Activity/"+activity.Picture)" alt=""></a>
+                @*<a href="javascript:;" onclick="getActivitySubDetailPage(@activity.ActivityID)"><img class="card-img-top" src="@Url.Content("~/images/Activity/"+activity.Picture)" alt=""></a>*@
+                <!---->
+                <a href="javascript:;" style="position:relative" onclick="getActivitySubDetailPage(@activity.ActivityID)">
+                    <img class="card-img-top" src="@Url.Content("~/images/Activity/"+activity.Picture)" alt="">
+                    <div onclick="addToFav(@activity.ActivityID,this)" class="addToFavourite">
+                        @{ 
+                            bool isFavourite = false;
+                            if (Session[CDictionary.SK_Logined_Member] != null)
+                            {
+                                int memberId = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
+                                ActivityFavourite activityFavourite = activity.ActivityFavourite.FirstOrDefault(af => af.MemberId == memberId);
+                                if (activityFavourite != null)
+                                {
+                                    isFavourite = true;
+                                }
+                            }
+                        }
+                        <i style="color:@(isFavourite?"#46A3FF":"white")" class='fas fa-briefcase'></i>
+                        <span>@(isFavourite?"取消收藏":"加入收藏")</span>
+                    </div>
+                </a>
+                <!---->
                 <div class="card-body">
                     <h4 class="card-title">
                         <a href="javascript:;" onclick="getActivitySubDetailPage(@activity.ActivityID)">@activity.ActivityName</a>
@@ -74,7 +95,7 @@
 <!--分頁部分,用Ajax-->
 @if (ViewBag.ActionName == "GetActivityPages")
 {
-    @Html.PagedListPager(Model, page => Url.Action("GetActivityPages", new { currentPage = page, orderMode = ViewBag.OrderMode }),
+    @Html.PagedListPager(Model, page => Url.Action("GetActivityPages", new { currentPage = page, orderMode = ViewBag.OrderMode,minPrice=ViewBag.MinPrice,maxPrice=ViewBag.MaxPrice,priceFilter=ViewBag.PriceFilter }),
     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
         new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 5 },
         new AjaxOptions() { OnBegin = "returnToActivityListTop", OnComplete = "savePageHistory", InsertionMode = InsertionMode.Replace, UpdateTargetId = "showActivities" }
@@ -83,7 +104,7 @@
 }
 else if (ViewBag.ActionName == "GetActivityPagesByKeyword")
 {
-    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesByKeyword", new { keyword = ViewBag.Keyword, currentPage = page, orderMode = ViewBag.OrderMode }),
+    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesByKeyword", new { keyword = ViewBag.Keyword, currentPage = page, orderMode = ViewBag.OrderMode, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, priceFilter = ViewBag.PriceFilter }),
     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
         new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 5 },
         new AjaxOptions() { OnBegin = "returnToActivityListTop", OnComplete = "savePageHistory", InsertionMode = InsertionMode.Replace, UpdateTargetId = "showActivities" }
@@ -92,7 +113,7 @@ else if (ViewBag.ActionName == "GetActivityPagesByKeyword")
 }
 else if (ViewBag.ActionName == "GetActivityPagesByCategoryId")
 {
-    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesByCategoryId", new { categoryId = ViewBag.CategoryId, currentPage = page, orderMode = ViewBag.OrderMode }),
+    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesByCategoryId", new { categoryId = ViewBag.CategoryId, currentPage = page, orderMode = ViewBag.OrderMode, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, priceFilter = ViewBag.PriceFilter }),
     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
         new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 5 },
         new AjaxOptions() { OnBegin = "returnToActivityListTop", OnComplete = "savePageHistory", InsertionMode = InsertionMode.Replace, UpdateTargetId = "showActivities" }
@@ -101,7 +122,7 @@ else if (ViewBag.ActionName == "GetActivityPagesByCategoryId")
 }
 else if (ViewBag.ActionName == "GetActivityPagesBySubCategoryId")
 {
-    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesBySubCategoryId", new { subCategoryId = ViewBag.SubCategoryId, currentPage = page, orderMode = ViewBag.OrderMode }),
+    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesBySubCategoryId", new { subCategoryId = ViewBag.SubCategoryId, currentPage = page, orderMode = ViewBag.OrderMode, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, priceFilter = ViewBag.PriceFilter }),
     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
         new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 5 },
         new AjaxOptions() { OnBegin = "returnToActivityListTop", OnComplete = "savePageHistory", InsertionMode = InsertionMode.Replace, UpdateTargetId = "showActivities" }
@@ -110,7 +131,7 @@ else if (ViewBag.ActionName == "GetActivityPagesBySubCategoryId")
 }
 else if (ViewBag.ActionName == "GetActivityPagesByDistrictId")
 {
-    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesByDistrictId", new { districtId = ViewBag.DistrictId, currentPage = page, orderMode = ViewBag.OrderMode }),
+    @Html.PagedListPager(Model, page => Url.Action("GetActivityPagesByDistrictId", new { districtId = ViewBag.DistrictId, currentPage = page, orderMode = ViewBag.OrderMode, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, priceFilter = ViewBag.PriceFilter }),
     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
         new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 5 },
         new AjaxOptions() { OnBegin= "returnToActivityListTop", OnComplete = "savePageHistory", InsertionMode = InsertionMode.Replace, UpdateTargetId = "showActivities" }

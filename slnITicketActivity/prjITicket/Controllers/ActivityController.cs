@@ -40,7 +40,7 @@ namespace prjITicket.Controllers
             //抓出每個活動最便宜的票,再取這當中的最大值,準備塞給價格篩選器的最大值
             int maxPriceAll = (int)db.Tickets.GroupBy(t => t.ActivityID).Max(g => g.Min(t => t.Price * (1 - t.Discount)));
             //找出銷售量前10的活動塞入ViewModel
-            List<ActivitySell> best10Activity = db.Activity.AsEnumerable().Where(a=>a.ActivityStatusID==1).Select(a => new ActivitySell()
+            List<ActivitySell> best10Activity = db.Activity.AsEnumerable().Where(a => a.ActivityStatusID == 1).Select(a => new ActivitySell()
             {
                 ActivityId = a.ActivityID,
                 ActivityName = a.ActivityName,
@@ -567,12 +567,8 @@ namespace prjITicket.Controllers
             return View();
         }
         //修改產品的頁面
-        public ActionResult EditActivity(int activityId=33)
+        public ActionResult EditActivity(int activityId)
         {
-            //todo,刪除,測試用測試用
-            activityId = 33;
-            //測試用測試用測試用測試用
-            ////////////////////////////
             Member member = Session[CDictionary.SK_Logined_Member] as Member;
             if (member == null || member.MemberRoleId != 3)
             {
@@ -1466,6 +1462,21 @@ namespace prjITicket.Controllers
         public bool CheckRepeatReport(int commentId, int memberId)
         {
             return db.CommentReport.Any(cr => cr.CommentId == commentId && cr.MemberId == memberId);
+        }
+        //上架/下架活動
+        public string UpDownActivity(int activityId)
+        {
+            Activity activity = db.Activity.FirstOrDefault(a => a.ActivityID == activityId);
+            if (activity.ActivityStatusID == 1)
+            {
+                activity.ActivityStatusID = 2;
+            }
+            else if (activity.ActivityStatusID == 2)
+            {
+                activity.ActivityStatusID = 0;
+            }
+            db.SaveChanges();
+            return activity.ActivityStatusID.ToString();
         }
     }
 }

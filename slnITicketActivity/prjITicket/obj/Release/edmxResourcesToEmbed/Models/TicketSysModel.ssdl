@@ -17,12 +17,35 @@
     <Property Name="ActivityStatusID" Type="int" Nullable="false" />
     <Property Name="DistrictId" Type="int" Nullable="false" />
   </EntityType>
+  <EntityType Name="ActivityFailedReason">
+    <Key>
+      <PropertyRef Name="ActivityFailedReasonID" />
+    </Key>
+    <Property Name="ActivityFailedReasonID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FailedReason" Type="nvarchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ActivityFavourite">
+    <Key>
+      <PropertyRef Name="ActivityFavouriteId" />
+    </Key>
+    <Property Name="ActivityFavouriteId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="ActivityId" Type="int" Nullable="false" />
+  </EntityType>
   <EntityType Name="ActivityStatus">
     <Key>
       <PropertyRef Name="ActivityStatusID" />
     </Key>
     <Property Name="ActivityStatusID" Type="int" Nullable="false" />
     <Property Name="ActivityStatusName" Type="nvarchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Ad_Article_Activity">
+    <Key>
+      <PropertyRef Name="AdID" />
+    </Key>
+    <Property Name="AdID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ArticleID" Type="int" Nullable="false" />
+    <Property Name="ActivityID" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Article">
     <Key>
@@ -33,8 +56,26 @@
     <Property Name="ArticleContent" Type="nvarchar(max)" Nullable="false" />
     <Property Name="MemberID" Type="int" Nullable="false" />
     <Property Name="Date" Type="datetime" Nullable="false" />
-    <Property Name="Picture" Type="varbinary" MaxLength="50" />
+    <Property Name="Picture" Type="nvarchar(max)" />
     <Property Name="ArticleCategoryID" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Article_Emotion">
+    <Key>
+      <PropertyRef Name="ArticleEmotionId" />
+    </Key>
+    <Property Name="ArticleEmotionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="ArticleId" Type="int" Nullable="false" />
+    <Property Name="ActionId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Article_Report">
+    <Key>
+      <PropertyRef Name="Article_ReportId" />
+    </Key>
+    <Property Name="Article_ReportId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ArticleId" Type="int" Nullable="false" />
+    <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="ReportId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="ArticleCategories">
     <Key>
@@ -77,6 +118,16 @@
     <Property Name="CommentContent" Type="nvarchar" MaxLength="300" Nullable="false" />
     <Property Name="CommentScore" Type="int" Nullable="false" />
     <Property Name="CommentDate" Type="datetime" Nullable="false" />
+    <Property Name="IsBaned" Type="bit" Nullable="false" />
+  </EntityType>
+  <EntityType Name="CommentReport">
+    <Key>
+      <PropertyRef Name="CommentReportId" />
+    </Key>
+    <Property Name="CommentReportId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CommentId" Type="int" Nullable="false" />
+    <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="ReportReason" Type="nvarchar" MaxLength="50" Nullable="false" />
   </EntityType>
   <EntityType Name="Districts">
     <Key>
@@ -86,15 +137,6 @@
     <Property Name="DistrictName" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="PostCode" Type="varchar" MaxLength="10" Nullable="false" />
     <Property Name="CityId" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Emotion">
-    <Key>
-      <PropertyRef Name="EmotionId" />
-    </Key>
-    <Property Name="EmotionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="MemberId" Type="int" Nullable="false" />
-    <Property Name="ArticleId" Type="int" Nullable="false" />
-    <Property Name="ActionId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="EmotionAction">
     <Key>
@@ -115,14 +157,18 @@
     <Property Name="NickName" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="BirthDate" Type="datetime" />
     <Property Name="Phone" Type="char" MaxLength="10" />
-    <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
-    <Property Name="Point" Type="int" />
+    <Property Name="Password" Type="nvarchar" MaxLength="50" />
+    <Property Name="Point" Type="int" Nullable="false" />
     <Property Name="Address" Type="nvarchar" MaxLength="100" />
     <Property Name="MemberRoleId" Type="int" Nullable="false" />
     <Property Name="Icon" Type="nvarchar(max)" />
     <Property Name="Sex" Type="bit" />
     <Property Name="DistrictId" Type="int" />
     <Property Name="RegisterCheckCode" Type="varchar" MaxLength="50" />
+    <Property Name="provider" Type="nvarchar" MaxLength="50" />
+    <Property Name="providerFB" Type="bit" />
+    <Property Name="providerGO" Type="bit" />
+    <Property Name="fRegister_time" Type="datetime" />
   </EntityType>
   <EntityType Name="MemberRole">
     <Key>
@@ -154,6 +200,7 @@
     <Property Name="Address" Type="nvarchar" MaxLength="100" Nullable="false" />
     <Property Name="OrderStatus" Type="bit" Nullable="false" />
     <Property Name="OrderGuid" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="PayPoint" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Reply">
     <Key>
@@ -164,6 +211,16 @@
     <Property Name="MemberID" Type="int" Nullable="false" />
     <Property Name="ReplyDate" Type="datetime" Nullable="false" />
     <Property Name="ArticleID" Type="int" Nullable="false" />
+    <Property Name="Readed" Type="bit" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Reply_Emotion">
+    <Key>
+      <PropertyRef Name="ReplyEmotionId" />
+    </Key>
+    <Property Name="ReplyEmotionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="ReplyId" Type="int" Nullable="false" />
+    <Property Name="ActionId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Reply_Report">
     <Key>
@@ -178,7 +235,7 @@
     <Key>
       <PropertyRef Name="ReportId" />
     </Key>
-    <Property Name="ReportId" Type="int" Nullable="false" />
+    <Property Name="ReportId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="ReportReason" Type="nvarchar" MaxLength="50" Nullable="false" />
   </EntityType>
   <EntityType Name="Seller">
@@ -192,6 +249,8 @@
     <Property Name="SellerPhone" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="SellerDeccription" Type="nvarchar(max)" />
     <Property Name="MemberId" Type="int" Nullable="false" />
+    <Property Name="fPass" Type="bit" />
+    <Property Name="fFileName" Type="nvarchar" MaxLength="50" />
   </EntityType>
   <EntityType Name="ShoppingCart">
     <Key>
@@ -250,6 +309,7 @@
     <Property Name="TicketGroupId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TicketGroupName" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="TicketGroupDiscount" Type="numeric" Precision="3" Scale="2" Nullable="false" />
+    <Property Name="Status" Type="bit" Nullable="false" />
   </EntityType>
   <EntityType Name="TicketQRCodes">
     <Key>
@@ -327,6 +387,54 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK_ActivityFavourite_Activity">
+    <End Role="Activity" Type="Self.Activity" Multiplicity="1" />
+    <End Role="ActivityFavourite" Type="Self.ActivityFavourite" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Activity">
+        <PropertyRef Name="ActivityID" />
+      </Principal>
+      <Dependent Role="ActivityFavourite">
+        <PropertyRef Name="ActivityId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ActivityFavourite_Member">
+    <End Role="Member" Type="Self.Member" Multiplicity="1" />
+    <End Role="ActivityFavourite" Type="Self.ActivityFavourite" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Member">
+        <PropertyRef Name="MemberID" />
+      </Principal>
+      <Dependent Role="ActivityFavourite">
+        <PropertyRef Name="MemberId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ad_Article_Activity_Activity">
+    <End Role="Activity" Type="Self.Activity" Multiplicity="1" />
+    <End Role="Ad_Article_Activity" Type="Self.Ad_Article_Activity" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Activity">
+        <PropertyRef Name="ActivityID" />
+      </Principal>
+      <Dependent Role="Ad_Article_Activity">
+        <PropertyRef Name="ActivityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ad_Article_Activity_Article">
+    <End Role="Article" Type="Self.Article" Multiplicity="1" />
+    <End Role="Ad_Article_Activity" Type="Self.Ad_Article_Activity" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Article">
+        <PropertyRef Name="ArticleID" />
+      </Principal>
+      <Dependent Role="Ad_Article_Activity">
+        <PropertyRef Name="ArticleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_Article_ArticleCategories">
     <End Role="ArticleCategories" Type="Self.ArticleCategories" Multiplicity="1" />
     <End Role="Article" Type="Self.Article" Multiplicity="*" />
@@ -348,6 +456,42 @@
       </Principal>
       <Dependent Role="Article">
         <PropertyRef Name="MemberID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Article_Report_Article_Report">
+    <End Role="Article" Type="Self.Article" Multiplicity="1" />
+    <End Role="Article_Report" Type="Self.Article_Report" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Article">
+        <PropertyRef Name="ArticleID" />
+      </Principal>
+      <Dependent Role="Article_Report">
+        <PropertyRef Name="ArticleId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Article_Report_Member">
+    <End Role="Member" Type="Self.Member" Multiplicity="1" />
+    <End Role="Article_Report" Type="Self.Article_Report" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Member">
+        <PropertyRef Name="MemberID" />
+      </Principal>
+      <Dependent Role="Article_Report">
+        <PropertyRef Name="MemberId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Article_Report_Report">
+    <End Role="Report" Type="Self.Report" Multiplicity="1" />
+    <End Role="Article_Report" Type="Self.Article_Report" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Report">
+        <PropertyRef Name="ReportId" />
+      </Principal>
+      <Dependent Role="Article_Report">
+        <PropertyRef Name="ReportId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -399,6 +543,30 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK_CommentReport_Comment">
+    <End Role="Comment" Type="Self.Comment" Multiplicity="1" />
+    <End Role="CommentReport" Type="Self.CommentReport" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Comment">
+        <PropertyRef Name="CommentID" />
+      </Principal>
+      <Dependent Role="CommentReport">
+        <PropertyRef Name="CommentId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CommentReport_Member">
+    <End Role="Member" Type="Self.Member" Multiplicity="1" />
+    <End Role="CommentReport" Type="Self.CommentReport" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Member">
+        <PropertyRef Name="MemberID" />
+      </Principal>
+      <Dependent Role="CommentReport">
+        <PropertyRef Name="MemberId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_Districts_Districts">
     <End Role="Cities" Type="Self.Cities" Multiplicity="1" />
     <End Role="Districts" Type="Self.Districts" Multiplicity="*" />
@@ -413,36 +581,36 @@
   </Association>
   <Association Name="FK_Emotion_Article">
     <End Role="Article" Type="Self.Article" Multiplicity="1" />
-    <End Role="Emotion" Type="Self.Emotion" Multiplicity="*" />
+    <End Role="Article_Emotion" Type="Self.Article_Emotion" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Article">
         <PropertyRef Name="ArticleID" />
       </Principal>
-      <Dependent Role="Emotion">
+      <Dependent Role="Article_Emotion">
         <PropertyRef Name="ArticleId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
   <Association Name="FK_Emotion_EmotionAction">
     <End Role="EmotionAction" Type="Self.EmotionAction" Multiplicity="1" />
-    <End Role="Emotion" Type="Self.Emotion" Multiplicity="*" />
+    <End Role="Article_Emotion" Type="Self.Article_Emotion" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="EmotionAction">
         <PropertyRef Name="EmotionActionId" />
       </Principal>
-      <Dependent Role="Emotion">
+      <Dependent Role="Article_Emotion">
         <PropertyRef Name="ActionId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
   <Association Name="FK_Emotion_Member">
     <End Role="Member" Type="Self.Member" Multiplicity="1" />
-    <End Role="Emotion" Type="Self.Emotion" Multiplicity="*" />
+    <End Role="Article_Emotion" Type="Self.Article_Emotion" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Member">
         <PropertyRef Name="MemberID" />
       </Principal>
-      <Dependent Role="Emotion">
+      <Dependent Role="Article_Emotion">
         <PropertyRef Name="MemberId" />
       </Dependent>
     </ReferentialConstraint>
@@ -528,6 +696,42 @@
       </Principal>
       <Dependent Role="Reply">
         <PropertyRef Name="ArticleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Reply_Emotion_EmotionAction">
+    <End Role="EmotionAction" Type="Self.EmotionAction" Multiplicity="1" />
+    <End Role="Reply_Emotion" Type="Self.Reply_Emotion" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="EmotionAction">
+        <PropertyRef Name="EmotionActionId" />
+      </Principal>
+      <Dependent Role="Reply_Emotion">
+        <PropertyRef Name="ActionId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Reply_Emotion_Member">
+    <End Role="Member" Type="Self.Member" Multiplicity="1" />
+    <End Role="Reply_Emotion" Type="Self.Reply_Emotion" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Member">
+        <PropertyRef Name="MemberID" />
+      </Principal>
+      <Dependent Role="Reply_Emotion">
+        <PropertyRef Name="MemberId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Reply_Emotion_Reply">
+    <End Role="Reply" Type="Self.Reply" Multiplicity="1" />
+    <End Role="Reply_Emotion" Type="Self.Reply_Emotion" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Reply">
+        <PropertyRef Name="ReplyID" />
+      </Principal>
+      <Dependent Role="Reply_Emotion">
+        <PropertyRef Name="ReplyId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -761,21 +965,27 @@
   </Association>
   <EntityContainer Name="TicketSysModelStoreContainer">
     <EntitySet Name="Activity" EntityType="Self.Activity" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ActivityFailedReason" EntityType="Self.ActivityFailedReason" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ActivityFavourite" EntityType="Self.ActivityFavourite" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ActivityStatus" EntityType="Self.ActivityStatus" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Ad_Article_Activity" EntityType="Self.Ad_Article_Activity" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Article" EntityType="Self.Article" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Article_Emotion" EntityType="Self.Article_Emotion" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Article_Report" EntityType="Self.Article_Report" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ArticleCategories" EntityType="Self.ArticleCategories" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="BanLIst" EntityType="Self.BanLIst" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Categories" EntityType="Self.Categories" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Cities" EntityType="Self.Cities" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="CommentReport" EntityType="Self.CommentReport" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Districts" EntityType="Self.Districts" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="Emotion" EntityType="Self.Emotion" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="EmotionAction" EntityType="Self.EmotionAction" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Member" EntityType="Self.Member" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="MemberRole" EntityType="Self.MemberRole" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Order_Detail" EntityType="Self.Order_Detail" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Orders" EntityType="Self.Orders" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Reply" EntityType="Self.Reply" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Reply_Emotion" EntityType="Self.Reply_Emotion" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Reply_Report" EntityType="Self.Reply_Report" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Report" EntityType="Self.Report" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Seller" EntityType="Self.Seller" Schema="dbo" store:Type="Tables" />
@@ -805,6 +1015,22 @@
       <End Role="SubCategories" EntitySet="SubCategories" />
       <End Role="Activity" EntitySet="Activity" />
     </AssociationSet>
+    <AssociationSet Name="FK_ActivityFavourite_Activity" Association="Self.FK_ActivityFavourite_Activity">
+      <End Role="Activity" EntitySet="Activity" />
+      <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ActivityFavourite_Member" Association="Self.FK_ActivityFavourite_Member">
+      <End Role="Member" EntitySet="Member" />
+      <End Role="ActivityFavourite" EntitySet="ActivityFavourite" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ad_Article_Activity_Activity" Association="Self.FK_Ad_Article_Activity_Activity">
+      <End Role="Activity" EntitySet="Activity" />
+      <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ad_Article_Activity_Article" Association="Self.FK_Ad_Article_Activity_Article">
+      <End Role="Article" EntitySet="Article" />
+      <End Role="Ad_Article_Activity" EntitySet="Ad_Article_Activity" />
+    </AssociationSet>
     <AssociationSet Name="FK_Article_ArticleCategories" Association="Self.FK_Article_ArticleCategories">
       <End Role="ArticleCategories" EntitySet="ArticleCategories" />
       <End Role="Article" EntitySet="Article" />
@@ -812,6 +1038,18 @@
     <AssociationSet Name="FK_Article_Member" Association="Self.FK_Article_Member">
       <End Role="Member" EntitySet="Member" />
       <End Role="Article" EntitySet="Article" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Article_Report_Article_Report" Association="Self.FK_Article_Report_Article_Report">
+      <End Role="Article" EntitySet="Article" />
+      <End Role="Article_Report" EntitySet="Article_Report" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Article_Report_Member" Association="Self.FK_Article_Report_Member">
+      <End Role="Member" EntitySet="Member" />
+      <End Role="Article_Report" EntitySet="Article_Report" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Article_Report_Report" Association="Self.FK_Article_Report_Report">
+      <End Role="Report" EntitySet="Report" />
+      <End Role="Article_Report" EntitySet="Article_Report" />
     </AssociationSet>
     <AssociationSet Name="FK_BanLIst_Member" Association="Self.FK_BanLIst_Member">
       <End Role="Member" EntitySet="Member" />
@@ -829,21 +1067,29 @@
       <End Role="Member" EntitySet="Member" />
       <End Role="Comment" EntitySet="Comment" />
     </AssociationSet>
+    <AssociationSet Name="FK_CommentReport_Comment" Association="Self.FK_CommentReport_Comment">
+      <End Role="Comment" EntitySet="Comment" />
+      <End Role="CommentReport" EntitySet="CommentReport" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CommentReport_Member" Association="Self.FK_CommentReport_Member">
+      <End Role="Member" EntitySet="Member" />
+      <End Role="CommentReport" EntitySet="CommentReport" />
+    </AssociationSet>
     <AssociationSet Name="FK_Districts_Districts" Association="Self.FK_Districts_Districts">
       <End Role="Cities" EntitySet="Cities" />
       <End Role="Districts" EntitySet="Districts" />
     </AssociationSet>
     <AssociationSet Name="FK_Emotion_Article" Association="Self.FK_Emotion_Article">
       <End Role="Article" EntitySet="Article" />
-      <End Role="Emotion" EntitySet="Emotion" />
+      <End Role="Article_Emotion" EntitySet="Article_Emotion" />
     </AssociationSet>
     <AssociationSet Name="FK_Emotion_EmotionAction" Association="Self.FK_Emotion_EmotionAction">
       <End Role="EmotionAction" EntitySet="EmotionAction" />
-      <End Role="Emotion" EntitySet="Emotion" />
+      <End Role="Article_Emotion" EntitySet="Article_Emotion" />
     </AssociationSet>
     <AssociationSet Name="FK_Emotion_Member" Association="Self.FK_Emotion_Member">
       <End Role="Member" EntitySet="Member" />
-      <End Role="Emotion" EntitySet="Emotion" />
+      <End Role="Article_Emotion" EntitySet="Article_Emotion" />
     </AssociationSet>
     <AssociationSet Name="FK_Member_Districts" Association="Self.FK_Member_Districts">
       <End Role="Districts" EntitySet="Districts" />
@@ -872,6 +1118,18 @@
     <AssociationSet Name="FK_Reply_Article" Association="Self.FK_Reply_Article">
       <End Role="Article" EntitySet="Article" />
       <End Role="Reply" EntitySet="Reply" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Reply_Emotion_EmotionAction" Association="Self.FK_Reply_Emotion_EmotionAction">
+      <End Role="EmotionAction" EntitySet="EmotionAction" />
+      <End Role="Reply_Emotion" EntitySet="Reply_Emotion" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Reply_Emotion_Member" Association="Self.FK_Reply_Emotion_Member">
+      <End Role="Member" EntitySet="Member" />
+      <End Role="Reply_Emotion" EntitySet="Reply_Emotion" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Reply_Emotion_Reply" Association="Self.FK_Reply_Emotion_Reply">
+      <End Role="Reply" EntitySet="Reply" />
+      <End Role="Reply_Emotion" EntitySet="Reply_Emotion" />
     </AssociationSet>
     <AssociationSet Name="FK_Reply_Member" Association="Self.FK_Reply_Member">
       <End Role="Member" EntitySet="Member" />
