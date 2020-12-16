@@ -10,5 +10,6 @@ namespace prjITicket.ViewModel
     {
         public Activity Activity { get; set; }
         public List<TicketGroups> Groups { get; set; }
+        public List<Activity> OtherPeopleBuy { get; set; }
     }
 }

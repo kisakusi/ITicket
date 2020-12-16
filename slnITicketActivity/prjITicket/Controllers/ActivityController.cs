@@ -33,18 +33,8 @@ namespace prjITicket.Controllers
         {
             //抓到需要秀在左邊的類別
             List<Categories> categories = db.Categories.ToList();
-            //隨機抽3個活動當輪播圖
-            int length = db.Activity.Where(a => a.ActivityStatusID == 1).Count();
-            List<int> indexs = new List<int>();
-            Random random = new Random();
-            while (indexs.Count < 3)
-            {
-                int index = random.Next(0, length);
-                if (!indexs.Contains(index))
-                    indexs.Add(index);
-            }
             List<Activity> activities = db.Activity.Where(a => a.ActivityStatusID == 1).ToList();
-            List<Activity> scrollActivities = indexs.Select(i => activities[i]).ToList();
+            List<Activity> scrollActivities = db.Activity.Where(a=>a.ActivityStatusID==1).OrderByDescending(a => a.ActivityID).Take(3).ToList();
             //從subcategory抓出6個熱門搜索
             List<SubCategories> hotSearch = db.SubCategories.OrderByDescending(sc => sc.SearchedTime).Take(6).ToList();
             //抓出每個活動最便宜的票,再取這當中的最大值,準備塞給價格篩選器的最大值
@@ -78,8 +68,12 @@ namespace prjITicket.Controllers
             }
             //找出所有與這個Activity相關的group
             List<TicketGroups> groups = db.TicketGroups.Where(tg =>tg.Status&&tg.TicketGroupDetail.Select(tgd => tgd.ActivityId).Contains(activityId)).ToList();
+            //找出(其他人還買了)的活動塞到ViewModel
+            List<Activity> otherPeopleBuy = db.Orders.Where(o => o.Order_Detail.Any(od => od.Tickets.ActivityID == activityId))
+                .SelectMany(o => o.Order_Detail).Where(od => od.Tickets.ActivityID != activityId)
+                .GroupBy(od => od.Tickets.Activity).OrderByDescending(g => g.Count()).Select(g => g.Key).Where(a=>a.ActivityStatusID==1).Take(3).ToList();
             //塞入ViewModel傳到前端
-            VMActivityDetail vm = new VMActivityDetail() { Activity = activity, Groups = groups };
+            VMActivityDetail vm = new VMActivityDetail() { Activity = activity, Groups = groups,OtherPeopleBuy = otherPeopleBuy };
             return View(vm);
         }
         //顯示購物車清單的controller
@@ -1351,14 +1345,20 @@ namespace prjITicket.Controllers
                 }
             }
             email += "</tr></table>";
-            //從所有活動找出推薦的活動給他
-            int cityId = order.Districts.CityId; //客人的城市
-            //客人買的東西的類別的數組
-            int[] categoryIds = order.Order_Detail.Select(od => od.Tickets.Activity.SubCategories.CategoryId).Distinct().ToArray();
-            //找出當前order有的activityId,排除在推薦之外
-            int[] activityNowIds = order.Order_Detail.Select(od => od.Tickets.ActivityID).ToArray();
-            //找出活動當中地點在客人的城市而且類型與其所購買產品的類型相似的活動的隨機3筆當作推薦
-            Activity[] activities = db.Activity.Where(a => a.ActivityStatusID==1&&categoryIds.Contains(a.SubCategories.CategoryId) && a.Districts.CityId == cityId&&!activityNowIds.Contains(a.ActivityID)).OrderBy(a => Guid.NewGuid().ToString()).Take(3).ToArray();
+            ////從所有活動找出推薦的活動給他
+            //當前order的活動
+            List<int> activityIds = order.Order_Detail.Select(od => od.Tickets.ActivityID).ToList();
+            //找出所有order中有買上面找出來的活動的order,並整合成orderDetail的集合
+            List<Orders> linkOrders = db.Orders.Where(o => o.Order_Detail.Any(od => activityIds.Contains(od.Tickets.ActivityID))).ToList();
+            List<Order_Detail> linkOrderDetails = new List<Order_Detail>();
+            foreach(Orders linkOrder in linkOrders)
+            {
+                foreach(Order_Detail order_Detail in linkOrder.Order_Detail)
+                {
+                    linkOrderDetails.Add(order_Detail);
+                }
+            }
+            Activity[] activities = linkOrderDetails.Where(od=>!activityIds.Contains(od.Tickets.Activity.ActivityID)).GroupBy(lod => lod.Tickets.Activity).OrderByDescending(g => g.Count()).Select(g => g.Key).Where(a=>a.ActivityStatusID==1).Take(3).ToArray();
             if (activities.Length != 0)
             {
                 email += "<h2 style='color:red;text-align:center;margin-top:50px'>推薦活動</h2>";
