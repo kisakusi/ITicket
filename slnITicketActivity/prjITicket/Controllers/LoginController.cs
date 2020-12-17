@@ -409,7 +409,6 @@ namespace prjITicket.Controllers
                 s.SellerPhone = formData.SellerPhone;
                 s.CompanyName = formData.CompanyName;
                 s.TaxIDNumber = formData.TaxIDNumber;
-                s.fPass = false;
                 s.fFileName = $"abc{m.MemberID:D4}" + FileSave.FileName;
                 db.Seller.Add(s);
                 db.SaveChanges();

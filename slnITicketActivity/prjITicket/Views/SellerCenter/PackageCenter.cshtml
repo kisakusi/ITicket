@@ -51,7 +51,7 @@
             <td>
                 <a id="btndetail" href="#" class="btn btn-light" onclick="ShowDetail(@item.TicketGroupId);">套票細項</a>
                 <a href="JavaScript:;" class="btn btn-success">修改</a>
-                <a href="JavaScript:;" class="btn btn-danger">刪除</a>
+                <a href="@Url.Action("DeleteTicketGroup","Activity",new { groupId=item.TicketGroupId})" class="btn btn-danger">刪除</a>
             </td>
         </tr>
     }

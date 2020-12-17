@@ -40,7 +40,7 @@
             <p class="lead">
                 by
                 @Html.ActionLink(Model.Article.Member.Name, "forum_mainblock", "Forum", new { searchText = Model.Article.Member.Name })
-                
+
             </p>
             <hr>
             <!-- Date/Time -->
@@ -132,7 +132,7 @@
         </div>
         <!-- Sidebar Widgets Column -->
         <div class="col-md-3">
-            
+
             <!-- Categories Widget -->
             <div class="card my-3 發文者資訊及操作區欄位">
                 <h5 class="card-header">發文者資訊</h5>
@@ -150,18 +150,18 @@
                 </div>
             </div>
             <!-- Side Widget -->
-            @if (member!=null && (Model.Article.MemberID == member.MemberID || member.MemberRoleId==4))
+            @if (member != null && (Model.Article.MemberID == member.MemberID || member.MemberRoleId == 4))
             {
-            <div class="card my-3 發文者資訊及操作區欄位">
-                <h5 class="card-header" style="background-color:coral">管理員/發文者才能看到的文章操作區</h5>
-                <div class="card-body">
-                    @Html.ActionLink("編輯", "before_Edit_article", "Forum", new { articleID = Model.Article.ArticleID }, null)
-                    @Html.ActionLink("刪除", "Delete", "Forum", new { articleID = Model.Article.ArticleID }, null)
+                <div class="card my-3 發文者資訊及操作區欄位">
+                    <h5 class="card-header" style="background-color:coral">管理員/發文者才能看到的文章操作區</h5>
+                    <div class="card-body">
+                        @Html.ActionLink("編輯", "before_Edit_article", "Forum", new { articleID = Model.Article.ArticleID }, null)
+                        @Html.ActionLink("刪除", "Delete", "Forum", new { articleID = Model.Article.ArticleID }, null)
+                    </div>
                 </div>
-            </div>
             }
         </div>
-    </div>  
+    </div>
     <!-- /.row -->
     <button type="button" id="BackTop" class="toTop-arrow"></button>
 </div>
@@ -241,173 +241,172 @@
                      if (data != "成功") {
                          alert(data);
                          if (data != "您已被停權！無法操作此功能")
-                         window.location.href = 'http://localhost:49949/Login/Login';
+                         window.location.href = '@Url.Action("Login", "Login")';
                      }
                      else {
                          alert(data);
                          $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID");
-                         editor.setData('');
-                     }
-                 }
-             });
-         }
-
-    });
-    refreshTime()
-    function refreshTime() {
-        $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID")
-        $("#ajaxshowActivity").empty().load("/Forum/forum_Activity?articleID=@Model.Article.ArticleID")
-    }
-    setInterval("refreshTime()", 300000);
-    $("#content").html(`@Html.Raw(Model.Article.ArticleContent)`);
-
-
-
-
-
-    function reportReason_article() {
-        let reportId = $('#articleReportReason').val();
-
-        if (reportId === '#') {
-
-            alert("社會再走，理由要有");
-        }
-        else {
-         $.ajax({
-            type: "post",
-             url: "@Url.Action("Article_Report")",
-             data: {
-                 ReportID: reportId, ArticleID: @Model.Article.ArticleID},
-             success: function (data) {
-                 if (data != "成功") {
-                     alert(data);
-                     window.location.href = 'http://localhost:49949/Login/Login';
-                 } else {
-                     document.getElementById('Modal').style.display = 'none';
-                     alert("檢舉" + data);
-                 }
-        }
-      });
-    }
-    }
-
-    function likeBtn_a()
-    {
-        let likebtn = document.getElementById('actionlike_a');
-        let dislikebtn = document.getElementById('actiondislike_a');
-        let ActionId = 1;
-        if (dislikebtn.className == 'bpclick') {
-            alert("此篇留言你已點了不喜歡。");
-        }
-        else {
-            if (likebtn.className == 'gp') {
-                likebtn.className = 'gpclick';
-
-                $.ajax({
-                 type: "post",
-                    url: "@Url.Action("Article_EmotionAction")",
-                    data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
-                    success: function (data) {
-                        if (data != "成功") {
-                            alert(data);
-                            window.location.href = 'http://localhost:49949/Login/Login';
-                        } else {
-                            $("#goodpoint").text(parseInt($("#goodpoint").text()) + 1);
+                        editor.setData('');
                         }
-                    },
-                    error: function (data) {
-                    }
-                });
-            }
-            else {
-                likebtn.className = 'gp';
-                $.ajax({
-                 type: "post",
-                    url: "@Url.Action("Article_EmotionAction_Cancel")",
-                    data: { ArticleID: @Model.Article.ArticleID},
-                    success: function (data) {
+                        }
+                        });
+                        }
+
+                        });
+                        refreshTime()
+                        function refreshTime() {
+                        $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID")
+                        $("#ajaxshowActivity").empty().load("/Forum/forum_Activity?articleID=@Model.Article.ArticleID")
+                        }
+                        setInterval("refreshTime()", 300000);
+                        $("#content").html(`@Html.Raw(Model.Article.ArticleContent)`);
+
+
+
+
+
+                        function reportReason_article() {
+                        let reportId = $('#articleReportReason').val();
+
+                        if (reportId === '#') {
+
+                        alert("社會再走，理由要有");
+                        }
+                        else {
+                        $.ajax({
+                        type: "post",
+                        url: "@Url.Action("Article_Report")",
+                        data: {
+                        ReportID: reportId, ArticleID: @Model.Article.ArticleID},
+                        success: function (data) {
+                        if (data != "成功") {
+                        alert(data);                        
+                         window.location.href = '@Url.Action("Login", "Login")';
+                        } else {
+                        document.getElementById('Modal').style.display = 'none';
+                        alert("檢舉" + data);
+                        }
+                        }
+                        });
+                        }
+                        }
+
+                        function likeBtn_a()
+                        {
+                        let likebtn = document.getElementById('actionlike_a');
+                        let dislikebtn = document.getElementById('actiondislike_a');
+                        let ActionId = 1;
+                        if (dislikebtn.className == 'bpclick') {
+                        alert("此篇留言你已點了不喜歡。");
+                        }
+                        else {
+                        if (likebtn.className == 'gp') {
+                        likebtn.className = 'gpclick';
+
+                        $.ajax({
+                        type: "post",
+                        url: "@Url.Action("Article_EmotionAction")",
+                        data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
+                        success: function (data) {
+                        if (data != "成功") {
+                        alert(data);                        
+                         window.location.href = '@Url.Action("Login", "Login")';
+                        } else {
+                        $("#goodpoint").text(parseInt($("#goodpoint").text()) + 1);
+                        }
+                        },
+                        error: function (data) {
+                        }
+                        });
+                        }
+                        else {
+                        likebtn.className = 'gp';
+                        $.ajax({
+                        type: "post",
+                        url: "@Url.Action("Article_EmotionAction_Cancel")",
+                        data: { ArticleID: @Model.Article.ArticleID},
+                        success: function (data) {
                         $("#goodpoint").text(parseInt($("#goodpoint").text()) - 1);
-                    },
-                    error: function (data) {
-                    }
-                });
-            }
-        }
-    }
-    function dislikeBtn_a() {
-        let likebtn = document.getElementById('actionlike_a');
-        let dislikebtn = document.getElementById('actiondislike_a');
-        let ActionId = 2;
-        if (likebtn.className == 'gpclick') {
-            alert("此篇留言你已點了喜歡。");
-        }
-        else {
-            if (dislikebtn.className == 'bp') {
-                dislikebtn.className = 'bpclick';
-
-                $.ajax({
-                 type: "post",
-                    url: "@Url.Action("Article_EmotionAction")",
-                    data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
-                    success: function (data) {
-                        if (data != "成功") {
-                            alert(data);
-                            window.location.href = 'http://localhost:49949/Login/Login';
-                        } else {
-                            $("#badpoint").text(parseInt($("#badpoint").text()) + 1);
+                        },
+                        error: function (data) {
                         }
-                    },
-                    error: function (data) {
-                    }
-                });
-            }
-            else {
-                dislikebtn.className = 'bp';
-                $.ajax({
-                 type: "post",
-                    url: "@Url.Action("Article_EmotionAction_Cancel")",
-                    data: { ArticleID: @Model.Article.ArticleID},
-                    success: function (data) {
+                        });
+                        }
+                        }
+                        }
+                        function dislikeBtn_a() {
+                        let likebtn = document.getElementById('actionlike_a');
+                        let dislikebtn = document.getElementById('actiondislike_a');
+                        let ActionId = 2;
+                        if (likebtn.className == 'gpclick') {
+                        alert("此篇留言你已點了喜歡。");
+                        }
+                        else {
+                        if (dislikebtn.className == 'bp') {
+                        dislikebtn.className = 'bpclick';
+
+                        $.ajax({
+                        type: "post",
+                        url: "@Url.Action("Article_EmotionAction")",
+                        data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
+                        success: function (data) {
+                        if (data != "成功") {
+                        alert(data);
+                         window.location.href = '@Url.Action("Login", "Login")';
+                        } else {
+                        $("#badpoint").text(parseInt($("#badpoint").text()) + 1);
+                        }
+                        },
+                        error: function (data) {
+                        }
+                        });
+                        }
+                        else {
+                        dislikebtn.className = 'bp';
+                        $.ajax({
+                        type: "post",
+                        url: "@Url.Action("Article_EmotionAction_Cancel")",
+                        data: { ArticleID: @Model.Article.ArticleID},
+                        success: function (data) {
                         $("#badpoint").text(parseInt($("#badpoint").text()) - 1);
-                    },
-                    error: function (data) {
-                    }
-                });
-            }
-        }
-    }
-    $(function () {
-        $('#BackTop').click(function () {
-            $('html,body').animate({ scrollTop: 0 }, 333);
-        });
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > 300) {
-                $('#BackTop').fadeIn(222);
-            } else {
-                $('#BackTop').stop().fadeOut(222);
-            }
-        }).scroll();
-    });
+                        },
+                        error: function (data) {
+                        }
+                        });
+                        }
+                        }
+                        }
+                        $(function () {
+                        $('#BackTop').click(function () {
+                        $('html,body').animate({ scrollTop: 0 }, 333);
+                        });
+                        $(window).scroll(function () {
+                        if ($(this).scrollTop() > 300) {
+                        $('#BackTop').fadeIn(222);
+                        } else {
+                        $('#BackTop').stop().fadeOut(222);
+                        }
+                        }).scroll();
+                        });
 
-    //獲得活動的次詳細頁
-    function getActivitySubDetailPage(activityId) {
-        $.ajax({
-            type: "get",
-            url: "@Url.Action("GetActivitySubDetailPage")",
-            data: { activityId: activityId },
-            success: function (result) {
-                $("#showActivity").html(result);
-                $("#activityListPageRight").hide(0, "swing", function () {
-                    $(document).scrollTop(0);
-                });
-            }
-        });
-    }
+                        //獲得活動的次詳細頁
+                        function getActivitySubDetailPage(activityId) {
+                        $.ajax({
+                        type: "get",
+                        url: "@Url.Action("GetActivitySubDetailPage")",
+                        data: { activityId: activityId },
+                        success: function (result) {
+                        $("#showActivity").html(result);
+                        $("#activityListPageRight").hide(0, "swing", function () {
+                        $(document).scrollTop(0);
+                        });
+                        }
+                        });
+                        }
 
-    function reply_quote(replyId, rpname) {
-        let rpcontent = document.getElementById("replyshow_content_" + replyId);
-        //let msg = "<h1>Test Title</h1><p>aaaaaa</p><p>bbbbbbbbbb</p>";
-        editor.setData("<strong>" + rpcontent.innerHTML + "-" + rpname + "</strong><br />");
+                        function reply_quote(replyId, rpname) {
+                        let rpcontent = document.getElementById("replyshow_content_" + replyId);
+                        editor.setData("<strong>" + rpcontent.innerHTML + "-" + rpname + "</strong><br />");
 
-    }
-</script>
+                        }
+                        </script>

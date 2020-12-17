@@ -1478,5 +1478,14 @@ namespace prjITicket.Controllers
             db.SaveChanges();
             return activity.ActivityStatusID.ToString();
         }
+        //刪除套票
+        public ActionResult DeleteTicketGroup(int groupId)
+        {
+            TicketGroups ticketGroups = db.TicketGroups.FirstOrDefault(tg => tg.TicketGroupId == groupId);
+            db.TicketGroupDetail.RemoveRange(ticketGroups.TicketGroupDetail);
+            db.TicketGroups.Remove(ticketGroups);
+            db.SaveChanges();
+            return RedirectToAction("PackageCenterM", "SellerCenter");
+        }
     }
 }

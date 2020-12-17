@@ -52,10 +52,14 @@ namespace prjITicket.Models
             int showban, string keyword)
         {
             TicketSysEntities db = new TicketSysEntities();
-            return db.CommentReport.GroupBy(x => x.CommentId).Where(g => g.Count() >= report).AsEnumerable()
-                .OrderByDescending(g => g.Count()).ThenByDescending(g => g.First().CommentId)
-                .Select(x => x.First().Comment)
-                .Where(x => author == 0 || x.CommentMemberID == author)
+            var q = db.CommentReport.GroupBy(x => x.CommentId).Where(g => g.Count() >= report).AsEnumerable()
+                .OrderByDescending(g => g.Count()).ThenByDescending(g => g.First().CommentId).Select(g => g.First().Comment);
+            if (report == 0)
+            {
+                int[] vs = db.CommentReport.Select(x => x.CommentId).Distinct().ToArray();
+                q = q.Concat(db.Comment.Where(x => !vs.Contains(x.CommentID)).OrderByDescending(x => x.CommentID));
+            }
+            return q.Where(x => author == 0 || x.CommentMemberID == author)
                 .Where(x => cate == 0 || x.Activity.SubCategories.CategoryId == cate)
                 .Where(x => subcate == 0 || x.Activity.SubCategoryId == subcate)
                 .Where(x => date == 0 || (DateTime.Now - x.CommentDate).TotalDays <= date)

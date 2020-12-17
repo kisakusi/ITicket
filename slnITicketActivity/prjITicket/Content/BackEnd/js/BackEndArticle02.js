@@ -189,6 +189,7 @@
                         }
                     })
                 })
+                $('.preventLink img').addClass('img-fluid')
                 $('html, body').animate({
                     scrollTop: $(window).scrollTop() > 225 ? $(this).offset().top - 135 : $(this).offset().top - 145
                 }, 700, () => $(this).next().children().css('transition', 'opacity 2s').css('opacity', '1'))

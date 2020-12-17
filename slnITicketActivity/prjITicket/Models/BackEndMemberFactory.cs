@@ -292,7 +292,7 @@ namespace prjITicket.Models
         public Nullable<int> Point => member.Point;
         public string Address => member.Address;
         public string MemberRoleName => member.MemberRole.MemberRoleName;
-        public string Sex => member.Sex == null ? null : member.Sex.Value ? "男性" : "女性";
+        public string Sex => member.Sex == null ? null : !member.Sex.Value ? "男性" : "女性";
         public string District => member.DistrictId == null ?
             null : $"{member.Districts.DistrictName} (${member.Districts.Cities.CityName})";
     }
@@ -314,7 +314,7 @@ namespace prjITicket.Models
         public Nullable<int> Point => member.Point;
         public string Address => member.Address;
         public string MemberRoleName => member.MemberRole.MemberRoleName;
-        public string Sex => member.Sex == null ? null : member.Sex.Value ? "男性" : "女性";
+        public string Sex => member.Sex == null ? null : !member.Sex.Value ? "男性" : "女性";
         public string District => member.DistrictId == null ?
             null : $"{member.Districts.DistrictName} (${member.Districts.Cities.CityName})";
         public bool SplitLine2 => true;

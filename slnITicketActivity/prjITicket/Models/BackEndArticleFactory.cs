@@ -60,10 +60,14 @@ namespace prjITicket.Models
         public static IEnumerable<Article> ArticleQuery(int author, int cate, int date, int report, string keyword)
         {
             TicketSysEntities db = new TicketSysEntities();
-            return db.Article_Report.GroupBy(x => x.ArticleId).Where(g => g.Count() >= report).AsEnumerable()
-                .OrderByDescending(g => g.Count()).ThenByDescending(g => g.First().ArticleId)
-                .Select(x => x.First().Article)
-                .Where(x => author == 0 || x.MemberID == author)
+            var q = db.Article_Report.GroupBy(x => x.ArticleId).Where(g => g.Count() >= report).AsEnumerable()
+                .OrderByDescending(g => g.Count()).ThenByDescending(g => g.First().ArticleId).Select(g => g.First().Article);
+            if (report == 0)
+            {
+                int[] vs = db.Article_Report.Select(x => x.ArticleId).Distinct().ToArray();
+                q = q.Concat(db.Article.Where(x => !vs.Contains(x.ArticleID)).OrderByDescending(x => x.ArticleID));
+            }
+            return q.Where(x => author == 0 || x.MemberID == author)
                 .Where(x => cate == 0 || x.ArticleCategoryID == cate)
                 .Where(x => date == 0 || (DateTime.Now - x.Date).TotalDays <= date)
                 .Where(x =>
@@ -76,16 +80,20 @@ namespace prjITicket.Models
         public static IEnumerable<Reply> ReplyQuery(int author, int cate, int date, int report, string keyword)
         {
             TicketSysEntities db = new TicketSysEntities();
-            return db.Reply_Report.GroupBy(x => x.ReplyId).Where(g => g.Count() >= report).AsEnumerable()
-                .OrderByDescending(g => g.Count()).ThenByDescending(g => g.First().ReplyId)
-                .Select(x => x.First().Reply)
-                .Where(x => author == 0 || x.MemberID == author)
+            var q = db.Reply_Report.GroupBy(x => x.ReplyId).Where(g => g.Count() >= report).AsEnumerable()
+                .OrderByDescending(g => g.Count()).ThenByDescending(g => g.First().ReplyId).Select(g => g.First().Reply);
+            if (report == 0)
+            {
+                int[] vs = db.Reply_Report.Select(x => x.ReplyId).Distinct().ToArray();
+                q = q.Concat(db.Reply.Where(x => !vs.Contains(x.ReplyID)).OrderByDescending(x => x.ReplyID));
+            }
+            return q.Where(x => author == 0 || x.MemberID == author)
                 .Where(x => cate == 0 || x.Article.ArticleCategoryID == cate)
                 .Where(x => date == 0 || (DateTime.Now - x.ReplyDate).TotalDays <= date)
                 .Where(x =>
-                    string.IsNullOrEmpty(keyword) ||
-                    x.Article.ArticleTitle.ToLower().Contains(keyword) ||
-                    x.Member.Email.Split('@')[0].ToLower().Contains(keyword)
+                     string.IsNullOrEmpty(keyword) ||
+                     x.Article.ArticleTitle.ToLower().Contains(keyword) ||
+                     x.Member.Email.Split('@')[0].ToLower().Contains(keyword)
                 );
         }
 

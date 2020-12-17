@@ -278,19 +278,18 @@ namespace 期末專題_討論版.Controllers
                 db.SaveChanges();
                 Response.Write("<script>" +
                     "alert('刪除成功！即將跳轉至討論版首頁');" +
-                    "window.location.href='http://localhost:49949/Forum/forum_mainblock';" +
-                    "</script> ");
+                    $"window.location.href='{Url.Action("forum_mainblock", "Forum")}';</script> ");
             }
             else if (member.MemberRoleId==2 || member.MemberRoleId==1)
             {
                 
                     Response.Write("<script>alert('您非該文章作者，禁止刪除！即將跳轉至討論版首頁');" +
-                   "window.location.href='http://localhost:49949/Forum/forum_mainblock';</script> ");
+                   $"window.location.href='{Url.Action("forum_mainblock", "Forum")}';</script> ");
             }
             else
             {
                 Response.Write("<script>alert('您尚未登入！即將跳轉至登入頁面');" +
-                    "window.location.href='http://localhost:49949/Login/Login';</script> ");
+                $"window.location.href='{Url.Action("Login", "Login")}';</script> ");
             }          
            
         }
