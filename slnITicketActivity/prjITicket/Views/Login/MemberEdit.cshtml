@@ -62,6 +62,7 @@
 
         //找到orderid下的oreder_detail
         $("#form1div").on("click", ".showqrCode", function () {
+            $("#dialogshow").empty();
             let orderid = $(this).data("orderid");           
             $.ajax({
                 type: "post",

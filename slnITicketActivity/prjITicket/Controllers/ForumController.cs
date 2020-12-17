@@ -164,17 +164,17 @@ namespace 期末專題_討論版.Controllers
 
                 Page Page = new Page();
                 Response.Write("<script>alert('您尚未登入！即將跳轉至登入頁面');" +
-                    "window.location.href='http://localhost:49949/Login/Login';</script> ");
+                    $"window.location.href='{Url.Action("Login","Login")}';</script> ");
             }
             else if (article.MemberID == member.MemberID || member.MemberRoleId == 4)
             {
                 Response.Write("<script>" +
-                    $"window.location.href='http://localhost:49949/Forum/Edit_article?articleID={articleID}';</script> ");
+                    $"window.location.href='{Url.Action("Edit_article","Forum",new { articleID=articleID})}';</script> ");
             }
             else
             {
                 Response.Write("<script>alert('您非該文章作者，禁止編輯！即將跳轉至討論版首頁');" +
-                    "window.location.href='http://localhost:49949/Forum/forum_mainblock';</script> ");
+                    $"window.location.href='{Url.Action("forum_mainblock","Forum")}';</script> ");
 
             }
         }
