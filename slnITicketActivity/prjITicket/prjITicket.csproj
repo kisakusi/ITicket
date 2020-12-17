@@ -875,6 +875,7 @@
     <Compile Include="ViewModel\VMReport.cs" />
     <Compile Include="ViewModel\VMTicketGroupsDetail.cs" />
     <Compile Include="ViewModel\VMTicketGroupsList.cs" />
+    <Compile Include="ViewModel\VMUpdateTicketGroup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
@@ -947,6 +948,7 @@
     <Content Include="Views\SellerCenter\PackageCenterM.cshtml" />
     <Content Include="Views\BackEndComment\CommentList.cshtml" />
     <Content Include="Views\BackEndMain\BackEndIndex.cshtml" />
+    <Content Include="Views\Activity\UpDateTicketGroup.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

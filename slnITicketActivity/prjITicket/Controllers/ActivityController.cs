@@ -1487,5 +1487,52 @@ namespace prjITicket.Controllers
             db.SaveChanges();
             return RedirectToAction("PackageCenterM", "SellerCenter");
         }
+        //產生修改套票的頁面
+        public ActionResult UpDateTicketGroup(int groupId)
+        {
+            //商家後臺修改套票連到這裡
+            Member member = Session[CDictionary.SK_Logined_Member] as Member;
+            if (member == null || member.MemberRoleId != 3)
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            List<Activity> activities = member.Seller.FirstOrDefault().Activity.Where(a => a.ActivityStatusID == 1).ToList();
+            TicketGroups ticketGroup = db.TicketGroups.FirstOrDefault(tg => tg.TicketGroupId == groupId);
+            VMUpdateTicketGroup vm = new VMUpdateTicketGroup()
+            {
+                Activities = activities,
+                TicketGroup = ticketGroup
+            };
+            return View(vm);
+        }
+        //修改套票的程式碼
+        public string MofifyTicketGroup(string ticketGroupName, decimal discount, int[] activityIds,int ticketGroupId)
+        {
+            //todo正式版Status調成false供後台審核
+            TicketGroups ticketGroup = db.TicketGroups.FirstOrDefault(tg => tg.TicketGroupId == ticketGroupId);
+            ticketGroup.TicketGroupName = ticketGroupName;
+            ticketGroup.TicketGroupDiscount = discount;
+            ticketGroup.Status = false;
+            List<TicketGroupDetail> oldDetail = db.TicketGroupDetail.Where(tgd => tgd.TicketGroupId == ticketGroupId).ToList();
+            db.TicketGroupDetail.RemoveRange(oldDetail);
+            foreach (int activityId in activityIds)
+            {
+                TicketGroupDetail ticketGroupDetail = new TicketGroupDetail()
+                {
+                    TicketGroupId = ticketGroup.TicketGroupId,
+                    ActivityId = activityId
+                };
+                db.TicketGroupDetail.Add(ticketGroupDetail);
+            }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            return "OK";
+        }
     }
 }
