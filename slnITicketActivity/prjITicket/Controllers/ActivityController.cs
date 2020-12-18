@@ -1386,6 +1386,8 @@ namespace prjITicket.Controllers
                 email += "</ul>";
             }
             //發送email的部分
+            string userName = "apikey";
+            string password = "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";
             try
             {
                 mail.From = new MailAddress("iticket128@gmail.com");
@@ -1394,10 +1396,10 @@ namespace prjITicket.Controllers
                 mail.IsBodyHtml = true;
                 mail.Priority = MailPriority.High;
                 mail.To.Add(emailAddress);
-                using (SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com"))
+                using (SmtpClient SmtpServer = new SmtpClient("smtp.sendgrid.net"))
                 {
                     SmtpServer.Port = 587;
-                    SmtpServer.Credentials = new NetworkCredential("iticket128@gmail.com", "!@#qweasd");
+                    SmtpServer.Credentials = new NetworkCredential(userName, password);
                     SmtpServer.EnableSsl = true;
                     SmtpServer.Send(mail);
                 }
@@ -1406,6 +1408,28 @@ namespace prjITicket.Controllers
             {
 
             }
+
+
+            //try
+            //{
+            //    mail.From = new MailAddress("iticket128@gmail.com");
+            //    mail.Subject = "iTicket訂單成功,查看電子票QRCode";
+            //    mail.Body = $@"<h1 style='text-align:center;color:#ff0000'>iTicket 訂購成功</h1>{email}";
+            //    mail.IsBodyHtml = true;
+            //    mail.Priority = MailPriority.High;
+            //    mail.To.Add(emailAddress);
+            //    using (SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com"))
+            //    {
+            //        SmtpServer.Port = 587;
+            //        SmtpServer.Credentials = new NetworkCredential("iticket128@gmail.com", "!@#qweasd");
+            //        SmtpServer.EnableSsl = true;
+            //        SmtpServer.Send(mail);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+
+            //}
         }
         //前端調用驗證套票名稱是否可用
         public string CheckTicketGroupNameAvailible(string ticketGroupName)

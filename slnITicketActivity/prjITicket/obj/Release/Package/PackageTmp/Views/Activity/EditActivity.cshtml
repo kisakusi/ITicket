@@ -134,6 +134,8 @@
     </div>
 </div>
 <script>
+    //紀錄當前頁面的活動名稱
+    let activityNameNow = "@Model.ActivityName";
     //讀取大類資料到下拉框
     loadDataToSelCategory();
     //大類有變化就動態變更小類下拉框的內容
@@ -236,13 +238,13 @@
     let isActivityNameAvailible = true;
     $("#txtActivityName").on("input", function () {
         isActivityNameAvailible = false;
+        let tipMsg = $(this).next();
         let activityName = this.value;
-        if (activityName =="@Model.ActivityName") {
+        if (activityName == activityNameNow) {
             tipMsg.html("活動名稱可以使用").css({ color: "green" });
             isActivityNameAvailible = true;
             return;
         }
-        let tipMsg = $(this).next();
         if (activityName == "") {
             tipMsg.html("不能是空值").css({ color: "red" });
             return;
@@ -353,7 +355,8 @@
                     alert("後台出現錯誤,修改失敗");
                 }
                 else {
-                    alert("修改活動成功,等待審核");                   
+                    alert("修改活動成功,等待審核");
+                    activityNameNow = avtivityName;
                 }
             }
         });
