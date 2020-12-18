@@ -87,7 +87,7 @@
                 <!-- sb-sidenav-footer -->
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                   商家
+                   @((Session[CDictionary.SK_Logined_Member] as Member).Seller.FirstOrDefault()?.CompanyName)
                 </div>
             </nav>
         </div>

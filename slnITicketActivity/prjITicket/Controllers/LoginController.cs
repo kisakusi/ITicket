@@ -546,8 +546,7 @@ namespace prjITicket.Controllers
 
         #region (ajax)會員資料修改與密碼修改
         public string MemberSave(QMember b)
-        {
-            
+        {          
             int id = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
             Member prod = db.Member.FirstOrDefault(t => t.MemberID == id);
             //if (ModelState.IsValid == false)
@@ -566,6 +565,7 @@ namespace prjITicket.Controllers
                 prod.DistrictId = b.DistrictId == null ? null : b.DistrictId;
                 prod.Sex = b.Sex;//== null ? null : b.Sex;
                 db.SaveChanges();
+                (Session[CDictionary.SK_Logined_Member] as Member).Name = b.Name;
                 return "修改成功";
             }
             return "修改失敗";

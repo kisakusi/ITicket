@@ -421,6 +421,7 @@
         data: member,
         success: function (data) {
             console.log(data);
+            $("#txtDisplayName").html(member.Name+" (商家)");
             swal("儲存成功!", "企業會員資料修改成功!", "success");
         }
 
