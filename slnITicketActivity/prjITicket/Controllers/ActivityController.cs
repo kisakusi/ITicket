@@ -524,7 +524,7 @@ namespace prjITicket.Controllers
         本地時,要把FinishPay與CatchFinishPayData合併
         ********************************/
         //本地版付款程式碼
-        public ActionResult FinishPay(int orderId)
+        public ActionResult FinishPay()
         {
             List<string> enErrors = new List<string>();
             Hashtable htFeedback = null;
