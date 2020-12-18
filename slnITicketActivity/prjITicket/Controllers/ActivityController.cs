@@ -197,14 +197,17 @@ namespace prjITicket.Controllers
                         oPayment.HashIV = "v77hoKGq4kWxNNIS";
                         oPayment.MerchantID = "2000132";
                         /* 基本參數 */
+                        //Azure版
+                        //oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("CatchFinishPayData");
+                        //oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay", new { orderId = order.OrderID });
+                        //本地版
                         oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
-                        //oPayment.Send.ClientBackURL = "http://localhost:53238" + Url.Action("Index");
                         oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
+                        //////////
                         oPayment.Send.MerchantTradeNo = orderGuid;
                         oPayment.Send.MerchantTradeDate = DateTime.Now;
                         oPayment.Send.TotalAmount = totalPrice-input.point;
-                        oPayment.Send.TradeDesc = "Itcket購票網";
-                        //oPayment.Send.ChoosePayment = PaymentMethod.ALL;
+                        oPayment.Send.TradeDesc = "Itcket購票網";                       
                         oPayment.Send.Remark = $"點數折抵{input.point}元";
                         //oPayment.Send.ChooseSubPayment = PaymentMethodItem.None;
                         //oPayment.Send.NeedExtraPaidInfo = ExtraPaymentInfo.Yes;
@@ -272,9 +275,13 @@ namespace prjITicket.Controllers
                     oPayment.HashIV = "v77hoKGq4kWxNNIS";
                     oPayment.MerchantID = "2000132";
                     /* 基本參數 */
+                    //Azure版
+                    //oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("CatchFinishPayData");
+                    //oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay", new { orderId = order.OrderID });
+                    //本地版
                     oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
-                    //oPayment.Send.ClientBackURL = "http://localhost:53238" + Url.Action("Index");
                     oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
+                    //////////
                     oPayment.Send.MerchantTradeNo = order.OrderGuid;
                     oPayment.Send.MerchantTradeDate = DateTime.Now;
                     oPayment.Send.TotalAmount = totalPrice - order.PayPoint;
@@ -457,9 +464,13 @@ namespace prjITicket.Controllers
                     oPayment.HashIV = "v77hoKGq4kWxNNIS";
                     oPayment.MerchantID = "2000132";
                     /* 基本參數 */
+                    //Azure版
+                    //oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("CatchFinishPayData");
+                    //oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay", new { orderId = order.OrderID });
+                    //本地版
                     oPayment.Send.ReturnURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
-                    //oPayment.Send.ClientBackURL = "http://localhost:53238" + Url.Action("Index");
                     oPayment.Send.OrderResultURL = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("/", 8)) + Url.Action("FinishPay");
+                    //////////
                     oPayment.Send.MerchantTradeNo = orderGuid;
                     oPayment.Send.MerchantTradeDate = DateTime.Now;
                     oPayment.Send.TotalAmount = totalPrice - input.point;
@@ -507,8 +518,13 @@ namespace prjITicket.Controllers
                 }
             }           
         }
-        //顯示購物完成的頁面
-        public ActionResult FinishPay()
+        /*******************************
+        上傳Azure時,需要把歐付寶背景回傳資料處理程式CatchFinishPayData與回傳完成付款頁面分開,
+        否則會執行2次
+        本地時,要把FinishPay與CatchFinishPayData合併
+        ********************************/
+        //本地版付款程式碼
+        public ActionResult FinishPay(int orderId)
         {
             List<string> enErrors = new List<string>();
             Hashtable htFeedback = null;
@@ -555,7 +571,62 @@ namespace prjITicket.Controllers
             string emailAddress = order.Email;
             SendFinishPayEmailToMember(emailAddress, orderGuid);
             return View(order);
-        }
+        }        
+        //Azure版付款程式碼
+        //顯示購物完成的頁面
+        //public ActionResult FinishPay(int orderId)
+        //{
+        //    Orders order = db.Orders.FirstOrDefault(o => o.OrderID == orderId);
+        //    return View(order);
+        //}
+        ////購物完成接收資料寫入資料庫
+        //public void CatchFinishPayData()
+        //{
+        //    List<string> enErrors = new List<string>();
+        //    Hashtable htFeedback = null;
+        //    using (AllInOne oPayment = new AllInOne())
+        //    {
+        //        oPayment.HashKey = "5294y06JbISpM5x9";
+        //        oPayment.HashIV = "v77hoKGq4kWxNNIS";
+        //        /* 取回付款結果 */
+        //        enErrors.AddRange(oPayment.CheckOutFeedback(ref htFeedback));
+        //    }
+        //    //抓到成功訂單的Guid
+        //    string orderGuid = htFeedback["MerchantTradeNo"].ToString();
+        //    Orders order = db.Orders.FirstOrDefault(o => o.OrderGuid == orderGuid);
+        //    //把訂單的付款狀態改為true
+        //    order.OrderStatus = true;
+        //    //為OrderDetail產生QRCode,計算應獲得點數為總成交價格的1%
+        //    decimal total = 0;
+        //    foreach (Order_Detail od in order.Order_Detail.ToList())
+        //    {
+        //        total += od.Tickets.Price * od.Quantity * (1 - od.Discount);
+        //        for (int i = 0; i < od.Quantity; i++)
+        //        {
+        //            TicketQRCodes qrCode = new TicketQRCodes()
+        //            {
+        //                QRCode = Guid.NewGuid().ToString(),
+        //                OrderDetailId = od.OrderDetailID
+        //            };
+        //            db.TicketQRCodes.Add(qrCode);
+        //        }
+        //    }
+        //    //todo 發送系統通知,通知獲得點數
+        //    int earnPoint = (int)(total - order.PayPoint) / 100;
+        //    if (earnPoint != 0)
+        //    {
+        //        order.Member.Point += earnPoint;
+        //        db.ShortMessage.Add(new ShortMessage()
+        //        {
+        //            MemberID = order.MemberID,
+        //            MessageContent = $"訂單號碼{order.OrderGuid}完成,獲得點數{earnPoint}點"
+        //        });
+        //    }
+        //    db.SaveChanges();
+        //    //發送Email
+        //    string emailAddress = order.Email;
+        //    SendFinishPayEmailToMember(emailAddress, orderGuid);
+        //}
         //上傳產品的頁面
         public ActionResult UpLoadActivity()
         {

@@ -49,12 +49,14 @@ namespace prjITicket.Service
         //寄驗證信的方法
         public void SendRegisterMail(string MailBody, string ToEmail)
         {
+            string userName = "apikey";
+            string password = "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";
             //建立寄信用Smtp物件，這裡使用Gmail為例
-            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+            SmtpClient SmtpServer = new SmtpClient("smtp.sendgrid.net");
             //設定使用的Port，這裡設定Gmail所使用的
             SmtpServer.Port = 587;
             //建立使用者憑據，這裡要設定Gmail帳戶
-            SmtpServer.Credentials = new System.Net.NetworkCredential(gmail_account, gmail_password);
+            SmtpServer.Credentials = new System.Net.NetworkCredential(userName,password);
             //開啟SSL
             SmtpServer.EnableSsl = true;
             //宣告信件內容物件

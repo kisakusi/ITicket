@@ -563,7 +563,7 @@ namespace prjITicket.Controllers
                 prod.IDentityNumber = b.IDentityNumber == null ? null : b.IDentityNumber;
                 prod.Passport = b.Passport == null ? null : b.Passport;
                 prod.Phone = b.Phone == null ? null : b.Phone;
-                
+                prod.DistrictId = b.DistrictId == null ? null : b.DistrictId;
                 prod.Sex = b.Sex;//== null ? null : b.Sex;
                 db.SaveChanges();
                 return "修改成功";
