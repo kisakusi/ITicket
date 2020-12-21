@@ -263,6 +263,7 @@
                                             <div class="col-md-offset-2 col-md-10" style="margin:10px 0 0 0;">
                                                 <input id="btnMember" type="button" value="確認儲存" class="btn btn-success" />
                                                 <input id="demobtnMember" type="button" value="Demo鍵" class="btn btn-primary" />
+                                                <input id="demobtnMember2" type="button" value="Demo鍵2" class="btn btn-warning" />
                                             </div>
                                         </div>
                                     </div>
@@ -312,6 +313,7 @@
                                     <div class="col-md-offset-2 col-md-10">
                                         <input id="btnPassword" type="button" value="確認儲存" class="btn btn-success" />
                                         <input id="demobtnPassword" type="button" value="Demo鍵" class="btn btn-primary" />
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -380,8 +382,15 @@
         url:'@Url.Action("MemberSave")',
         type: 'POST',
         data: member,
-        success: function (data) {
-            $("#txtDisplayName").html(member.Name+" (@x.MemberRole.MemberRoleName)");
+            success: function (data) {
+                if (@x.MemberRoleId!=4) {
+                    $("#txtDisplayName").html(member.Name+" (管理者)");
+                }
+                else
+                {
+                    $("#txtDisplayName").html(member.Name+" (普通會員)");
+                }
+            
             console.log(data);
             swal("儲存成功!", "會員資料修改成功!", "success");
         }
@@ -483,21 +492,20 @@
             return "檢查碼不正確";
         return "格式正確";
     }
-    //todo
-    //判斷出生日期不得大於現在日期
-    let birthDate = document.getElementById("txtBirthDate");
-
-    birthDate.onchange = function () {
-        console.log(this.value)
-        var nowdate = new Date();
-        //var nowdate = now.format("yyyy-MM-dd");
-        let birthdate = this.value;
-        if (birthdate > nowdate) {
-            this.nextElementSibling.style.color = "red";
-            this.nextElementSibling.innerHTML = "日期不可大於今天";
-        }
-    }
-
+    //todo 12/18
+    //限制出生日期不得大於現在日期
+    $(function () {
+        //得到當前日期
+        let date_now = new Date();
+        //得到當前年份
+        let year = date_now.getFullYear();
+        //得到當前月份
+        let month = date_now.getMonth() < 10 ? ("0" + date_now.getMonth() + 1) : (date_now.getMonth() + 1);
+        //得到當前日期
+        let date = date_now.getDate() < 10 ? "0" + date_now.getDate() : date_now.getDate();
+        $("#txtBirthDate").attr("max", year + "-" + month + "-" + date);
+    });
+   
 </script>
 
 <script>
@@ -570,6 +578,12 @@
         $("#demobtnMember").click(function () {
             loaddemoMember();
         })
+
+        //demo會員資料變更2
+        $("#demobtnMember2").click(function () {
+            loaddemoMember2();
+        })
+
         //demo會員密碼變更
         $("#demobtnPassword").click(function () {
             loaddemoPassword();
@@ -698,7 +712,7 @@
         });
     }
 
-      //todo 12/15藉由MemberId更改我的訊息圈圈數字
+      //藉由MemberId更改我的訊息圈圈數字
     function changeShortMessageNumber() {
         $.ajax({
             type: 'get',
@@ -720,18 +734,33 @@
 
     //demo會員資料變更
     function loaddemoMember() {
-        $("#txtName").val("王池田");
-        $("#txtNickName").val("池田");
+        $("#txtName").val("王孝一");
+        $("#txtNickName").val("孝一");
         $("#txtIDentityNumber").val("A129688927");
         $("#txtPhone").val("0911155337");
         $("#txtSex").val("0", true);
         $("#txtBirthDate").val("2000-12-25");
         $("#txtcity").val("5", true);
-        $("#txtdistrict").html("<option value='9'>大安區</option>");
+        $("#txtdistrict").html("<option value='13'>大安區</option>");
         $("#txtpostalcode").val("106")
         $("#txtaddress").val("復興南路一段390號")
 
     }
+
+    //demo2會員資料變更 todo 12/18
+    function loaddemoMember2() {
+        $("#txtName").val("陳莉莉");
+        $("#txtNickName").val("Lily");
+        $("#txtIDentityNumber").val("C287544282");
+        $("#txtPhone").val("0916523935");
+        $("#txtSex").val("1", true);
+        $("#txtBirthDate").val("2002-10-10");
+        $("#txtcity").val("6", true);
+        $("#txtdistrict").html("<option value='22'>信義區</option>");
+        $("#txtpostalcode").val("201")
+        $("#txtaddress").val("東明路17巷19號")
+    }
+
     //demo會員密碼變更
     function loaddemoPassword() {
         $("#txtPassword").val("gb0zWxjwido");
@@ -836,8 +865,8 @@
                 url: "@Url.Action("CreateImage")",
                 data: { input: base64code },
                 success: function () {
-                    swal("儲存成功!", "","success");
-                    
+                    swal("儲存成功!", "", "success");
+                    location.reload();
                 }
             })
         });

@@ -146,13 +146,19 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="@Url.Action("Index","Home")">ITicket購票網</a>
-            @{                
-                 if (member != null)
-                 {
+            @{
+                if (member != null && member.provider == null)
+                {
                     <span id="txtDisplayName" style="color:#ffffff">
                         @member.Name (@member.MemberRole.MemberRoleName)
-                    </span> 
-                 } 
+                    </span>
+                }
+                else if (member != null && member.provider != null)
+                {
+                    <span id="txtDisplayName" style="color:#ffffff">
+                        @member.Name (普通會員)
+                    </span>
+                }
             }
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -169,14 +175,14 @@
                         {
                             if (admin != null && admin.MemberRoleId == 4)
                             {
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("BackEndIndex","BackEndMain")">
-                    後台
-                </a>
-            </li>
- }
-    }
-    catch { } }
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("BackEndIndex","BackEndMain")">
+                                        後台
+                                    </a>
+                                </li>
+                            }
+                        }
+                        catch { } }
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("ActivityList","Activity")">商品一覽</a>
                     </li>
@@ -190,20 +196,20 @@
                             <button style="width:35px;height:35px;text-align:center;position:relative;" class="btn btn-cart btn-sm" type="button" id="dropdownMessageButton" data-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
                                 <i class="far fa-bell" style="color:white;font-size:2em;line-height:35px;width:35px;display:inline-block;margin-left:-10px"></i>
-                                @{ 
+                                @{
                                     if (member != null)
                                     {
                                         var msgcount = db.ShortMessage.Where(m => m.MemberID == member.MemberID).Count();
                                         if (msgcount > 3)
                                         {
-                        <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">3<small style="position:absolute;top:0;">+</small></span> }
-                    else
-                    {
-    <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">@msgcount</span> } @*<script>
-            $("#dropdownMessageButton").click(function () {
-                $(".shortmessage").remove();
-    })
-        </script>*@ } }
+                                            <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">3<small style="position:absolute;top:0;">+</small></span> }
+                                        else
+                                        {
+                                            <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">@msgcount</span> } @*<script>
+                                            $("#dropdownMessageButton").click(function () {
+                                                $(".shortmessage").remove();
+                                    })
+                                        </script>*@ } }
 
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px" aria-labelledby="dropdownMenuButton">
@@ -215,25 +221,37 @@
                                                 var msgs = db.Member.FirstOrDefault(m => m.MemberID == member.MemberID).ShortMessage.OrderByDescending(s => s.ShortMessageID).Take(3).ToList();
                                                 foreach (ShortMessage msg in msgs)
                                                 {
-                                <tr>
-                                    <td>@msg.MessageContent</td>
-                                </tr>
- }
-            <tr style="text-align:center;">
-                @if (member.MemberRole.MemberRoleName == "商家")
-                {
-<td>
-    <a href="@Url.Action("BussEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
-</td>
- }
-else if (member.MemberRole.MemberRoleName == "普通會員")
-{
-<td>
-    <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
-</td>
-}
-            </tr>
- } }
+                                                    <tr>
+                                                        <td>@msg.MessageContent</td>
+                                                    </tr>
+                                                }
+                                                <tr style="text-align:center;">
+                                                    @if (member.provider == null && member.MemberRole.MemberRoleName == "商家")
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("BussEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
+                                                    }
+                                                    else if (member.provider == null && member.MemberRole.MemberRoleName == "普通會員")
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
+                                                    }
+                                                    else if (member.provider == null && member.MemberRole.MemberRoleName == "管理者")
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
+                                                    }
+                                                    else if (member.provider != null)
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            } }
                                     </table>
                                 </div>
                             </div>
@@ -245,39 +263,39 @@ else if (member.MemberRole.MemberRoleName == "普通會員")
                                     aria-haspopup="true" aria-expanded="false">
                                 @if (Session[CDictionary.SK_Logined_Member] != null && (Session[CDictionary.SK_Logined_Member] as Member).Icon != null)
                                 {
-                    <i id="layoutimg" style="content:url(@Url.Content("~/images/Login/Upload/"+(Session[CDictionary.SK_Logined_Member]as Member).Icon));width:35px;height:35px;transform:translate(-6px,-3px);border-radius:50%"></i> }
-                else
-                {
-    <i style="content:url(../../images/Login/Layout/bar.png);width:35px;height:35px;transform:translate(-6px,-3px);border-radius:50%"></i>}
+                                    <i id="layoutimg" style="content:url(@Url.Content("~/images/Login/Upload/"+(Session[CDictionary.SK_Logined_Member]as Member).Icon));width:35px;height:35px;transform:translate(-6px,-3px);border-radius:50%"></i> }
+                                else
+                                {
+                                    <i style="content:url(../../images/Login/Layout/bar.png);width:35px;height:35px;transform:translate(-6px,-3px);border-radius:50%"></i>}
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px" aria-labelledby="dropdownMenuButton">
                                 <div class="p-3">
                                     @if (Session[CDictionary.SK_Logined_Member] == null)
                                     {
-                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("Login", "Login")">登入</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("Login", "Login")">登入</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Register", "Login")">註冊</a> }
 
 
                                     else if ((Session[CDictionary.SK_Logined_Member] as Member).provider == "facebook" ||
                                         (Session[CDictionary.SK_Logined_Member] as Member).provider == "google")
                                     {
-                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">會員中心</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">會員中心</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a> }
                                     else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "普通會員" ||
                                         (Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "未驗證")
                                     {
-                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">會員中心</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("MemberEdit", "Login")">會員中心</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a> }
                                     else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "商家")
                                     {
-                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("BussEdit", "Login")">會員中心</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white " href="@Url.Action("BussEdit", "Login")">會員中心</a>
                                         <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a>
-                                                        <a onclick="alertshow()" class="btn btn-block btn-primary btn-sm text-white" href="javascript:;">商家中心</a>
-                                                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("CustomerSupport","Activity")">客服專用</a> }
-                                                                    else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "管理者")
-                                                                    {
-                                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a>
-                                                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("MemberEdit", "Login")">會員中心</a>}
+                                        <a onclick="alertshow()" class="btn btn-block btn-primary btn-sm text-white" href="javascript:;">商家中心</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("CustomerSupport","Activity")">客服專用</a> }
+                                    else if ((Session[CDictionary.SK_Logined_Member] as Member).MemberRole.MemberRoleName == "管理者")
+                                    {
+                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("Logout", "Login")">登出</a>
+                                        <a class="btn btn-block btn-primary btn-sm text-white" href="@Url.Action("MemberEdit", "Login")">會員中心</a>}
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 ﻿@using prjITicket.Models
 @{
     TicketSysEntities db = new TicketSysEntities();
+    Member member = Session[CDictionary.SK_Logined_Member] as Member;
     Seller memberseller = null;
     int pass = 0;
     try
@@ -148,6 +149,20 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="@Url.Action("Index","Home")">ITicket購票網</a>
+            @{
+                if (member != null && member.provider == null)
+                {
+                    <span id="txtDisplayName" style="color:#ffffff">
+                        @member.Name (@member.MemberRole.MemberRoleName)
+                    </span>
+                }
+                else if (member != null && member.provider != null)
+                {
+                    <span id="txtDisplayName" style="color:#ffffff">
+                        @member.Name (普通會員)
+                    </span>
+                }
+            }
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -187,7 +202,7 @@
                                     aria-haspopup="true" aria-expanded="false">
                                 <i class="far fa-bell" style="color:white;font-size:2em;line-height:35px;width:35px;display:inline-block;margin-left:-10px"></i>
                                 @{
-                                    Member member = Session[CDictionary.SK_Logined_Member] as Member;
+                                    //Member member = Session[CDictionary.SK_Logined_Member] as Member;
                                     if (member != null)
                                     {
                                         var msgcount = db.ShortMessage.Where(m => m.MemberID == member.MemberID).Count();
@@ -200,10 +215,10 @@
                                             <span class="badge badge-pill badge-danger shortmessage" style="position:absolute;top:2px;left:15px">@msgcount</span>
                                         }
                                         @*<script>
-                                                $("#dropdownMessageButton").click(function () {
-                                                    $(".shortmessage").remove();
-                                                })
-                                            </script>*@
+                                        $("#dropdownMessageButton").click(function () {
+                                            $(".shortmessage").remove();
+                                        })
+                                    </script>*@
 
                                     }
 
@@ -216,7 +231,7 @@
                                     <table id="shortmegs" class="table">
                                         @{
 
-                                            if (Session[CDictionary.SK_Logined_Member] != null && member != null)
+                                            if (member != null)
                                             {
                                                 var msgs = db.Member.FirstOrDefault(m => m.MemberID == member.MemberID).ShortMessage.OrderByDescending(s => s.ShortMessageID).Take(3).ToList();
                                                 foreach (ShortMessage msg in msgs)
@@ -226,14 +241,29 @@
                                                     </tr>
                                                 }
                                                 <tr style="text-align:center;">
-                                                    @if (member.MemberRole.MemberRoleName == "商家")
+                                                    @if (member.provider == null && member.MemberRole.MemberRoleName == "商家")
                                                     {
-                                                        <td><a href="@Url.Action("BussEdit","Login",new { mode="shortMessage"})">查看詳細內容</a></td>
-
+                                                        <td>
+                                                            <a href="@Url.Action("BussEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
                                                     }
-                                                    else if (member.MemberRole.MemberRoleName == "普通會員")
+                                                    else if (member.provider == null && member.MemberRole.MemberRoleName == "普通會員")
                                                     {
-                                                        <td><a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a></td>
+                                                        <td>
+                                                            <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
+                                                    }
+                                                    else if (member.provider == null && member.MemberRole.MemberRoleName == "管理者")
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
+                                                    }
+                                                    else if (member.provider != null)
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("MemberEdit","Login",new { mode="shortMessage"})">查看詳細內容</a>
+                                                        </td>
                                                     }
                                                 </tr>
                                             }

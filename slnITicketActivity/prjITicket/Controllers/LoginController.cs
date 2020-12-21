@@ -598,7 +598,7 @@ namespace prjITicket.Controllers
         #endregion
 
 
-
+        #region 上傳會員照片
         //上傳會員照片
         //=====================================================
         public void CreateImage(string input)
@@ -619,6 +619,9 @@ namespace prjITicket.Controllers
                 (Session[CDictionary.SK_Logined_Member] as Member).Icon = photoName;
             }
         }
+        #endregion
+
+        #region 載入會員修改頁面抓取City、District、PostCode欄位
         //載入所有城市至Cities資料庫
         //====================================================
         public void loadAllCities()
@@ -672,8 +675,10 @@ namespace prjITicket.Controllers
             var postCode = db.Districts.FirstOrDefault(d => d.DistrictId == districtId).PostCode;
             return postCode;
         }
+        #endregion
 
-        //todo12/16會員訂單管理查詢
+        #region 會員訂單管理查詢
+        //會員訂單管理查詢
         public ActionResult getOrderbyMemberId(int memberId, int page = 1)
         {
             int pagesize = 5;
@@ -684,7 +689,7 @@ namespace prjITicket.Controllers
             return PartialView("getOrderbyMemberId", pagelist);
         }
 
-        //todo 12/13
+        
 
         //會員訂單管理showQRCode
         public string getQRCodeByOrderId(int orderId)
@@ -697,7 +702,9 @@ namespace prjITicket.Controllers
             }
             return JsonConvert.SerializeObject(datas);
         }
+        #endregion
 
+        #region 會員收藏管理
         //會員我的收藏查詢
         public ActionResult getActivityFavouriteByMemberId(int MemberId, int page = 1)
         {
@@ -726,9 +733,9 @@ namespace prjITicket.Controllers
 
             return "刪除成功";
         }
+        #endregion
 
-
-        //todo
+        #region 會員後台訊息管理
         //取得後台系統訊息 ShoppingCartList.cshtml參考
         public ActionResult getShortMassageByMemberId(int MemberId, int page = 1)
         {
@@ -740,7 +747,7 @@ namespace prjITicket.Controllers
             return PartialView("getShortMassageByMemberId", pagelist);
         }
 
-        //todo 12/15
+        
         //會員我的訊息刪除
         public string deleteShortmessage(int memberId, int shortmessageId)
         {
@@ -750,12 +757,13 @@ namespace prjITicket.Controllers
             return "刪除成功";
         }
 
-        //todo 12/15
+        
         //會員我的訊息圈圈數字改變
         public int changeShortMessageNumber(int memberId)
         {
             int number = db.ShortMessage.Where(s => s.MemberID == memberId).Count();
             return number;
         }
+        #endregion
     }
 }
