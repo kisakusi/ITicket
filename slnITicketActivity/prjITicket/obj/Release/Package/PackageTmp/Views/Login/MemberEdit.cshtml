@@ -381,7 +381,7 @@
         type: 'POST',
         data: member,
         success: function (data) {
-
+            $("#txtDisplayName").html(member.Name+" (@x.MemberRole.MemberRoleName)");
             console.log(data);
             swal("儲存成功!", "會員資料修改成功!", "success");
         }

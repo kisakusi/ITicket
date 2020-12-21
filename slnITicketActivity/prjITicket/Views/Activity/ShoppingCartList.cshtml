@@ -33,6 +33,12 @@
                 let point = parseInt($("#displayPoint").html());
                 $("#txtSendPoint").val(point);
             });
+            //demo鍵的程式碼
+            $("#btnDemo").click(function () {
+                $("#name").val("謎擬Q");
+                $("#mail").val("fantasysdo@gmail.com");
+                $("#address").val("台北市大安區復興路一段392號");
+            });
         });
         //Ajax伺服器請求獲得購物車資料
         function getShoppingCartDetail() {
@@ -406,5 +412,7 @@
             </div>
         </div>
     </div>
-
 </div>
+<!--demo鍵-->
+<button id="btnDemo" style="position:fixed;right:20px;bottom:20px;">demo鍵</button>
+<!---------->
