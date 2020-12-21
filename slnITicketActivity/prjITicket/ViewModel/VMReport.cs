@@ -19,9 +19,14 @@ namespace prjITicket.ViewModel
         public List<Article> Article { get; set; }
         public string searchWord { get; set; }
         public int page { get; set; }
+        public int maxpage { get; set; }
+        public string editor { get; set; }
+        public string list { set; get; }
         public int ArticleCategoryID { get; set; }
         public List<Activity> activities { set; get; }
         public List<string> A權限 { set; get; }
+        public List<Member> Memberlist { get; set; }
+
     }
 
 }

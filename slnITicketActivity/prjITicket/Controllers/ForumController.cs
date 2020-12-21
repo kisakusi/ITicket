@@ -20,29 +20,25 @@ namespace 期末專題_討論版.Controllers
         //=====↓↓↓文章增刪修區域↓↓↓=====
 
         //新增文章前，判斷是否登入，如果沒有則導入登入畫面；如果有被停權則彈出視窗；如果以登入且沒有被停權，則導入新增文章頁面。
-        public void before_Add_article()
+        public string before_Add_article()
         {
             Member member = Session[CDictionary.SK_Logined_Member] as Member;
             TicketSysEntities db = new TicketSysEntities();
 
-            if (member == null || member.MemberRoleId == 1) 
+            if (member == null || member.MemberRoleId == 1)
             {
-                Response.Write("<script>alert('您尚未登入！即將跳轉至登入頁面');" +
-                        $"window.location.href='{Url.Action("Login","Login")}';</script>" );
+                return "未登入";
             }
-            else{
-                if (db.BanLIst.Where(n => n.EndTime > DateTime.Now).Select(n => n.BanMemberId).Contains(member.MemberID))
-                {
-                    Response.Write("<script>alert('您被停權！無法使用此功能');" +
-                        $"window.location.href='{Url.Action("forum_mainblock","Forum")}';</script> ");
-                }
-                else
-                {
-                    Response.Write("<script>" +
-                        $"window.location.href='{Url.Action("Add_article", "Forum")}';</script> ");
-                }
+            else if (db.BanLIst.Where(n => n.EndTime > DateTime.Now).Select(n => n.BanMemberId).Contains(member.MemberID))
+            {
+                return "被停權";
+            }
+            else
+            {
+                return "可發文";
             }
         }
+    
         //新增文章，用VM傳入必要資訊如：
         public ActionResult Add_article()
         {
@@ -153,31 +149,7 @@ namespace 期末專題_討論版.Controllers
             return Json(result);
 
         }
-        //編輯文章前，判斷是否登入，如果沒有則導入登入畫面，如果有則導入編輯文章頁面。
-        public void before_Edit_article(int? articleID)
-        {
-            Member member = Session[CDictionary.SK_Logined_Member] as Member;
-            TicketSysEntities db = new TicketSysEntities();
-            Article article = db.Article.Where(n => n.ArticleID == articleID).FirstOrDefault();
-            if (member==null || member.MemberRoleId==1)
-            {
-
-                Page Page = new Page();
-                Response.Write("<script>alert('您尚未登入！即將跳轉至登入頁面');" +
-                    $"window.location.href='{Url.Action("Login","Login")}';</script> ");
-            }
-            else if (article.MemberID == member.MemberID || member.MemberRoleId == 4)
-            {
-                Response.Write("<script>" +
-                    $"window.location.href='{Url.Action("Edit_article","Forum",new { articleID=articleID})}';</script> ");
-            }
-            else
-            {
-                Response.Write("<script>alert('您非該文章作者，禁止編輯！即將跳轉至討論版首頁');" +
-                    $"window.location.href='{Url.Action("forum_mainblock","Forum")}';</script> ");
-
-            }
-        }
+        
         //編輯文章，用VM傳入必要資訊如：
         public ActionResult Edit_article(int? articleID)
         {
@@ -192,7 +164,8 @@ namespace 期末專題_討論版.Controllers
             vMforum_Mainblock.ArticleCategories = new List<ArticleCategories>();
             vMforum_Mainblock.Article.Add(article);
             vMforum_Mainblock.ArticleCategories = p.ToList();
-            vMforum_Mainblock.activities = db.Activity.Where(n => n.SellerID == article.MemberID).ToList();
+            vMforum_Mainblock.activities = db.Activity.Where(n => n.Seller.MemberId == article.MemberID).ToList();
+            
             return View(vMforum_Mainblock);
         }
         [ValidateInput(false)]
@@ -200,9 +173,18 @@ namespace 期末專題_討論版.Controllers
         public string Edit_article(string title, string content, int ArticleID, string picPath, int[] Activities)
         {
             TicketSysEntities db = new TicketSysEntities();
+            Member member = Session[CDictionary.SK_Logined_Member] as Member;
             Article article = db.Article.Where(n => n.ArticleID == ArticleID).FirstOrDefault();
+            if (member == null || (member.MemberRoleId != 4 && member.MemberID != article.MemberID))
+                return "您沒有登入或是權限不足";
+
+
             if (article != null)
             {
+                if (string.IsNullOrEmpty(title))
+                    return "標題不得空白";
+                if (string.IsNullOrEmpty(content))
+                    return "內文不得空白";
                 article.ArticleTitle = title;
                 article.ArticleContent = content;
                 article.Date = DateTime.Now;
@@ -237,8 +219,7 @@ namespace 期末專題_討論版.Controllers
 
             //是一般會員且是作者，或是權限為管理員，就可以編輯
             Article article = db.Article.Where(n => n.ArticleID == articleID).FirstOrDefault();
-
-            if (member.MemberRoleId==4 || article.MemberID==member.MemberID)
+            if (member != null && (member.MemberRoleId==4 || article.MemberID==member.MemberID))
             {
                 var q = db.Article.Where(n => n.ArticleID == articleID).FirstOrDefault();
                 var reply = db.Reply.Where(n => n.ArticleID == articleID);
@@ -280,7 +261,7 @@ namespace 期末專題_討論版.Controllers
                     "alert('刪除成功！即將跳轉至討論版首頁');" +
                     $"window.location.href='{Url.Action("forum_mainblock", "Forum")}';</script> ");
             }
-            else if (member.MemberRoleId==2 || member.MemberRoleId==1)
+            else if (member != null && (member.MemberRoleId==2 || member.MemberRoleId==1))
             {
                 
                     Response.Write("<script>alert('您非該文章作者，禁止刪除！即將跳轉至討論版首頁');" +
@@ -308,8 +289,9 @@ namespace 期末專題_討論版.Controllers
                      orderby n.Date descending
                      select n).ToList();
             var p = db.ArticleCategories.Select(n => n).ToList();
-            int maxPage = q.Count / 4;
-            var qq = new VMforum_mainblock { Article = q, ArticleCategories = p, page = maxPage ,searchWord = searchText };
+            int maxPage = (q.Count -1) / 4;
+            var memberlist = db.Member.ToList();
+            var qq = new VMforum_mainblock { Article = q, ArticleCategories = p, maxpage = maxPage ,searchWord = searchText, Memberlist = memberlist, editor ="", list ="", page=0 };
 
             //刪除沒有用到的圖片(就是剪裁失敗的)
             CleanClear cleanClear = new CleanClear();
@@ -487,7 +469,7 @@ namespace 期末專題_討論版.Controllers
         //======↑↑↑舉報增刪修↑↑↑=====
 
         //文章搜尋
-        public ActionResult SearchArticle(string searchText = "", int Page = 0, int CategoryID = 0, int searchType = 30)
+        public ActionResult SearchArticle(string searchText = "", int Page = 0, int CategoryID = 0, int searchType = 30, string list = "ByTime" ,string editor = "")
         {
             Member member = Session[CDictionary.SK_Logined_Member] as Member;
             TicketSysEntities db = new TicketSysEntities();
@@ -517,13 +499,30 @@ namespace 期末專題_討論版.Controllers
                     q = q.Union(al.Article_Search_Content(articles, searchText)).ToList();
                 articles = q;
             }
+            //如果按到的是專欄作家
+            if (!string.IsNullOrEmpty(editor))
+            {
+                articles = articles.Where(n => n.Member.NickName == editor).ToList();
+            }
+            //
+            //第幾頁
+            int maxPage = ((articles.Count() - 1) / 4);
             //todo:按日期檢索
             ///
-            int maxPage = ((articles.Count()-1) / 4);
-            //第幾頁
-            articles = articles.OrderByDescending(n => n.Date).Skip(Page * 4).ToList();//這個頁數不能一起算欸！放最後篩好了
+            //如果有選擇按照讚數排列
+            if (list == "ByGood")
+            {
+                articles = articles.OrderByDescending(n => n.Article_Emotion.Count(k => k.ActionId == 1) - n.Article_Emotion.Count(k => k.ActionId == 2)).Skip(Page * 4).ToList();
+            }
+            else
+            {
+                articles = articles.OrderByDescending(n => n.Date).Skip(Page * 4).ToList();//這個頁數不能一起算欸！放最後篩好了
+            }
+            
+            
+            
             var p = db.ArticleCategories.Select(n => n).ToList();
-            var qq = new VMforum_mainblock { Article = articles, ArticleCategories = p, searchWord = searchText, page = maxPage, ArticleCategoryID = CategoryID };
+            var qq = new VMforum_mainblock { Article = articles, ArticleCategories = p, searchWord = searchText, page = Page,maxpage = maxPage, ArticleCategoryID = CategoryID,editor = editor,list = list};
             return PartialView(qq);
 
 
@@ -634,7 +633,7 @@ namespace 期末專題_討論版.Controllers
             {
                 item.Readed = true;
             }
-            
+            db.SaveChanges();
         }
     }
 }

@@ -10,6 +10,8 @@
 
 <link href="~/Content/Forum_use/forumcontent.css" rel="stylesheet" />
 <link href="~/Content/Forum_use/css/styles.css" rel="stylesheet" />
+@*SweetAlert彈框*@
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <div class="container">
     @* 彈出視窗:Modal *@
     <div class="modal fade" id="UploadImage" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -155,7 +157,7 @@
                 <div class="card my-3 發文者資訊及操作區欄位">
                     <h5 class="card-header" style="background-color:coral">管理員/發文者才能看到的文章操作區</h5>
                     <div class="card-body">
-                        @Html.ActionLink("編輯", "before_Edit_article", "Forum", new { articleID = Model.Article.ArticleID }, null)
+                        @Html.ActionLink("編輯", "Edit_article", "Forum", new { articleID = Model.Article.ArticleID }, null)
                         @Html.ActionLink("刪除", "Delete", "Forum", new { articleID = Model.Article.ArticleID }, null)
                     </div>
                 </div>
@@ -230,7 +232,7 @@
         let rpcontent = editor.getData();
         let articleID = @Model.Article.ArticleID;
          if (rpcontent == "") {
-             alert("請輸入留言");
+             swal("留言失敗", "請輸入留言", "error");
          }
          else {
              $.ajax({
@@ -239,12 +241,12 @@
                  data: { content: rpcontent, articleID: articleID },
                  success: function (data) {
                      if (data != "成功") {
-                         alert(data);
+                         swal(data, "", "error")
                          if (data != "您已被停權！無法操作此功能")
-                         window.location.href = '@Url.Action("Login", "Login")';
+                         setTimeout(function () { window.location.href = '@(Url.Action("Login", "Login"))';},1500)
                      }
                      else {
-                         alert(data);
+                         swal("留言成功", "", "success");
                          $("#ajaxdemoshow").empty().load("/Forum/forum_reply?articleID=@Model.Article.ArticleID");
                         editor.setData('');
                         }
@@ -269,8 +271,7 @@
                         let reportId = $('#articleReportReason').val();
 
                         if (reportId === '#') {
-
-                        alert("社會再走，理由要有");
+                            swal("檢舉不成功", "社會在走，理由要有！", "error")
                         }
                         else {
                         $.ajax({
@@ -280,11 +281,12 @@
                         ReportID: reportId, ArticleID: @Model.Article.ArticleID},
                         success: function (data) {
                         if (data != "成功") {
-                        alert(data);                        
-                         window.location.href = '@Url.Action("Login", "Login")';
+                            swal(data, "", "error")
+                            setTimeout(function () { window.location.href = '@(Url.Action("Login", "Login"))';},1500)
+
                         } else {
                         document.getElementById('Modal').style.display = 'none';
-                        alert("檢舉" + data);
+                            swal("檢舉成功","", "success")
                         }
                         }
                         });
@@ -296,8 +298,9 @@
                         let likebtn = document.getElementById('actionlike_a');
                         let dislikebtn = document.getElementById('actiondislike_a');
                         let ActionId = 1;
-                        if (dislikebtn.className == 'bpclick') {
-                        alert("此篇留言你已點了不喜歡。");
+                            if (dislikebtn.className == 'bpclick') {
+                                swal( "此篇留言你已點了不喜歡", "","warning")
+
                         }
                         else {
                         if (likebtn.className == 'gp') {
@@ -309,8 +312,8 @@
                         data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
                         success: function (data) {
                         if (data != "成功") {
-                        alert(data);                        
-                         window.location.href = '@Url.Action("Login", "Login")';
+                            swal(data, "", "error")
+                         setTimeout(function () { window.location.href = '@(Url.Action("Login", "Login"))';},1500)
                         } else {
                         $("#goodpoint").text(parseInt($("#goodpoint").text()) + 1);
                         }
@@ -339,7 +342,7 @@
                         let dislikebtn = document.getElementById('actiondislike_a');
                         let ActionId = 2;
                         if (likebtn.className == 'gpclick') {
-                        alert("此篇留言你已點了喜歡。");
+                            swal( "此篇留言你已點了喜歡","", "warning")
                         }
                         else {
                         if (dislikebtn.className == 'bp') {
@@ -351,8 +354,8 @@
                         data: { ArticleID:@Model.Article.ArticleID, ActionID: ActionId },
                         success: function (data) {
                         if (data != "成功") {
-                        alert(data);
-                         window.location.href = '@Url.Action("Login", "Login")';
+                            swal(data, "", "error")
+                         setTimeout(function () { window.location.href = '@(Url.Action("Login", "Login"))';},1500)
                         } else {
                         $("#badpoint").text(parseInt($("#badpoint").text()) + 1);
                         }
@@ -409,4 +412,4 @@
                         editor.setData("<strong>" + rpcontent.innerHTML + "-" + rpname + "</strong><br />");
 
                         }
-                        </script>
+</script>

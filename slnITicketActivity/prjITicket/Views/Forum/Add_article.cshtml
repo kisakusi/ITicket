@@ -8,6 +8,8 @@
 }
 <link href="~/Content/Forum_use/forumcontent.css" rel="stylesheet" />
 <link href="~/Content/Forum_use/css/styles.css" rel="stylesheet" />
+@*SweetAlert彈框*@
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <style>
 
     #ImgAreaSelect img:not(.img2) {
@@ -58,7 +60,7 @@
                         <hr />
                         @* 彈出視窗:Modal *@
                         <div class="modal fade" id="UploadImage" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg"  role="document">
+                            <div class="modal-dialog modal-lg" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
@@ -66,9 +68,9 @@
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    <div class="modal-body">
+                                    <div class="modal-body" style="border: 14px;padding-top: 0px;padding-bottom: 0px;">
                                         <p>預覽圖片</p>
-                                        <div align="center">
+                                        <div>
                                             <div style="width: 700px; height: 200px;">
                                                 <div style="float: left; position: relative; overflow: hidden; width: 600px; height: 200px;">
                                                     <img id="Image2" class="img2" alt="Thumbnail Preview" />
@@ -113,7 +115,7 @@
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">選擇要加入推廣的商品</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -241,7 +243,7 @@
 
                 if (x1.length == 0 && x2.length == 0 && y1.length == 0 && y2.length == 0)
                 {
-                    alert('請選擇裁剪區域');
+                    swal('請選擇裁剪區域', "", "warning")
                     return false;
                 }
                 else
@@ -259,12 +261,12 @@
                             {
                                 if (result.result != 'OK')
                                 {
-                                    alert(result.msg);
+                                    swal(result.msg, "", "error")
                                     window.location.href = '@Url.Action("Crop", "Home")' + '?id=' + $('#UploadImage_ID').val();
                                 }
                                 else
                                 {
-                                    alert('裁剪完成');
+                                    swal('裁剪完成', "", "success")
                         $('img#Image3').attr('src', result.CropImage);
                         $('img#Image3').show();
                                     picPath = result.CropImage;
@@ -346,7 +348,7 @@
         let content = editor.getData();
         let ArticleCategoryID = $("#ArticleCategorySelected").val();
         if (ArticleCategoryID == "0") {
-            alert("必須選擇類別");
+            swal('必須選擇類別', "", "error")
             return;
         }
         $.ajax({
@@ -358,7 +360,7 @@
                     location.href ='@Url.Action("forum_mainblock")';
                 }
                 else {
-                    alert(result);
+                    swal(result, "", "error")
                 }
             }
         });
