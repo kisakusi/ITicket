@@ -37,7 +37,7 @@ namespace prjITicket.ViewModel
 
         public DateTime TicketTime { get { return this.TicketTimes.TicketTime; } }
 
-
+        
         
     }
 }

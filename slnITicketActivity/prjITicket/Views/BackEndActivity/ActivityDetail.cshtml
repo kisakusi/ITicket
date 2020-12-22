@@ -1,14 +1,12 @@
 ﻿@using BackEnd
 @using prjITicket.ViewModel
 @model prjITicket.ViewModel.CBackEndActivityDetailModel
-
 @{
     Layout = "~/Views/Shared/_BackEndLayoutPage.cshtml";
 
     ViewBag.Title = "ActivityDetail";
 }
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
 @{
     if (Model.Detail.StatusID == 0)
     {
@@ -23,10 +21,11 @@
 <input id="hiddenActivityName" type="hidden" value="@Html.DisplayFor(model => model.Detail.ActivityName)">
 <input id="hiddenStatusID" type="hidden" value="@Html.DisplayFor(model => model.Detail.StatusID)">
 <input id="hiddenSellerID" type="hidden" value="@Html.DisplayFor(model => model.Detail.SellerID)" />
-
 <h1 class="mt-4"></h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="@Url.Action("BackEndIndex","BackEndMain")">後台</a></li>
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("BackEndIndex","BackEndMain")">後台</a>
+    </li>
     <li class="breadcrumb-item active">
         <a href="@Url.Action("ActivityMaintain", "BackEndActivity")">活動列表</a>
     </li>
@@ -42,7 +41,6 @@
         }
     }
 </ol>
-
 
 <div class="container-fluid">
     <div class="card mb-4">
@@ -61,6 +59,19 @@
                         <td>商家名稱</td>
                         <td style="width:80%" colspan="2">
                             @Html.DisplayFor(model => model.Detail.CompanyName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>主類別</td>
+                        <td style="width:80%" colspan="2">
+                            @Html.DisplayFor(model => model.CategoryName)
+                        </td>
+                    </tr>
+
+                    <tr id="idActivityName">
+                        <td>子類別</td>
+                        <td style="width:80%" colspan="2">
+                            @Html.DisplayFor(model => model.SubCategoryName)
                         </td>
                     </tr>
                     <tr id="idActivityName">
@@ -197,22 +208,17 @@
 
     function EditData() {
 
-        const btnCheck = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-primary ',
-                cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false
-        })
         if ($("#switcher").prop("checked")) {
-            btnCheck.fire({
+            Swal.fire({
                 title: '是否確定要審核通過?',
                 text: "提醒：審核通過活動即上架",
                 icon: 'question',
                 showCancelButton: true,
                 cancelButtonText: '再想想',
                 confirmButtonText: '是',
-                reverseButtons: true
+                reverseButtons: true,
+                closeOnConfirm: false,
+                closeOnCancel: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     //點擊"是"的BUTTON
@@ -225,7 +231,7 @@
                         },
                         success: function (data) {
                             //跳出修改成功的訊息
-                            btnCheck.fire(
+                            Swal.fire(
                                 '審核通過',
                                 '活動已審核通過並上架',
                                 'success'
@@ -237,7 +243,7 @@
                         },
                         error: function (xhr) {
                             //alert(xhr);
-                            btnCheck.fire(
+                            Swal.fire(
                                 'Error',
                                 xhr,
                                 'error'
@@ -278,7 +284,7 @@
                 return;
             }
 
-            btnCheck.fire({
+            Swal.fire({
                 title: '是否確定審核未通過?',
                 text: "提醒：審核未通過活動不會上架",
                 icon: 'question',
@@ -301,7 +307,7 @@
                         },
                         success: function (data) {
                             //跳出審核未通過的訊息
-                            btnCheck.fire(
+                            Swal.fire(
                                 '已通知商家',
                                 '活動審核未通過並已通知商家',
                                 'success'
@@ -312,7 +318,7 @@
                             });
                         },
                         error: function (xhr) {
-                            btnCheck.fire(
+                            Swal.fire(
                                 'Error',
                                 xhr,
                                 'error'
@@ -360,4 +366,3 @@
         $("#idtext_7").val("圖片解析度太低")
     })
 </script>
-

@@ -10,14 +10,13 @@ using prjITicket.Models;
 
 namespace prjITicket.Controllers
 {
-    public class BackEndMemberController : Controller, IDisposable
+    public class BackEndMemberController : Controller
     {
         TicketSysEntities db = new TicketSysEntities();
 
         public ActionResult MemberList()
         {
-            if (Session[CDictionary.SK_Logined_Member] == null||
-                (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId!=4)
+            if ((Session[CDictionary.SK_Logined_Member] as Member)?.MemberRoleId != 4)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -25,177 +24,191 @@ namespace prjITicket.Controllers
         }
 
         [HttpPost]
-        public async Task<string> SendMessageAsync(string state, string members, string message)
+        public JsonResult MemberList(MemberAjax m)
         {
-            try
+            IEnumerable<Member> members = db.Member.Where(x => 
+                !m.Veri || (x.MemberRoleId == 3 && db.Seller.FirstOrDefault(s => s.MemberId == x.MemberID).fPass == null)
+            );
+            switch (m.RoleId)
             {
-                List<int> collection = null;
-                switch (state)
+                case 3:
+                    members = members.Where(x => x.MemberRoleId == 3);
+                    break;
+                case 2:
+                    members = members.Where(x => x.MemberRoleId == 2);
+                    break;
+                case 1:
+                    members = members.Where(x => x.MemberRoleId == 1);
+                    break;
+                case 0:
+                    int[] vs = db.BanLIst.Where(x => x.EndTime > DateTime.Now).Select(x => x.BanMemberId).Distinct().ToArray();
+                    members = members.Where(x => vs.Contains(x.MemberID));
+                    break;
+            }
+            members = members.AsEnumerable().Where(x =>
+                string.IsNullOrEmpty(m.Keyword) ||
+                x.Email.Split('@')[0].ToLower().Contains(m.Keyword) ||
+                x.NickName.ToLower().Contains(m.Keyword) ||
+                x.Name.ToLower().Contains(m.Keyword) ||
+                (x.Phone != null && x.Phone.Contains(m.Keyword))
+            );
+
+            List<MemberJson> data = new List<MemberJson>();
+            if (members.Count() == 0)
+            {
+                data.Add(new MemberJson
                 {
-                    case "All":
-                    case "會員":
-                        collection = db.Member.Select(x => x.MemberID).ToList();
+                    MaxPage = 1,
+                    ChangePage = 1
+                });
+            }
+            else
+            {
+                int skip = m.PageSize * (m.PageCurrent - 1);
+                int take = m.PageSize;
+                int maxpage = (int)Math.Ceiling((decimal)members.Count() / m.PageSize);
+                int changepage = m.PageCurrent > maxpage ? maxpage : 0;
+                data.Add(new MemberJson
+                {
+                    MaxPage = maxpage,
+                    ChangePage = changepage
+                });
+                skip = changepage == 0 ? skip : take * (changepage - 1);
+                switch (m.Sort)
+                {
+                    case "1d":
+                        members = members.OrderByDescending(x => x.Email).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
                         break;
-                    case "商家":
-                        collection = db.Member.Where(x => x.MemberRoleId == 3).Select(x => x.MemberID).ToList();
+                    case "1a":
+                        members = members.OrderBy(x => x.Email).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
                         break;
-                    case "普通會員":
-                        collection = db.Member.Where(x => x.MemberRoleId == 2).Select(x => x.MemberID).ToList();
+                    case "2d":
+                        members = members.OrderByDescending(x => x.NickName).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
                         break;
-                    case "未驗證會員":
-                        collection = db.Member.Where(x => x.MemberRoleId == 1).Select(x => x.MemberID).ToList();
+                    case "2a":
+                        members = members.OrderBy(x => x.NickName).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
                         break;
-                    case "停權會員":
-                        collection = db.BanLIst.Where(x => x.EndTime > DateTime.Now)
-                            .Select(x => x.BanMemberId).Distinct().ToList();
+                    case "3d":
+                        members = members.OrderByDescending(x => x.Name).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
                         break;
-                    case "指定會員":
-                        collection = members.Split(',').Select(x => int.Parse(x)).ToList();
+                    case "3a":
+                        members = members.OrderBy(x => x.Name).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
+                        break;
+                    case "4d":
+                        members = members.OrderByDescending(x => x.Phone).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
+                        break;
+                    case "4a":
+                        members = members.OrderBy(x => x.Phone).ThenByDescending(x => x.MemberID)
+                            .Skip(skip).Take(take).ToList();
+                        break;
+                    default:
+                        members = members.OrderByDescending(x => x.MemberID).Skip(skip).Take(take).ToList();
                         break;
                 }
-                List<Task> tasks = new List<Task>();
-                foreach (int id in collection)
+                data.AddRange(members.Select(member => new MemberJson
                 {
-                    tasks.Add(Task.Run(() => MemberCRUD.SendMessageToMember(id, message)));
-                }
-                await Task.WhenAll(tasks);
-                return "系統通知發送完畢!";
+                    member = member,
+                    seller = db.Seller.FirstOrDefault(x => x.MemberId == member.MemberID),
+                    banlist = db.BanLIst.Where(x => x.BanMemberId == member.MemberID && x.EndTime > DateTime.Now)
+                        .OrderByDescending(x => x.EndTime)
+                }));
             }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
-        [HttpPost]
-        public JsonResult MerchantList(MemberAjax m)
-        {
-            int skip = m.PageSize * (m.PageCurrent - 1);
-            int take = m.PageSize;
-            IEnumerable<Seller> query = MemberCRUD.SellerQuery(m.Keyword, m.NonVerify);
-            int count = query.Count();
-            if (count == 0)
-            {
-                return Json(new { });
-            }
-            int changepage = 0;
-            if (count <= skip)
-            {
-                changepage = (int)Math.Ceiling((decimal)count / take);
-                skip = take * (changepage - 1);
-            }
-            IEnumerable<Seller> sellers = query.SellerSort(m.SortRule, skip, take);
-            IEnumerable<SellerJson> jsons = sellers.Select(seller => new SellerJson
-            {
-                Count = count,
-                ChangePage = changepage,
-                seller = seller,
-                banlists = db.BanLIst
-            });
-            return Json(jsons);
-        }
-
-        [HttpPost]
-        public JsonResult GeneralList(MemberAjax m)
-        {
-            int skip = m.PageSize * (m.PageCurrent - 1);
-            int take = m.PageSize;
-            IEnumerable<Member> query = MemberCRUD.MemberQuery(m.RoleId, m.Keyword);
-            int count = query.Count();
-            if (count == 0)
-            {
-                return Json(new { });
-            }
-            int changepage = 0;
-            if (count <= skip)
-            {
-                changepage = (int)Math.Ceiling((decimal)count / take);
-                skip = take * (changepage - 1);
-            }
-            IEnumerable<Member> members = query.MemberSort(m.SortRule, skip, take);
-            IEnumerable<MemberJson> jsons = members.Select(member => new MemberJson
-            {
-                Count = count,
-                ChangePage = changepage,
-                member = member,
-                banlists = db.BanLIst
-            });
-            return Json(jsons);
-        }
-
-        [HttpPost]
-        public JsonResult BanMemberList(MemberAjax m)
-        {
-            int skip = m.PageSize * (m.PageCurrent - 1);
-            int take = m.PageSize;
-            IEnumerable<Member> query = MemberCRUD.BanMemberQuery(m.Keyword);
-            int count = query.Count();
-            if (count == 0)
-            {
-                return Json(new { });
-            }
-            int changepage = 0;
-            if (count <= skip)
-            {
-                changepage = (int)Math.Ceiling((decimal)count / take);
-                skip = take * (changepage - 1);
-            }
-            IEnumerable<Member> members = query.MemberSort(m.SortRule, skip, take);
-            IEnumerable<MemberJson> jsons = members.Select(member => new MemberJson
-            {
-                Count = count,
-                ChangePage = changepage,
-                member = member,
-                banlists = db.BanLIst
-            });
-            return Json(jsons);
+            return Json(data);
         }
 
         [HttpPost]
         public JsonResult MemberDetail(int id)
         {
             Member member = db.Member.FirstOrDefault(x => x.MemberID == id);
-            if (member.MemberRoleId == 3)
+            MemberDetail data = new MemberDetail
             {
-                SellerDetail json = new SellerDetail
+                member = member,
+                seller = db.Seller.FirstOrDefault(x => x.MemberId == id),
+                banlist = db.BanLIst.Where(x => x.BanMemberId == member.MemberID)
+                    .OrderByDescending(x => x.EndTime)
+            };
+            return Json(data);
+        }
+
+        [HttpPost]
+        public JsonResult MemberEmailCollection(int[] BackEndMemberListCollection)
+        {
+            var data = BackEndMemberListCollection.Select(id => new
                 {
-                    banlist = db.BanLIst.Where(x => x.BanMemberId == id),
-                    member = member,
-                    seller = db.Seller.FirstOrDefault(x => x.MemberId == id)
+                    email = db.Member.FirstOrDefault(x => x.MemberID == id).Email
+                });
+            return Json(data);
+        }
+
+        [HttpPost]
+        public async Task<string> SendMessageAsync(int[] BackEndMemberListCollection, string message)
+        {
+            List<Task> tasks = new List<Task>();
+            foreach (int id in BackEndMemberListCollection)
+            {
+                tasks.Add(Task.Run(() =>
+                    BackEndFactory.SendMessageToMember(id, "一般系統通知", message, false, DateTime.Now)
+                ));
+            }
+            await Task.WhenAll(tasks);
+            return "系統通知發送完畢!";
+        }
+
+        [HttpPost]
+        public async Task<string> BanMemberAsync(BanTaskInfo m)
+        {
+            if (db.Member.FirstOrDefault(x => x.MemberID == m.BTid).MemberRoleId != 4)
+            {
+                BanLIst banlist = new BanLIst
+                {
+                    BanMemberId = m.BTid,
+                    AdminMemberId = (Session[CDictionary.SK_Logined_Member] as Member).MemberID,
+                    Reason = m.BTmessage,
+                    EndTime = m.BTendtime
                 };
-                return Json(json);
+                db.Entry(banlist).State = EntityState.Added;
+                db.SaveChanges();
+                await BackEndFactory.SendMessageToMember(m.BTid, m.BTmain, m.BTmessage, true, m.BTendtime);
+                return "已完成停權會員與發送通知兼站外寄信!";
             }
             else
             {
-                MemberDetail json = new MemberDetail
-                {
-                    banlist = db.BanLIst.Where(x => x.BanMemberId == id),
-                    member = member
-                };
-                return Json(json);
+                return "管理者身份無法被停權!!!";
             }
         }
 
         [HttpPost]
-        public async Task<EmptyResult> BanMember(int id, string reason, DateTime endtime)
+        public async Task<string> UnBanMemberAsync(int id)
         {
-            int adminId = (Session[CDictionary.SK_Logined_Member] as Member).MemberID;
-            await MemberCRUD.BanMemberWithMessage(id, adminId, reason, endtime);
-            return new EmptyResult();
+            List<BanLIst> banlists = db.BanLIst.Where(x => x.BanMemberId == id && x.EndTime > DateTime.Now).ToList();
+            foreach (BanLIst banlist in banlists)
+            {
+                db.Entry(banlist).State = EntityState.Deleted;
+                db.SaveChanges();
+            }
+            string message = "iTicket 管理者已解除您的停權處分";
+            await BackEndFactory.SendMessageToMember(id, "解除停權通知", message, false, DateTime.Now);
+            return "已完成解除停權與發送通知兼站外寄信!";
         }
 
         [HttpPost]
-        public async Task<EmptyResult> UnBanMember(int id)
+        public async Task<string> VerifyAsync(int id, bool fPass, string message = null)
         {
-            await MemberCRUD.UnBanMemberWithMessage(id);
-            return new EmptyResult();
-        }
+            Seller seller = db.Seller.FirstOrDefault(x => x.MemberId == id);
+            seller.fPass = fPass;
+            db.SaveChanges();
 
-        [HttpPost]
-        public async Task<EmptyResult> MerchantVerification(int id, bool fPass, string reason = "")
-        {
-            await MemberCRUD.MerchantVerificationWithMessage(id, fPass, reason);
-            return new EmptyResult();
+            string main = fPass ? "商家審核通過" : "商家審核不通過";
+            message = fPass ? "iTicket 管理者已通過您申請的商家審核" : message;
+            await BackEndFactory.SendMessageToMember(id, main, message, false, DateTime.Now);
+            return fPass ? "審核通過" : $"以「{message}」為理由不給予通過";
         }
 
         [HttpPost]
@@ -217,8 +230,7 @@ namespace prjITicket.Controllers
         [HttpGet]
         public ActionResult DataDownload(int id)
         {
-            if (Session[CDictionary.SK_Logined_Member] == null||
-                (Session[CDictionary.SK_Logined_Member] as Member).MemberRoleId!=4)
+            if ((Session[CDictionary.SK_Logined_Member] as Member)?.MemberRoleId != 4)
             {
                 return Content($"<script>window.close()</script>");
             }

@@ -4,8 +4,13 @@
 
     ViewBag.Title = "OrderQuery";
 }
+<link rel="stylesheet" href="~/Content/BackEnd/js/jquery-ui.min.js" />
+<link rel="stylesheet" href="~/Content/BackEnd/css/jquery-ui.css" />
 <!--Sweet Alert CDN-->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 
 <h1 class="mt-4">訂單查詢</h1>
 <ol class="breadcrumb mb-4">
@@ -25,6 +30,15 @@
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
+                    <span class="input-group-text">訂單日期</span>
+                </div>
+                <input type="text" id="OrderStartDate" autocomplete="off" class="form-control clsdatepicker" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="起始日期">
+                <label style="margin:5px">to</label>
+                <input type="text" id="OrderEndDate" autocomplete="off" class="form-control clsdatepicker" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="結束日期">
+
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
                     <span class="input-group-text">訂單編號</span>
                 </div>
                 <input type="text" id="txtOrderGuid" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
@@ -39,7 +53,6 @@
                 </div>
                 <input type="text" id="txtUserEmail" autocomplete="off" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
-
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default" style="margin-right:1%">訂單狀態</span>
                 <div class="form-check form-check-inline">
@@ -172,7 +185,6 @@
     }
 
 </script>
-
 <script type="text/javascript">
     $(function () {
 
@@ -204,7 +216,10 @@
                         OrderStatus1: $("#ckbox1").prop("checked") ? $("#ckbox1").val() : null,
                         OrderGuid: $("#txtOrderGuid").val(),
                         UserName: $("#txtUserName").val(),
-                        UserEmail: $("#txtUserEmail").val()
+                        UserEmail: $("#txtUserEmail").val(),
+                        StartTime: $("#OrderStartDate").val(),
+                        EndTime: $("#OrderEndDate").val()
+
                     },
                 },
                 //設置是否透過Server端處理分頁、排序、過濾處理機制模式，
@@ -220,7 +235,7 @@
                         "title": "訂單日期",
                         "data": "OrderDate",
                         "render": function (data, type, row, meta) {
-                            return new Date().Format("yyyy-MM-dd");
+                            return new Date(row.OrderDate).Format("yyyy-MM-dd");
                         }
                     },
                     {
@@ -228,7 +243,7 @@
                         "data": "OrderGuid",
                     },
                     {
-                        "title": "訂購人姓名",
+                        "title": "姓名",
                         "data": "UserName",
                     },
                     {
@@ -237,7 +252,15 @@
                     },
                     {
                         "title": "訂單金額",
-                        "data": "Email",
+                        "data": "OrderPrice",
+                        "render": function (data, type, row, meta) {
+                            //console.log(row);
+                            return data - row.PayPoint
+                        }
+                    },
+                    {
+                        "title": "使用點數",
+                        "data": "PayPoint",
                     },
                     {
                         "title": "付款狀態",
@@ -317,4 +340,13 @@
             if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
     }
+
+
+    $(function () {
+        $(".clsdatepicker").datepicker({
+            dateFormat: 'yy-mm-dd', autoSize: true
+        });
+        //$("#OrderStartDate").formatDate("yy-mm-dd", new Date());
+
+    });
 </script>

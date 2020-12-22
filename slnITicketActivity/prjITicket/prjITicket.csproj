@@ -169,14 +169,11 @@
     <Content Include="Content\BackEnd\image\ITicket_logo1_notext.png" />
     <Content Include="Content\BackEnd\image\ITicket_Logo2.png" />
     <Content Include="Content\BackEnd\image\ITicket_logo2_notext.png" />
-    <Content Include="Content\BackEnd\js\BackEndArticle01.js" />
-    <Content Include="Content\BackEnd\js\BackEndArticle02.js" />
-    <Content Include="Content\BackEnd\js\BackEndComment01.js" />
-    <Content Include="Content\BackEnd\js\BackEndComment02.js" />
-    <Content Include="Content\BackEnd\js\BackEndDemoMA.js" />
-    <Content Include="Content\BackEnd\js\BackEndDemoMAC.js" />
-    <Content Include="Content\BackEnd\js\BackEndMember01.js" />
-    <Content Include="Content\BackEnd\js\BackEndMember02.js" />
+    <Content Include="Content\BackEnd\js\BackEndArticle.jsx" />
+    <Content Include="Content\BackEnd\js\BackEndComment.jsx" />
+    <Content Include="Content\BackEnd\js\BackEndDemoDemo.jsx" />
+    <Content Include="Content\BackEnd\js\BackEndFactory.jsx" />
+    <Content Include="Content\BackEnd\js\BackEndMember.jsx" />
     <Content Include="Content\BackEnd\js\scripts.js" />
     <Content Include="Content\BackEnd\node_modules\jquery\AUTHORS.txt" />
     <Content Include="Content\BackEnd\node_modules\jquery\dist\jquery.js" />
@@ -761,9 +758,7 @@
     <Compile Include="Models\Article_Report.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\BackEndArticleFactory.cs" />
-    <Compile Include="Models\BackEndCommentFactory.cs" />
-    <Compile Include="Models\BackEndMemberFactory.cs" />
+    <Compile Include="Models\BackEndFactory.cs" />
     <Compile Include="Models\BanLIst.cs">
       <DependentUpon>TicketSysModel.tt</DependentUpon>
     </Compile>
@@ -879,6 +874,7 @@
     <Compile Include="ViewModel\BackEnd\CBackEndActivityReason.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndActivityTimes.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndMain.cs" />
+    <Compile Include="ViewModel\BackEnd\CBackEndMainArticle.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndOrderDetail.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndOrders.cs" />
     <Compile Include="ViewModel\BackEnd\CBackEndTicketGroupDetail.cs" />
@@ -934,7 +930,6 @@
     <Content Include="Views\Shared\_ForumLayout.cshtml" />
     <Content Include="Views\BackEndActivity\ActivityDetail.cshtml" />
     <Content Include="Views\BackEndActivity\ActivityMaintain.cshtml" />
-    <Content Include="Views\BackEndOrder\OrderList.cshtml" />
     <Content Include="Views\BackEndOrder\OrderQuery.cshtml" />
     <Content Include="Views\Shared\_BackEndLayoutPage.cshtml" />
     <Content Include="Views\BackEndMember\MemberList.cshtml" />

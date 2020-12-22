@@ -46,13 +46,17 @@ namespace BackEnd.Controllers
         private string orderStatus1; //已付款
         private string orderGuid;//訂單編號
         private string username;//訂購人姓名
-        private string useremail;
+        private string useremail;//訂購人email
+        private string startTime;
+        private string endTime;
 
         public string OrderGuid { get => orderGuid; set => orderGuid = value; }
         public string OrderStatus0 { get => orderStatus0; set => orderStatus0 = value; }
         public string OrderStatus1 { get => orderStatus1; set => orderStatus1 = value; }
         public string Username { get => username; set => username = value; }
         public string UserEmail { get => useremail; set => useremail = value; }
+        public string StartTime { get => startTime; set => startTime = value; }
+        public string EndTime { get => endTime; set => endTime = value; }
     }
     public class OrderDetail
     {
@@ -94,13 +98,19 @@ namespace BackEnd.Controllers
         public DateTime YesterdayOrderTime { get => yesterdayOrderTime; set => yesterdayOrderTime = value; }
         public DateTime BeforeyesterdayOrderTime { get => beforeyesterdayOrderTime; set => beforeyesterdayOrderTime = value; }
     }
+    public class ArticleID
+    {
+        private int id;
+
+        public int articleID { get => id; set => id = value; }
+    }
 
     public class WebApiController : ApiController
     {
 
         TicketSysEntities ticket = new TicketSysEntities();
 
-        //後臺產品查詢API
+        //後臺活動查詢API
         [HttpPost]
         public List<CBackEndActivity> getActivity([FromBody]formDataClass formDataClass)
         {
@@ -163,7 +173,7 @@ namespace BackEnd.Controllers
             return backEndActivities.ToList();
         }
 
-        //後台產品審核成功API
+        //後台活動審核成功API
         [HttpPut]
         public string updateActivtyStatus([FromBody]updateActivtyStatus updateActivtyStatus)
         {
@@ -230,17 +240,25 @@ namespace BackEnd.Controllers
             bool OrderStatus1_bool;
             bool.TryParse(OrderStatus1, out OrderStatus1_bool);
 
+            string StartTime = orderQuery.StartTime;
+            DateTime startTime;
+            DateTime.TryParse(StartTime, out startTime);
+
+            string EndTime = orderQuery.EndTime;
+            DateTime endTime;
+            DateTime.TryParse(EndTime, out endTime);
 
             string OrderGuid = !string.IsNullOrEmpty(orderQuery.OrderGuid) ? orderQuery.OrderGuid.Trim() : null;
             string UserName = !string.IsNullOrEmpty(orderQuery.Username) ? orderQuery.Username.Trim() : null;
             string UserEmail = !string.IsNullOrEmpty(orderQuery.UserEmail) ? orderQuery.UserEmail.Trim() : null;
-
+          
             IQueryable<CBackEndOrders> BackEndOrders = null;
 
             var predicate_OrdersStatus = PredicateBuilder.New<Orders>(false);
             var predicate_OrderGuid = PredicateBuilder.New<Orders>(true);
             var predicate_UserName = PredicateBuilder.New<Orders>(true);
             var predicate_UserEmail = PredicateBuilder.New<Orders>(true);
+            var Predicate_OrderDate = PredicateBuilder.New<Orders>(true);
 
 
             if (!string.IsNullOrEmpty(OrderGuid))
@@ -258,15 +276,22 @@ namespace BackEnd.Controllers
             if (!string.IsNullOrEmpty(OrderStatus1))
                 predicate_OrdersStatus = predicate_OrdersStatus.Or(o => o.OrderStatus.Equals(OrderStatus1_bool));
 
-            BackEndOrders = from o in ticket.Orders.Where(predicate_OrdersStatus).Where(predicate_OrderGuid).Where(predicate_UserName).Where(predicate_UserEmail)
+            if (!string.IsNullOrEmpty(StartTime) && !string.IsNullOrEmpty(EndTime))
+                Predicate_OrderDate = Predicate_OrderDate.
+                    And(o => (o.OrderDate.Year >= startTime.Year && o.OrderDate.Month >= startTime.Month && o.OrderDate.Day >= startTime.Day)
+                    && (o.OrderDate.Year <= endTime.Year && o.OrderDate.Month <= endTime.Month && o.OrderDate.Day <= endTime.Day
+                    ));
+            
+            BackEndOrders = from o in ticket.Orders.Where(predicate_OrdersStatus).Where(predicate_OrderGuid).Where(predicate_UserName).Where(predicate_UserEmail).Where(Predicate_OrderDate)
                             select new CBackEndOrders
                             {
                                 Orders = o,
+                                OrderPrice =o.Order_Detail.Sum(od=>(int)((od.Quantity * od.Tickets.Price)*(1-od.Discount)))
                             };
+
 
             return BackEndOrders.ToList();
         }
-
 
         //後臺訂單明細API
         [HttpPost]
@@ -455,6 +480,22 @@ namespace BackEnd.Controllers
             List<DateTime> ticketTimes = ticket.TicketTimes.Where(t => t.ActivityId == ActivityID).Select(s => s.TicketTime).ToList();
 
             return ticketTimes;
+        }
+
+        //文章內容
+        [HttpPost]
+        public CBackEndMainArticle Article([FromBody]ArticleID articleID)
+        {
+            int ArticleID = articleID.articleID;
+
+            //Article article = new Article();
+            CBackEndMainArticle CBackEndMainArticle = new CBackEndMainArticle();
+            var ar = ticket.Article.Where(a => a.ArticleCategoryID.Equals(a.ArticleCategories.ArticleCategoryID) && a.MemberID.Equals(a.Member.MemberID) && a.ArticleID == ArticleID).FirstOrDefault();
+            CBackEndMainArticle.Article = ar;
+            CBackEndMainArticle.ArticleCategoryName = ar.ArticleCategories.ArticleCategoryName;
+            CBackEndMainArticle.MemberName = ar.Article_Emotion.FirstOrDefault().Member.Name;
+
+            return CBackEndMainArticle;
         }
 
     }

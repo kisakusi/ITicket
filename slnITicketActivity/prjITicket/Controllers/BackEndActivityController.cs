@@ -72,6 +72,12 @@ namespace BackEnd.Controllers
                 })
                 .ToList();
 
+            string SubCategoryName = ticket.Activity.Where(a => a.ActivityID == id).Select(a => a.SubCategories.SubCategoryName).FirstOrDefault();
+            cBackEndActivityDetailModel.SubCategoryName = SubCategoryName;
+
+            string CategoryName = ticket.Activity.Where(a => a.ActivityID == id).Select(a => a.SubCategories.Categories.CategoryName).FirstOrDefault();
+            cBackEndActivityDetailModel.CategoryName = CategoryName;
+
             return View(cBackEndActivityDetailModel);
         }
     }

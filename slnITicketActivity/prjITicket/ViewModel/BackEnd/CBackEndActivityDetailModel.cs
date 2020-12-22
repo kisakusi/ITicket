@@ -13,5 +13,8 @@ namespace prjITicket.ViewModel
         public CBackEndActivityDetail Detail = new CBackEndActivityDetail();
 
         public List<CBackEndActivityTimes> ActivityTimes = new List<CBackEndActivityTimes>();
+
+        public string SubCategoryName { get; set; }
+        public string CategoryName { get; set; }
     }
 }

@@ -18,5 +18,8 @@ namespace prjITicket.ViewModel
         public string Email { get { return this.Orders.Email; } }
         public bool OrderStatus { get { return this.Orders.OrderStatus; } }
         public string OrderGuid { get { return this.Orders.OrderGuid; } }
+        public int PayPoint { get { return this.Orders.PayPoint; } }
+        
+        public int OrderPrice { get; set; }
     }
 }

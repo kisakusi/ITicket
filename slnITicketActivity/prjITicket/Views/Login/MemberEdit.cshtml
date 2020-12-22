@@ -865,8 +865,9 @@
                 url: "@Url.Action("CreateImage")",
                 data: { input: base64code },
                 success: function () {
-                    swal("儲存成功!", "", "success");
-                    location.reload();
+                    swal("儲存成功!", "", "success").then((value) => {
+                        location.reload();
+                    });
                 }
             })
         });
