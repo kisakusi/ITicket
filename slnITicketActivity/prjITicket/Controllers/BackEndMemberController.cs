@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -45,13 +46,27 @@ namespace prjITicket.Controllers
                     members = members.Where(x => vs.Contains(x.MemberID));
                     break;
             }
-            members = members.AsEnumerable().Where(x =>
-                string.IsNullOrEmpty(m.Keyword) ||
-                x.Email.Split('@')[0].ToLower().Contains(m.Keyword) ||
-                x.NickName.ToLower().Contains(m.Keyword) ||
-                x.Name.ToLower().Contains(m.Keyword) ||
-                (x.Phone != null && x.Phone.Contains(m.Keyword))
-            );
+            switch (m.SearchMode)
+            {
+                case false:
+                    members = members.AsEnumerable().Where(x =>
+                        string.IsNullOrEmpty(m.Keyword) ||
+                        x.Email.Split('@')[0].ToLower().Contains(m.Keyword) ||
+                        x.NickName.ToLower().Contains(m.Keyword) ||
+                        x.Name.ToLower().Contains(m.Keyword) ||
+                        (x.Phone != null && x.Phone.Contains(m.Keyword))
+                    );
+                    break;
+                case true:
+                    members = members.AsEnumerable().Where(x =>
+                        string.IsNullOrEmpty(m.Keyword) ||
+                        x.Email.Split('@')[0].ToLower().SuperContains(m.Keyword) ||
+                        x.NickName.ToLower().SuperContains(m.Keyword) ||
+                        x.Name.ToLower().SuperContains(m.Keyword) ||
+                        (x.Phone != null && x.Phone.SuperContains(m.Keyword))
+                    );
+                    break;
+            }
 
             List<MemberJson> data = new List<MemberJson>();
             if (members.Count() == 0)
@@ -59,7 +74,9 @@ namespace prjITicket.Controllers
                 data.Add(new MemberJson
                 {
                     MaxPage = 1,
-                    ChangePage = 1
+                    ChangePage = 1,
+                    CurrentTimer = m.CurrentTimer,
+                    TotalSearch = members.Count(),
                 });
             }
             else
@@ -71,7 +88,9 @@ namespace prjITicket.Controllers
                 data.Add(new MemberJson
                 {
                     MaxPage = maxpage,
-                    ChangePage = changepage
+                    ChangePage = changepage,
+                    CurrentTimer = m.CurrentTimer,
+                    TotalSearch = members.Count(),
                 });
                 skip = changepage == 0 ? skip : take * (changepage - 1);
                 switch (m.Sort)
@@ -105,8 +124,10 @@ namespace prjITicket.Controllers
                             .Skip(skip).Take(take).ToList();
                         break;
                     case "4a":
-                        members = members.OrderBy(x => x.Phone).ThenByDescending(x => x.MemberID)
-                            .Skip(skip).Take(take).ToList();
+                        members = members.Where(x => x.Phone != null).OrderBy(x => x.Phone).ThenByDescending(x => x.MemberID)
+                            .Concat(
+                                members.Where(x => x.Phone == null).OrderByDescending(x => x.MemberID)
+                            ).Skip(skip).Take(take).ToList();
                         break;
                     default:
                         members = members.OrderByDescending(x => x.MemberID).Skip(skip).Take(take).ToList();
@@ -117,7 +138,8 @@ namespace prjITicket.Controllers
                     member = member,
                     seller = db.Seller.FirstOrDefault(x => x.MemberId == member.MemberID),
                     banlist = db.BanLIst.Where(x => x.BanMemberId == member.MemberID && x.EndTime > DateTime.Now)
-                        .OrderByDescending(x => x.EndTime)
+                        .OrderByDescending(x => x.EndTime),
+                    SearchMode = m.SearchMode
                 }));
             }
             return Json(data);
@@ -240,6 +262,120 @@ namespace prjITicket.Controllers
                 string filepath = Server.MapPath($"~/Content/Login/SellerImage/{filename}");
                 FileStream stream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 return File(stream, "application/msword", filename);
+            }
+            catch
+            {
+                return Content($"<script>window.close()</script>");
+            }
+        }
+
+        [HttpGet]
+        public ActionResult MemberDownload()
+        {
+            if ((Session[CDictionary.SK_Logined_Member] as Member)?.MemberRoleId != 4)
+            {
+                return Content($"<script>window.close()</script>");
+            }
+            try
+            {
+                string members = string.Join("", db.Member.AsEnumerable()
+                    .OrderByDescending(x => x.MemberID)
+                    .Select(member => new MemberExcel
+                    {
+                        member = member
+                    }).Select(member => $@"
+                        <tr>
+                            <td>{member.MemberID}</td>
+                            <td>{member.MemberEmail}</td>
+                            <td>{member.MemberName}</td>
+                            <td>{member.MemberIDentityNumber}</td>
+                            <td>{member.MemberPassport}</td>
+                            <td>{member.MemberNickName}</td>
+                            <td>{member.MemberBirthDate}</td>
+                            <td>{member.MemberPhone}</td>
+                            <td>{member.MemberPoint}</td>
+                            <td>{member.MemberAddress}</td>
+                            <td>{member.MemberRoleName}</td>
+                            <td>{member.MemberSex}</td>
+                            <td>{member.MemberDistrict}</td>
+                        </tr>"));
+                string memberTable = $@"
+                    <table border='1'>
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Email</th>
+                                <th>姓名</th>
+                                <th>身分證字號</th>
+                                <th>護照</th>
+                                <th>暱稱</th>
+                                <th>生日</th>
+                                <th>電話</th>
+                                <th>獎勵點數</th>
+                                <th>地址</th>
+                                <th>角色權限</th>
+                                <th>性別</th>
+                                <th>城市</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${members}
+                        </tbody>
+                    </table>";
+                byte[] bytes = Encoding.Default.GetBytes(memberTable);
+                return File(bytes, "application/vnd.ms-excel", "ITicket 會員資料.xls");
+            }
+            catch 
+            {
+                return Content($"<script>window.close()</script>");
+            }
+        }
+
+        [HttpGet]
+        public ActionResult SellerDownload()
+        {
+            if ((Session[CDictionary.SK_Logined_Member] as Member)?.MemberRoleId != 4)
+            {
+                return Content($"<script>window.close()</script>");
+            }
+            try
+            {
+                string sellers = string.Join("", db.Seller.AsEnumerable()
+                    .OrderByDescending(x => x.SellerID)
+                    .Select(seller => new SellerExcel
+                    {
+                        seller = seller
+                    }).Select(seller => $@"
+                        <tr>
+                            <td>{seller.SellerID}</td>
+                            <td>{seller.SellerCompanyName}</td>
+                            <td>{seller.SellerTaxIDNumber}</td>
+                            <td>{seller.SellerHomePage}</td>
+                            <td>{seller.SellerPhone}</td>
+                            <td>{seller.SellerDiscription}</td>
+                            <td>{seller.fPass}</td>
+                            <td>{seller.fFileName}</td>
+                        </tr>"));
+                string sellerTable = $@"
+                    <table border='1'>
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>公司名</th>
+                                <th>統編</th>
+                                <th>商家網站主頁</th>
+                                <th>商家聯絡資訊</th>
+                                <th>商家描述資訊</th>
+                                <th>審核狀態</th>
+                                <th>商家上傳資料有無</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sellers}
+                        </tbody>
+                    </table>";
+                byte[] bytes = Encoding.Default.GetBytes(sellerTable);
+                return File(bytes, "application/vnd.ms-excel", "ITicket 商家資料.xls");
             }
             catch
             {

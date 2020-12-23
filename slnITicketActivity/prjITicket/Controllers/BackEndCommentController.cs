@@ -59,24 +59,49 @@ namespace prjITicket.Controllers
                     );
                 }
             }
-            comments = comments
-                .Where(x => m.Cate == 0 || x.Activity.SubCategories.CategoryId == m.Cate)
-                .Where(x => m.SubCate == 0 || x.Activity.SubCategoryId == m.SubCate)
-                .Where(x => m.Date == 0 || (DateTime.Now - x.CommentDate).TotalDays <= m.Date)
-                .Where(x => m.ShowBan == 1 || x.IsBaned == false)
-                .Where(x =>
-                    string.IsNullOrEmpty(m.Keyword) ||
-                    (
-                        m.Keyword.StartsWith("author:") ? 
-                        (
-                            x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
-                        ): 
-                        (
-                            x.Activity.ActivityName.ToLower().Contains(m.Keyword) ||
-                            x.Member.Email.Split('@')[0].ToLower().Contains(m.Keyword)
-                        )
-                    )
-                );
+            switch (m.SearchMode)
+            {
+                case false:
+                    comments = comments
+                        .Where(x => m.Cate == 0 || x.Activity.SubCategories.CategoryId == m.Cate)
+                        .Where(x => m.SubCate == 0 || x.Activity.SubCategoryId == m.SubCate)
+                        .Where(x => m.Date == 0 || (DateTime.Now - x.CommentDate).TotalDays <= m.Date)
+                        .Where(x => m.ShowBan == 1 || x.IsBaned == false)
+                        .Where(x =>
+                            string.IsNullOrEmpty(m.Keyword) ||
+                            (
+                                m.Keyword.StartsWith("author:") ?
+                                (
+                                    x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
+                                ) :
+                                (
+                                    x.Activity.ActivityName.ToLower().Contains(m.Keyword) ||
+                                    x.Member.Email.Split('@')[0].ToLower().Contains(m.Keyword)
+                                )
+                            )
+                        );
+                    break;
+                case true:
+                    comments = comments
+                        .Where(x => m.Cate == 0 || x.Activity.SubCategories.CategoryId == m.Cate)
+                        .Where(x => m.SubCate == 0 || x.Activity.SubCategoryId == m.SubCate)
+                        .Where(x => m.Date == 0 || (DateTime.Now - x.CommentDate).TotalDays <= m.Date)
+                        .Where(x => m.ShowBan == 1 || x.IsBaned == false)
+                        .Where(x =>
+                            string.IsNullOrEmpty(m.Keyword) ||
+                            (
+                                m.Keyword.StartsWith("author:") ?
+                                (
+                                    x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
+                                ) :
+                                (
+                                    x.Activity.ActivityName.ToLower().SuperContains(m.Keyword) ||
+                                    x.Member.Email.Split('@')[0].ToLower().SuperContains(m.Keyword)
+                                )
+                            )
+                        );
+                    break;
+            }
 
             List<CommentJson> data = new List<CommentJson>();
             if (comments.Count() == 0)
@@ -84,7 +109,9 @@ namespace prjITicket.Controllers
                 data.Add(new CommentJson
                 {
                     MaxPage = 1,
-                    ChangePage = 1
+                    ChangePage = 1,
+                    CurrentTimer = m.CurrentTimer,
+                    TotalSearch = comments.Count(),
                 });
             }
             else
@@ -96,14 +123,17 @@ namespace prjITicket.Controllers
                 data.Add(new CommentJson
                 {
                     MaxPage = maxpage,
-                    ChangePage = changepage
+                    ChangePage = changepage,
+                    CurrentTimer = m.CurrentTimer,
+                    TotalSearch = comments.Count(),
                 });
                 skip = changepage == 0 ? skip : take * (changepage - 1);
                 comments = comments.Skip(skip).Take(take).ToList();
                 data.AddRange(comments.Select(comment => new CommentJson
                 {
                     comment = comment,
-                    reports = db.CommentReport
+                    reports = db.CommentReport,
+                    SearchMode = m.SearchMode
                 }));
             }
             return Json(data);

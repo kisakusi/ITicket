@@ -61,22 +61,45 @@ namespace prjITicket.Controllers
                         );
                     }
                 }
-                articles = articles
-                    .Where(x => m.Cate == 0 || x.ArticleCategoryID == m.Cate)
-                    .Where(x => m.Date == 0 || (DateTime.Now - x.Date).TotalDays <= m.Date)
-                    .Where(x =>
-                        string.IsNullOrEmpty(m.Keyword) ||
-                        (
-                            m.Keyword.StartsWith("author:") ?
-                            (
-                                x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
-                            ):
-                            (
-                                x.ArticleTitle.ToLower().Contains(m.Keyword) ||
-                                x.Member.Email.Split('@')[0].ToLower().Contains(m.Keyword)
-                            )
-                        )
-                    );
+                switch (m.SearchMode)
+                {
+                    case false:
+                        articles = articles
+                            .Where(x => m.Cate == 0 || x.ArticleCategoryID == m.Cate)
+                            .Where(x => m.Date == 0 || (DateTime.Now - x.Date).TotalDays <= m.Date)
+                            .Where(x =>
+                                string.IsNullOrEmpty(m.Keyword) ||
+                                (
+                                    m.Keyword.StartsWith("author:") ?
+                                    (
+                                        x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
+                                    ) :
+                                    (
+                                        x.ArticleTitle.ToLower().Contains(m.Keyword) ||
+                                        x.Member.Email.Split('@')[0].ToLower().Contains(m.Keyword)
+                                    )
+                                )
+                            );
+                        break;
+                    case true:
+                        articles = articles
+                            .Where(x => m.Cate == 0 || x.ArticleCategoryID == m.Cate)
+                            .Where(x => m.Date == 0 || (DateTime.Now - x.Date).TotalDays <= m.Date)
+                            .Where(x =>
+                                string.IsNullOrEmpty(m.Keyword) ||
+                                (
+                                    m.Keyword.StartsWith("author:") ?
+                                    (
+                                        x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
+                                    ) :
+                                    (
+                                        x.ArticleTitle.ToLower().SuperContains(m.Keyword) ||
+                                        x.Member.Email.Split('@')[0].ToLower().SuperContains(m.Keyword)
+                                    )
+                                )
+                            );
+                        break;
+                }
 
                 List<ArticleJson> data = new List<ArticleJson>();
                 if (articles.Count() == 0)
@@ -84,7 +107,9 @@ namespace prjITicket.Controllers
                     data.Add(new ArticleJson
                     {
                         MaxPage = 1,
-                        ChangePage = 1
+                        ChangePage = 1,
+                        CurrentTimer = m.CurrentTimer,
+                        TotalSearch = articles.Count(),
                     });
                 }
                 else
@@ -96,14 +121,17 @@ namespace prjITicket.Controllers
                     data.Add(new ArticleJson
                     {
                         MaxPage = maxpage,
-                        ChangePage = changepage
+                        ChangePage = changepage,
+                        CurrentTimer = m.CurrentTimer,
+                        TotalSearch = articles.Count(),
                     });
                     skip = changepage == 0 ? skip : take * (changepage - 1);
                     articles = articles.Skip(skip).Take(take).ToList();
                     data.AddRange(articles.Select(article => new ArticleJson
                     {
                         article = article,
-                        reportA = db.Article_Report
+                        reportA = db.Article_Report,
+                        SearchMode = m.SearchMode
                     }));
                 }
                 return Json(data);
@@ -144,22 +172,45 @@ namespace prjITicket.Controllers
                         );
                     }
                 }
-                replies = replies
-                    .Where(x => m.Cate == 0 || x.Article.ArticleCategoryID == m.Cate)
-                    .Where(x => m.Date == 0 || (DateTime.Now - x.ReplyDate).TotalDays <= m.Date)
-                    .Where(x =>
-                        string.IsNullOrEmpty(m.Keyword) ||
-                        (
-                            m.Keyword.StartsWith("author:") ?
-                            (
-                                x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
-                            ) :
-                            (
-                                x.Article.ArticleTitle.ToLower().Contains(m.Keyword) ||
-                                x.Member.Email.Split('@')[0].ToLower().Contains(m.Keyword)
-                            )
-                        )
-                    );
+                switch (m.SearchMode)
+                {
+                    case false:
+                        replies = replies
+                            .Where(x => m.Cate == 0 || x.Article.ArticleCategoryID == m.Cate)
+                            .Where(x => m.Date == 0 || (DateTime.Now - x.ReplyDate).TotalDays <= m.Date)
+                            .Where(x =>
+                                string.IsNullOrEmpty(m.Keyword) ||
+                                (
+                                    m.Keyword.StartsWith("author:") ?
+                                    (
+                                        x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
+                                    ) :
+                                    (
+                                        x.Article.ArticleTitle.ToLower().Contains(m.Keyword) ||
+                                        x.Member.Email.Split('@')[0].ToLower().Contains(m.Keyword)
+                                    )
+                                )
+                            );
+                        break;
+                    case true:
+                        replies = replies
+                            .Where(x => m.Cate == 0 || x.Article.ArticleCategoryID == m.Cate)
+                            .Where(x => m.Date == 0 || (DateTime.Now - x.ReplyDate).TotalDays <= m.Date)
+                            .Where(x =>
+                                string.IsNullOrEmpty(m.Keyword) ||
+                                (
+                                    m.Keyword.StartsWith("author:") ?
+                                    (
+                                        x.Member.Email.Split('@')[0].ToLower() == m.Keyword.Split(':')[1].Trim()
+                                    ) :
+                                    (
+                                        x.Article.ArticleTitle.ToLower().SuperContains(m.Keyword) ||
+                                        x.Member.Email.Split('@')[0].ToLower().SuperContains(m.Keyword)
+                                    )
+                                )
+                            );
+                        break;
+                }
 
                 List<ArticleJson> data = new List<ArticleJson>();
                 if (replies.Count() == 0)
@@ -167,7 +218,9 @@ namespace prjITicket.Controllers
                     data.Add(new ArticleJson
                     {
                         MaxPage = 1,
-                        ChangePage = 1
+                        ChangePage = 1,
+                        CurrentTimer = m.CurrentTimer,
+                        TotalSearch = replies.Count(),
                     });
                 }
                 else
@@ -179,14 +232,17 @@ namespace prjITicket.Controllers
                     data.Add(new ArticleJson
                     {
                         MaxPage = maxpage,
-                        ChangePage = changepage
+                        ChangePage = changepage,
+                        CurrentTimer = m.CurrentTimer,
+                        TotalSearch = replies.Count(),
                     });
                     skip = changepage == 0 ? skip : take * (changepage - 1);
                     replies = replies.Skip(skip).Take(take).ToList();
                     data.AddRange(replies.Select(reply => new ArticleJson
                     {
                         reply = reply,
-                        reportR = db.Reply_Report
+                        reportR = db.Reply_Report,
+                        SearchMode = m.SearchMode
                     }));
                 }
                 return Json(data);

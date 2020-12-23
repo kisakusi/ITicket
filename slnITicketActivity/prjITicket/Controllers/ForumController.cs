@@ -359,18 +359,16 @@ namespace 期末專題_討論版.Controllers
                     return "您已被停權！無法操作此功能";
                 }
                 else
-                {
-                
-                Reply rp = new Reply();
-                rp.MemberID = member.MemberID;
-                rp.ReplyDate = DateTime.Now;
-                rp.ArticleID = articleID;
-                rp.ReplyContent = content;
-                rp.Readed = false;
-                db.Reply.Add(rp);
-                db.SaveChanges();
-                return "成功";
-
+                {              
+                    Reply rp = new Reply();
+                    rp.MemberID = member.MemberID;
+                    rp.ReplyDate = DateTime.Now;
+                    rp.ArticleID = articleID;
+                    rp.ReplyContent = content;
+                    rp.Readed = false;
+                    db.Reply.Add(rp);
+                    db.SaveChanges();
+                    return "成功";
                 }
             }
             catch (DbEntityValidationException ex)

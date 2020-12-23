@@ -48,6 +48,23 @@ namespace prjITicket.Models
             }
             catch { }
         }
+
+        public static bool SuperContains(this string text, string keyword)
+        {
+            int i = 0;
+            foreach(char t in text)
+            {
+                if (t == keyword[i])
+                {
+                    i++;
+                }
+                if (i == keyword.Length)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public class BanTaskInfo
@@ -88,12 +105,16 @@ namespace prjITicket.Models
         public int PageSize { get; set; }
         public string Keyword { get; set; }
         public int Sort { get; set; }
+        public long CurrentTimer { get; set; }
+        public bool SearchMode { get; set; }
     }
 
     public class CommentJson
     {
         public int? MaxPage { get; set; }
         public int? ChangePage { get; set; }
+        public long? CurrentTimer { get; set; }
+        public int? TotalSearch { get; set; }
 
         public Comment comment { private get; set; }
         public int? CommentID => comment?.CommentID;
@@ -102,6 +123,7 @@ namespace prjITicket.Models
         public int? Score => comment?.CommentScore;
         public string Date => comment?.CommentDate.ToString("yyyy-MM-dd HH:mm:ss");
         public bool? IsBaned => comment?.IsBaned;
+        public bool? SearchMode { get; set; }
 
         public IEnumerable<CommentReport> reports { private get; set; }
         public int? ReportCount => reports?.Count(x => x.CommentId == comment.CommentID);
@@ -161,12 +183,16 @@ namespace prjITicket.Models
         public int PageSize { get; set; }
         public string Keyword { get; set; }
         public int Sort { get; set; }
+        public long CurrentTimer { get; set; }
+        public bool SearchMode { get; set; }
     }
 
     public class ArticleJson
     {
         public int? MaxPage { get; set; }
         public int? ChangePage { get; set; }
+        public long? CurrentTimer { get; set; }
+        public int? TotalSearch { get; set; }
 
         public Article article { private get; set; }
         public Reply reply { private get; set; }
@@ -179,6 +205,7 @@ namespace prjITicket.Models
         public string ARxDate => 
             article?.Date.ToString("yyyy-MM-dd HH:mm:ss") ?? 
             reply?.ReplyDate.ToString("yyyy-MM-dd HH:mm:ss");
+        public bool? SearchMode { get; set; }
 
         public IEnumerable<Article_Report> reportA { private get; set; }
         public IEnumerable<Reply_Report> reportR { private get; set; }
@@ -196,6 +223,7 @@ namespace prjITicket.Models
         public int? ReplyID => reply?.ReplyID;
         public int? ReplyArticleID => reply?.ArticleID;
         public string ReplyArticleTitle => reply?.Article.ArticleTitle;
+        public string ReplyArticleContent => reply?.Article.ArticleContent;
         public string XContent => article?.ArticleContent ?? reply?.ReplyContent;
 
         public int? MemberID => article?.MemberID ?? reply?.MemberID;
@@ -247,12 +275,16 @@ namespace prjITicket.Models
         public string Sort { get; set; }
         public int RoleId { get; set; }
         public bool Veri { get; set; }
+        public long CurrentTimer { get; set; }
+        public bool SearchMode { get; set; }
     }
 
     public class MemberJson
     {
         public int? MaxPage { get; set; }
         public int? ChangePage { get; set; }
+        public long? CurrentTimer { get; set; }
+        public int? TotalSearch { get; set; }
 
         public Member member { private get; set; }
         public int? MemberID => member?.MemberID;
@@ -262,6 +294,7 @@ namespace prjITicket.Models
         public string MemberPhone => member?.Phone;
         public int? MemberRoleId => member?.MemberRoleId;
         public string MemberRoleName => member?.MemberRole.MemberRoleName;
+        public bool? SearchMode { get; set; }
         
         public Seller seller { private get; set; }
         public int? SellerID => seller?.SellerID;
@@ -304,5 +337,39 @@ namespace prjITicket.Models
         public IEnumerable<BanLIst> banlist { private get; set; }
         public IEnumerable<string> Reasons => banlist?.Select(x => x.Reason);
         public IEnumerable<string> EndTimes => banlist?.Select(x => x.EndTime.ToString("yyyy-MM-dd"));
+    }
+
+    public class MemberExcel
+    {
+        public Member member { private get; set; }
+        public int MemberID => member.MemberID;
+        public string MemberEmail => member.Email?.Replace("<", "&lt;");
+        public string MemberName => member.Name?.Replace("<", "&lt;");
+        public string MemberIDentityNumber => member.IDentityNumber?.Replace("<", "&lt;");
+        public string MemberPassport => member?.Passport?.Replace("<", "&lt;");
+        public string MemberNickName => member.NickName?.Replace("<", "&lt;");
+        public string MemberBirthDate => member.BirthDate?.ToString("yyyy-MM-dd");
+        public string MemberPhone => member.Phone == null ? null : 
+            $"{member.Phone.Substring(0, 4)}-{member.Phone.Substring(4, 3)}-{member.Phone.Substring(7, 3)}";
+        public int MemberPoint => member.Point;
+        public string MemberAddress => member.Address?.Replace("<", "&lt;");
+        public string MemberRoleName => member.MemberRole.MemberRoleName?.Replace("<", "&lt;");
+        public string MemberSex => member.Sex == null ? null : (bool)member.Sex ? "女性" : "男性";
+        public string MemberDistrict => member.DistrictId == null ? null :
+            $"{member.Districts.DistrictName?.Replace("<", "&lt;")} ({member.Districts.Cities.CityName?.Replace("<", "&lt;")})";
+    }
+
+    public class SellerExcel
+    {
+        public Seller seller { private get; set; }
+        public int SellerID => seller.SellerID;
+        public string SellerCompanyName => seller.CompanyName?.Replace("<", "&lt;");
+        public string SellerTaxIDNumber => seller.TaxIDNumber;
+        public string SellerHomePage => seller.SellerHomePage?.Replace("<", "&lt;");
+        public string SellerPhone => seller.SellerPhone == null ? null :
+            $"{seller.SellerPhone.Substring(0, 4)}-{seller.SellerPhone.Substring(4, 3)}-{seller.SellerPhone.Substring(7, 3)}";
+        public string SellerDiscription => seller.SellerDeccription?.Replace("<", "&lt;");
+        public string fPass => seller.fPass == null ? "尚未審核" : (bool)seller.fPass ? "審核通過" : "審核不通過";
+        public string fFileName => seller.fFileName == null ? "無上傳" : "有上傳";
     }
 }

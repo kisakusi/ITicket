@@ -18,8 +18,9 @@
         <input type="hidden" id="fPageSize" name="PageSize" value="10">
         <input type="hidden" id="fKeyword" name="Keyword" value="">
         <input type="hidden" id="fSort" name="Sort" value="0">
-        <input type="hidden" id="fRoleId" name="RoleId" value="4" />
-        <input type="hidden" id="fVeri" name="Veri" value="false" />
+        <input type="hidden" id="fRoleId" name="RoleId" value="4">
+        <input type="hidden" id="fVeri" name="Veri" value="false">
+        <input type="hidden" id="fSearchMode" name="SearchMode" value="false">
     </form>
     <div id="isHandle" class="spinner-border text-warning align-middle d-none" role="status">
         <span class="sr-only">Loading...</span>
@@ -40,6 +41,11 @@
     <div class="card-header sticky-top" style="z-index: 500; top: 55px; background-color: #f7f7f7;">
         <i class="fas fa-address-card mr-2"></i>會員管理
         <span id="ctrlHint" class="text-success mx-2"></span>
+        <button id="ctrlReset" class="btn btn-secondary btn-sm float-right mr-3 align-top">重設條件</button>
+        <button id="ctrlDownload" class="btn btn-info btn-sm float-right mr-3 align-top">資料下載</button>
+        <label class="float-right mr-3" style="cursor: pointer">
+            <input id="ctrlSearchMode" type="checkbox" class="ml-2"> 模糊搜尋
+        </label>
         <label class="float-right mr-3" style="cursor: pointer">
             <input id="ctrlVeri" type="checkbox"> 未審核商家
         </label>
@@ -54,7 +60,7 @@
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
-                </select> 筆資料
+                </select> 筆資料, 共 <span id="TotalSearch"></span> 筆資料
             </div>
             <div class="col-8">
                 <nav id="pageTop" class="float-right"></nav>
@@ -154,6 +160,38 @@
                 <button id="BanTaskAction" class="btn btn-danger"><i class="fas fa-skull-crossbones mr-1"></i> 新增停權</button>
                 <button id="UnBanTaskAction" class="btn btn-success"><i class="fas fa-ankh mr-1"></i> 解除停權</button>
                 <button id="Confirm" class="btn btn-primary d-none"><i class="fas fa-sync mr-1"></i> 以管理者身份執行</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MsgBox -->
+<div id="MsgBox" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true" style="z-index: 1600">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content text-white bg-dark">
+            <!-- modal-header -->
+            <div class="modal-header">
+                <h5 class="modal-title">發送系統通知</h5>
+                <button id="MsgBoxDemo" class="btn btn-outline-info ml-3">Demo</button>
+                <button class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                </button>
+            </div>
+            <!-- modal-body -->
+            <div class="modal-body">
+                <form id="MsgBoxForm">
+                    <div class="form-group">
+                        <label for="MsgBoxTextarea">系統通知:</label>
+                        <textarea id="MsgBoxTextarea" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+                <p>發送的對象:</p>
+                <div id="MsgBoxTarget"></div>
+            </div>
+            <!-- modal-footer -->
+            <div class="modal-footer">
+                <button id="MsgCancel" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times mr-1"></i> 取消</button>
+                <button id="MsgConfirm" class="btn btn-primary"><i class="fas fa-paper-plane mr-1"></i> 發送系統通知</button>
             </div>
         </div>
     </div>

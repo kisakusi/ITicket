@@ -1,16 +1,28 @@
-﻿function AjaxCommentList() {
+﻿let CurrentTimer = 0
+
+function AjaxCommentList() {
+    CurrentTimer = new Date().getTime()
     $('#isHandle').removeClass('d-none')
     $.ajax({
         url: '/BackEndComment/CommentList',
         type: 'post',
-        data: $('#ctrlForm').serialize(),
+        data: $('#ctrlForm').serialize() + `&CurrentTimer=${CurrentTimer}`,
         success: function (data) {
+            if (CurrentTimer > data[0].CurrentTimer) {
+                return
+            }
             if (data[0].ChangePage != 0) {
                 $('#fPageCurrent').val(data[0].ChangePage)
             }
+            $('#TotalSearch').text(data[0].TotalSearch)
             $('#ctrlHint').text($('#fKeyword').val() == '' ? ''
                 : $('#fKeyword').val().startsWith('author:') ? `查詢作者: ${$('#fKeyword').val().split(':')[1].trim()}`
-                : `關鍵字: ${$('#fKeyword').val()}`)
+                : `${$('#fSearchMode').val() === 'false' ? '完整關鍵字' : '模糊搜尋'}: ${$('#fKeyword').val()}`)
+            if ($('#fSearchMode').val() === 'false') {
+                $('#ctrlHint').addClass('text-success').removeClass('text-warning')
+            } else {
+                $('#ctrlHint').removeClass('text-success').addClass('text-warning')
+            }
             ReactDOM.render(<CommentList data={data.slice(1)} />, document.querySelector('#listBody'))
             let maxpage = data[0].MaxPage
             let current = parseInt($('#fPageCurrent').val())
@@ -37,57 +49,61 @@ class CommentDetail extends React.Component {
         let data = this.props.data
         return (
             <div className="row">
-                <div className="col pl-3 pr-1 py-3">
-                    <div className="card text-body mb-1">
-                        <div className="card-header">
-                            <h5>{data[0].MemberEmail.split('@')[0]} 的評論內容
-                                {
-                                    data[0].IsBaned &&
-                                    <span className="badge badge-danger ml-2">已隱藏</span>
-                                }
-                            </h5>
+                <div className="col pl-3 pr-1 py-3" style={{ height: `${window.innerHeight * 0.5}px` }}>
+                    <div style={{ paddingRight: '1px', height: '100%', overflowY: 'scroll' }}>
+                        <div className="card text-body mb-1">
+                            <div className="card-header">
+                                <h5>{data[0].MemberEmail.split('@')[0]} 的評論內容
+                                    {
+                                        data[0].IsBaned &&
+                                        <span className="badge badge-danger ml-2">已隱藏</span>
+                                    }
+                                </h5>
+                            </div>
+                            <div className="card-body">
+                                <p className="text-warning">
+                                    {data[0].CommentScore > 0 ? '★' : '☆'}
+                                    {data[0].CommentScore > 1 ? '★' : '☆'}
+                                    {data[0].CommentScore > 2 ? '★' : '☆'}
+                                    {data[0].CommentScore > 3 ? '★' : '☆'}
+                                    {data[0].CommentScore > 4 ? '★' : '☆'}
+                                </p>
+                                <p>{data[0].CommentContent}</p>
+                            </div>
                         </div>
-                        <div className="card-body">
-                            <p className="text-warning">
-                                {data[0].CommentScore > 0 ? '★' : '☆'}
-                                {data[0].CommentScore > 1 ? '★' : '☆'}
-                                {data[0].CommentScore > 2 ? '★' : '☆'}
-                                {data[0].CommentScore > 3 ? '★' : '☆'}
-                                {data[0].CommentScore > 4 ? '★' : '☆'}
-                            </p>
-                            <p>{data[0].CommentContent}</p>
-                        </div>
-                    </div>
-                    <div className="card text-body mt-1" style={{ minHeight: `${70 * (data.length - 2.5)}px` }}>
-                        <div className="card-header">
-                            <h5>活動: &nbsp;
+                        <div className="card text-body mt-1" >
+                            <div className="card-header">
+                                <h5>活動: &nbsp;
                                 <a href="javascript:"
-                                    onClick={() => this.openActivityPage(data[0].ActivityName)}>
-                                    {data[0].ActivityName}
-                                </a>
-                            </h5>
-                        </div>
-                        <div className="card-body">
-                            <p>{data[0].ActivityDescription}</p>
+                                        onClick={() => this.openActivityPage(data[0].ActivityName)}>
+                                        {data[0].ActivityName}
+                                    </a>
+                                </h5>
+                            </div>
+                            <div className="card-body">
+                                <div>{data[0].ActivityDescription}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="col pl-1 pr-3 py-3">
-                    <div className="card text-body" style={{ height: '100%' }}>
-                        <div className="card-header">
-                            <h5>檢舉人與理由</h5>
-                        </div>
-                        <div className="card-body">
-                            {data.slice(1).map(e =>
-                                <div>
-                                    <h6>#{data.indexOf(e)} 檢舉人: {e.ReportEmail.split('@')[0]}</h6>
-                                    <p className="text-danger">&nbsp;&nbsp;{e.ReportReason}</p>
-                                </div>
-                            )}
-                            {
-                                data.length == 1 &&
-                                <span className="text-secondary">評論沒有被檢舉</span>
-                            }
+                <div className="col pl-1 pr-3 py-3" style={{ height: `${window.innerHeight * 0.5}px` }}>
+                    <div style={{ paddingRight: '1px', height: '100%', overflowY: 'scroll' }}>
+                        <div className="card text-body" style={{ minHeight: '100%' }}>
+                            <div className="card-header">
+                                <h5>檢舉人與理由</h5>
+                            </div>
+                            <div className="card-body">
+                                {data.slice(1).map(e =>
+                                    <div>
+                                        <h6>#{data.indexOf(e)} 檢舉人: {e.ReportEmail.split('@')[0]}</h6>
+                                        <p className="text-danger">&nbsp;&nbsp;{e.ReportReason}</p>
+                                    </div>
+                                )}
+                                {
+                                    data.length == 1 &&
+                                    <span className="text-secondary">評論沒有被檢舉</span>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -153,11 +169,11 @@ class CommentList extends React.Component {
                     >
                         <td className="pt-2 pb-1"><i className="far fa-circle"></i></td>
                         <td className="pt-2 pb-1">
-                            <span dangerouslySetInnerHTML={{ __html: keyHighlight(e.Author.split('@', 2)[0], fKeyword) }}></span>
+                            <span dangerouslySetInnerHTML={{ __html: keyHighlight(e.Author.split('@', 2)[0], fKeyword, e.SearchMode) }}></span>
                             <br />
                             <sup className="text-secondary">&nbsp;&nbsp;&nbsp;@{e.Author.split('@', 2)[1]}</sup>
                         </td>
-                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.Activity, fKeyword) }}></td>
+                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.Activity, fKeyword, e.SearchMode) }}></td>
                         <td className="pt-2 pb-1">
                             <img src={e.Score > 0 ? chngstar : star} style={{ width: '24px', margin: '1px' }} />
                             <img src={e.Score > 1 ? chngstar : star} style={{ width: '24px', margin: '1px' }} />
@@ -222,6 +238,37 @@ $(function () {
         $('#fPageCurrent').val(1)
         $('#fPageSize').val(10)
         $('#pageAmount').prop('selectedIndex', 0)
+        AjaxCommentList()
+    })
+
+    // Basic Reset
+    $('#ctrlReset').css({
+        'outline': 'none !important',
+        'box-shadow': 'none'
+    }).on('click', function () {
+        $('#fPageCurrent').val(1)
+        $('#fPageSize').val(10)
+        $('#pageAmount').prop('selectedIndex', 0)
+        $('#searchbox').val('')
+        $('#fKeyword').val('')
+        $('#fSort').val(1)
+        $('#ctrlSort1').prop('checked', true)
+        $('#fSearchMode').val(false)
+        $('#ctrlSearchMode').prop('checked', false)
+        $('#ctrlCate').prop('selectedIndex', 0)
+        $('#ctrlSubCate').prop('selectedIndex', 0)
+        $('#ctrlDate').prop('selectedIndex', 0)
+        $('#ctrlReport').prop('selectedIndex', 0)
+        $('#ctrlShowBan').prop('selectedIndex', 0)
+        AjaxCommentList()
+    })
+
+    // Pro - SearchMode Change
+    $('#ctrlSearchMode').on('change', function () {
+        $('#fPageCurrent').val(1)
+        $('#fPageSize').val(10)
+        $('#pageAmount').prop('selectedIndex', 0)
+        $('#fSearchMode').val($(this).prop('checked'))
         AjaxCommentList()
     })
 
