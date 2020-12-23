@@ -82,7 +82,7 @@
             <div class="w3-container">
                 <br />
                 <span>請選擇檢舉理由：</span>
-                <select id="reason">
+                <select id="reason@(count)">
                     <option value="#">請選擇理由</option>
                     @foreach (var q in Model.Report)
                     {
@@ -130,7 +130,7 @@
                     url: "@Url.Action("Reply_Delete")",
                     data: { replyId: replyId ,ArticleID:@Model.Article.ArticleID},
             success: function (data) {
-                    alert("刪除成功");
+                swal("留言刪除成功")
                         $("#ajaxdemoshow").load(`/Forum/forum_reply?articleID=@Model.Article.ArticleID`);
                 }
             });
@@ -142,7 +142,7 @@
 
         if (rpcontent == "")
         {
-            alert("請輸入留言");
+            swal("請輸入留言！", "", "error")
         }
         else
         {
@@ -151,7 +151,7 @@
                     url: "@Url.Action("Reply_Edit","Forum")",
                     data: { rpcontent: rpcontent, replyID: replyId },
                     success: function (data) {
-                    alert("成功")
+                        swal("留言編輯成功")
                         $("#ajaxdemoshow").load(`@Url.Action("forum_reply","Forum",new { articleID =Model.Article.ArticleID})`);
                 }
             });
@@ -194,23 +194,24 @@
 
     function reportReason(replyId,count) {
         let Modal = document.getElementById('Modal' + count);
-        let reportId = $('#reason').val();
-        if (reportId === '#') {
-            alert("社會再走，理由要有");
+        let reportId = document.getElementById('reason' + count);
+        let reason = reportId.value;
+        if (reason === '#') {
+            swal("檢舉不成功", "社會在走，理由要有！", "error")
         }
         else {
          $.ajax({
             type: "post",
              url: "@Url.Action("Reply_Report")",
              data: {
-                ReportID: reportId, ReplyID: replyId},
+                 ReportID: reason, ReplyID: replyId},
              success: function (data) {
                     if (data != "成功") {
-                        alert(data);
+                        swal(data, "", "error")
                         window.location.href = '@Url.Action("Login","Login")';
                     } else {
                         Modal.style.display = 'none';
-                        alert("檢舉" + data);
+                        swal("檢舉成功", "", "success")
                     }
                 }
             });
@@ -223,7 +224,7 @@
         let ActionId = 1;
         let goodpoint = document.getElementById('goodpoint' + replyId);
         if (dislikebtn.className == 'bpclick') {
-            alert("此篇留言你已點了不喜歡。");
+            swal("此篇留言你已點了不喜歡", "", "warning")
         }
         else {
             if (likebtn.className == 'gp') {
@@ -235,8 +236,8 @@
                     data: { ReplyID: replyId, ActionID: ActionId},
                     success: function (data) {
                         if (data != "成功") {
-                            alert(data);
-                            window.location.href = '@Url.Action("Login","Login")';
+                            swal(data, "", "error")
+                            window.location.href = '@(Url.Action("Login","Login"))';
                         } else {
                             goodpoint.innerText = parseInt(goodpoint.innerText) + 1;
                         }
@@ -268,7 +269,7 @@
         let ActionId = 2;
 
         if (likebtn.className == 'gpclick') {
-            alert("此篇留言你以點了喜歡。");
+            swal("此篇留言你已點了喜歡", "", "warning")
         } else {
             if (dislikebtn.className == 'bp') {
                 dislikebtn.className = 'bpclick';
@@ -279,8 +280,8 @@
                     data: { ReplyID: replyId, ActionID: ActionId},
                       success: function (data) {
                         if (data != "成功") {
-                            alert(data);
-                            window.location.href = '@Url.Action("Login","Login")';
+                            swal(data, "", "error")
+                            window.location.href = '@(Url.Action("Login","Login"))';
                         } else {
                             badpoint.innerText = parseInt(badpoint.innerText) + 1;
                         }

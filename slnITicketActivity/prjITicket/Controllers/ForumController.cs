@@ -9,6 +9,7 @@ using System.IO;
 using System.Drawing;
 using System.Web.UI;
 using prjITicket.ViewModel;
+using System.Data.Entity.Validation;
 
 namespace 期末專題_討論版.Controllers
 {
@@ -372,10 +373,17 @@ namespace 期末專題_討論版.Controllers
 
                 }
             }
-            catch (Exception ex)
+            catch (DbEntityValidationException ex)
             {
-                return ex.Message;
+                var entityError = ex.EntityValidationErrors.SelectMany(x => x.ValidationErrors).Select(x => x.ErrorMessage);
+                var getFullMessage = string.Join("; ", entityError);
+                var exceptionMessage = string.Concat(ex.Message, "errors are: ", getFullMessage);
+                return exceptionMessage;
             }
+            //catch (Exception ex)
+            //{
+            //    return ex.Message;
+            //}
         }
         //刪除留言
         public ActionResult Reply_Delete(int replyID, int ArticleID)

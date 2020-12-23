@@ -85,11 +85,11 @@
                     }
                     else if (item.ActivityStatusID == 1)
                     {
-                        <a id="btnUpDown" href="javascript:;" onclick="upDownActivity(@item.ActivityID)" class="btn btn-danger">下架</a>
+                        <a id="btnUpDown@(item.ActivityID)" href="javascript:;" onclick="upDownActivity(@item.ActivityID)" class="btn btn-danger">下架</a>
                     }
                     else
                     {
-                        <a id="btnUpDown" href="javascript:;" onclick="upDownActivity(@item.ActivityID)" class="btn btn-success">上架</a>
+                        <a id="btnUpDown@(item.ActivityID)" href="javascript:;" onclick="upDownActivity(@item.ActivityID)" class="btn btn-success">上架</a>
                     }
             </td>
         </tr>
@@ -112,10 +112,10 @@
             data: { activityId: activityId },
             success: function (result) {
                 if (result == "0") {
-                    $("#btnUpDown").replaceWith('<a href="javascript:;" class="btn btn-primary">正在審核</a>');
+                    $(`#btnUpDown${activityId}`).replaceWith('<a href="javascript:;" class="btn btn-primary">正在審核</a>');
                 }
                 else if (result == "2") {
-                    $("#btnUpDown").replaceWith(`<a id="btnUpDown" href="javascript:;" onclick="upDownActivity(${activityId})" class="btn btn-success">上架</a>`);
+                    $(`#btnUpDown${activityId}`).replaceWith(`<a id="btnUpDown${activityId}" href="javascript:;" onclick="upDownActivity(${activityId})" class="btn btn-success">上架</a>`);
                 }
             }
         });

@@ -207,7 +207,7 @@
       <PropertyRef Name="ReplyID" />
     </Key>
     <Property Name="ReplyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="ReplyContent" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="ReplyContent" Type="nvarchar(max)" Nullable="false" />
     <Property Name="MemberID" Type="int" Nullable="false" />
     <Property Name="ReplyDate" Type="datetime" Nullable="false" />
     <Property Name="ArticleID" Type="int" Nullable="false" />

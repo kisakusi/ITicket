@@ -596,6 +596,19 @@
         return "格式正確";
     }
 
+    //限制出生日期不得大於現在日期
+    $(function () {
+        //得到當前日期
+        let date_now = new Date();
+        //得到當前年份
+        let year = date_now.getFullYear();
+        //得到當前月份
+        let month = date_now.getMonth() < 10 ? ("0" + date_now.getMonth() + 1) : (date_now.getMonth() + 1);
+        //得到當前日期
+        let date = date_now.getDate() < 10 ? "0" + date_now.getDate() : date_now.getDate();
+        $("#txtBirthDate").attr("max", year + "-" + month + "-" + date);
+    });
+
 </script>
 
 
@@ -765,7 +778,7 @@
         });
     }
 
-    //todo 12/15 藉由MemberId更改我的訊息圈圈數字
+    //藉由MemberId更改我的訊息圈圈數字
     function changeShortMessageNumber() {
         $.ajax({
             type: 'get',
@@ -795,7 +808,7 @@
         $("#txtSex").val("0", true);
         $("#txtBirthDate").val("2000-12-25");
         $("#txtCity").val("5", true);
-        $("#txtDistrict").html("<option value='9'>大安區</option>");
+        $("#txtDistrict").html("<option value='13'>大安區</option>");
         $("#txtPostalcode").val("106")
         $("#txtAddress").val("復興南路一段390號")
 
@@ -803,11 +816,11 @@
 
     //demo企業會員詳細資料變更
     function loaddemoBussDetailMember() {
-        $("#txtCompanyName").val("財團法人資訊工業策進會數位教育研究所");
+        $("#txtCompanyName").val("良心企業");
         $("#txtTaxIDNumber").val("05076416");
         $("#txtSellerHomePage").val("https://www.iiiedu.org.tw/");
         $("#txtSellerPhone").val("(02)6631-6666");
-        $("#SellerDeccription").val("策進中華民國資通訊科技之創新與應用，協助發展數位經濟，是資訊工業策進會成立的宗旨。");
+        $("#SellerDeccription").val("『禮、義、廉、恥，國之四維；四維不張，國乃滅亡。』善乎管生之能言也！禮、義，治人之大法；廉、恥，立人之大節。蓋不廉則無所不取，不恥則無所不為。人而如此，則禍敗亂亡，亦無所不至。況為大臣而無所不取，無所不為，則天下其有不亂，國家其有不亡者乎？");
     }
 
     //demo企業會員密碼變更
@@ -912,7 +925,9 @@
                 url: "@Url.Action("CreateImage")",
                 data: { input: base64code },
                 success: function () {
-                    swal("儲存成功!","", "success");
+                    swal("儲存成功!", "", "success").then((value) => {
+                        location.reload();
+                    });
                 }
             })
         });

@@ -383,7 +383,7 @@
         type: 'POST',
         data: member,
             success: function (data) {
-                if (@x.MemberRoleId!=4) {
+                if (@x.MemberRoleId==4) {
                     $("#txtDisplayName").html(member.Name+" (管理者)");
                 }
                 else

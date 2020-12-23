@@ -17,6 +17,7 @@
 }
 <style>
 
+
     .spanActivity {
         cursor: pointer;
         color: #007bff;
@@ -31,12 +32,10 @@
 <input id="hiddenSellerID" type="hidden" value="@Html.DisplayFor(model => model.List.Seller.SellerID)">
 <input id="hiddenTicketGroupName" type="hidden" value="@Model.List.TicketGroupName" />
 <input id="hiddenStatus" type="hidden" value="@Model.List.TicketGroupStatus.ToString()">
-
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item">
         <a href="@Url.Action("BackEndIndex","BackEndMain")">後台</a>
     </li>
-
     <li class="breadcrumb-item active">
         <a href="@Url.Action("TicketGroupMaintain", "BackEndTicketGroup")">套票列表</a>
     </li>
@@ -61,7 +60,7 @@
                 <tbody>
                     <tr>
                         <td>@Html.DisplayNameFor(m => m.List.TicketGroupID)</td>
-                        <td id="idActivityID">
+                        <td id="idTicketGroupID">
                             @Html.DisplayFor(model => model.List.TicketGroupID)
                         </td>
                     </tr>
@@ -85,7 +84,6 @@
                             <td style="width:80%" colspan="2">@result </td>
 
                         }
-
                     </tr>
                     <tr id="idActivityName">
                         <td>套票內容</td>
@@ -183,16 +181,8 @@
 <script type="text/javascript">
 
     function submit() {
-
-        const btnCheck = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-primary ',
-                cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false
-        })
         if ($("#switcher").prop("checked")) {
-            btnCheck.fire({
+            Swal.fire({
                 title: '是否確定要審核通過?',
                 text: "提醒：審核通過套票即上架",
                 icon: 'question',
@@ -212,7 +202,7 @@
                         },
                         success: function (data) {
                             //跳出修改成功的訊息
-                            btnCheck.fire(
+                            Swal.fire(
                                 '審核通過',
                                 '套票已審核通過並上架',
                                 'success'
@@ -223,7 +213,7 @@
                             });
                         },
                         error: function (xhr) {
-                            btnCheck.fire(
+                            Swal.fire(
                                 'Error',
                                 xhr,
                                 'error'
@@ -264,7 +254,7 @@
                 return;
             }
 
-            btnCheck.fire({
+            Swal.fire({
                 title: '是否確定審核未通過?',
                 text: "提醒：審核未通過套票不會上架",
                 icon: 'question',
@@ -287,7 +277,7 @@
                         },
                         success: function (data) {
                             //跳出審核未通過的訊息
-                            btnCheck.fire(
+                            Swal.fire(
                                 '已通知商家',
                                 '活動審核未通過並已通知商家',
                                 'success'
@@ -298,7 +288,7 @@
                             });
                         },
                         error: function (xhr) {
-                            btnCheck.fire(
+                            Swal.fire(
                                 'Error',
                                 xhr,
                                 'error'
@@ -394,5 +384,4 @@
     }
 
 </script>
-
 
