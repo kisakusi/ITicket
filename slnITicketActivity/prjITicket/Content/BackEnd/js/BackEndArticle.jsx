@@ -14,7 +14,6 @@ function AjaxArticleList() {
             if (data[0].ChangePage != 0) {
                 $('#fPageCurrent').val(data[0].ChangePage)
             }
-            $('#TotalSearch').text(data[0].TotalSearch)
             $('#ctrlHint').text($('#fKeyword').val() == '' ? ''
                 : $('#fKeyword').val().startsWith('author:') ? `查詢作者: ${$('#fKeyword').val().split(':')[1].trim()}`
                 : `${$('#fSearchMode').val() === 'false' ? '完整關鍵字' : '模糊搜尋'}: ${$('#fKeyword').val()}`)

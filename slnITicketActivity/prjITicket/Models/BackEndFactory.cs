@@ -114,7 +114,6 @@ namespace prjITicket.Models
         public int? MaxPage { get; set; }
         public int? ChangePage { get; set; }
         public long? CurrentTimer { get; set; }
-        public int? TotalSearch { get; set; }
 
         public Comment comment { private get; set; }
         public int? CommentID => comment?.CommentID;
@@ -192,7 +191,6 @@ namespace prjITicket.Models
         public int? MaxPage { get; set; }
         public int? ChangePage { get; set; }
         public long? CurrentTimer { get; set; }
-        public int? TotalSearch { get; set; }
 
         public Article article { private get; set; }
         public Reply reply { private get; set; }
@@ -284,7 +282,6 @@ namespace prjITicket.Models
         public int? MaxPage { get; set; }
         public int? ChangePage { get; set; }
         public long? CurrentTimer { get; set; }
-        public int? TotalSearch { get; set; }
 
         public Member member { private get; set; }
         public int? MemberID => member?.MemberID;

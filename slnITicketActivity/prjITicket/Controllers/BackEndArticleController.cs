@@ -102,14 +102,13 @@ namespace prjITicket.Controllers
                 }
 
                 List<ArticleJson> data = new List<ArticleJson>();
-                if (articles.Count() == 0)
+                if (!articles.Any())
                 {
                     data.Add(new ArticleJson
                     {
                         MaxPage = 1,
                         ChangePage = 1,
                         CurrentTimer = m.CurrentTimer,
-                        TotalSearch = articles.Count(),
                     });
                 }
                 else
@@ -123,7 +122,6 @@ namespace prjITicket.Controllers
                         MaxPage = maxpage,
                         ChangePage = changepage,
                         CurrentTimer = m.CurrentTimer,
-                        TotalSearch = articles.Count(),
                     });
                     skip = changepage == 0 ? skip : take * (changepage - 1);
                     articles = articles.Skip(skip).Take(take).ToList();
@@ -213,14 +211,13 @@ namespace prjITicket.Controllers
                 }
 
                 List<ArticleJson> data = new List<ArticleJson>();
-                if (replies.Count() == 0)
+                if (!replies.Any())
                 {
                     data.Add(new ArticleJson
                     {
                         MaxPage = 1,
                         ChangePage = 1,
                         CurrentTimer = m.CurrentTimer,
-                        TotalSearch = replies.Count(),
                     });
                 }
                 else
@@ -234,7 +231,6 @@ namespace prjITicket.Controllers
                         MaxPage = maxpage,
                         ChangePage = changepage,
                         CurrentTimer = m.CurrentTimer,
-                        TotalSearch = replies.Count(),
                     });
                     skip = changepage == 0 ? skip : take * (changepage - 1);
                     replies = replies.Skip(skip).Take(take).ToList();
@@ -314,6 +310,12 @@ namespace prjITicket.Controllers
                     db.Entry(reportA).State = EntityState.Deleted;
                     db.SaveChanges();
                 }
+                List<Article_Emotion> emotionsA = db.Article_Emotion.Where(x => x.ArticleId == m.BTxid).ToList();
+                foreach (Article_Emotion emotionA in emotionsA)
+                {
+                    db.Entry(emotionA).State = EntityState.Deleted;
+                    db.SaveChanges();
+                }
 
                 int[] repliesIDs = db.Reply.Where(x => x.ArticleID == m.BTxid).Select(x => x.ReplyID).ToArray();
                 foreach (int rid in repliesIDs)
@@ -322,6 +324,12 @@ namespace prjITicket.Controllers
                     foreach (Reply_Report reportR in reportsR)
                     {
                         db.Entry(reportR).State = EntityState.Deleted;
+                        db.SaveChanges();
+                    }
+                    List<Reply_Emotion> emotionsR = db.Reply_Emotion.Where(x => x.ReplyId == rid).ToList();
+                    foreach (Reply_Emotion emotionR in emotionsR)
+                    {
+                        db.Entry(emotionR).State = EntityState.Deleted;
                         db.SaveChanges();
                     }
                     Reply reply = db.Reply.FirstOrDefault(x => x.ReplyID == rid);
@@ -339,6 +347,12 @@ namespace prjITicket.Controllers
                 foreach (Reply_Report report in reports)
                 {
                     db.Entry(report).State = EntityState.Deleted;
+                    db.SaveChanges();
+                }
+                List<Reply_Emotion> emotions = db.Reply_Emotion.Where(x => x.ReplyId == m.BTxid).ToList();
+                foreach (Reply_Emotion emotion in emotions)
+                {
+                    db.Entry(emotion).State = EntityState.Deleted;
                     db.SaveChanges();
                 }
                 Reply reply = db.Reply.FirstOrDefault(x => x.ReplyID == m.BTxid);

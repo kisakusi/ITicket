@@ -22,7 +22,6 @@ function AjaxMemberList() {
             if (data[0].ChangePage != 0) {
                 $('#fPageCurrent').val(data[0].ChangePage)
             }
-            $('#TotalSearch').text(data[0].TotalSearch)
             $('#ctrlHint').text($('#fKeyword').val() == '' ? '' : `${$('#fSearchMode').val() === 'false' ? '完整關鍵字' : '模糊搜尋'}: ${$('#fKeyword').val()}`)
             if ($('#fSearchMode').val() === 'false') {
                 $('#ctrlHint').addClass('text-success').removeClass('text-warning')

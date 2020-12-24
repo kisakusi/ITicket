@@ -69,14 +69,13 @@ namespace prjITicket.Controllers
             }
 
             List<MemberJson> data = new List<MemberJson>();
-            if (members.Count() == 0)
+            if (!members.Any())
             {
                 data.Add(new MemberJson
                 {
                     MaxPage = 1,
                     ChangePage = 1,
                     CurrentTimer = m.CurrentTimer,
-                    TotalSearch = members.Count(),
                 });
             }
             else
@@ -90,7 +89,6 @@ namespace prjITicket.Controllers
                     MaxPage = maxpage,
                     ChangePage = changepage,
                     CurrentTimer = m.CurrentTimer,
-                    TotalSearch = members.Count(),
                 });
                 skip = changepage == 0 ? skip : take * (changepage - 1);
                 switch (m.Sort)

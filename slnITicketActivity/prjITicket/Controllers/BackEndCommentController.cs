@@ -104,14 +104,13 @@ namespace prjITicket.Controllers
             }
 
             List<CommentJson> data = new List<CommentJson>();
-            if (comments.Count() == 0)
+            if (!comments.Any())
             {
                 data.Add(new CommentJson
                 {
                     MaxPage = 1,
                     ChangePage = 1,
                     CurrentTimer = m.CurrentTimer,
-                    TotalSearch = comments.Count(),
                 });
             }
             else
@@ -125,7 +124,6 @@ namespace prjITicket.Controllers
                     MaxPage = maxpage,
                     ChangePage = changepage,
                     CurrentTimer = m.CurrentTimer,
-                    TotalSearch = comments.Count(),
                 });
                 skip = changepage == 0 ? skip : take * (changepage - 1);
                 comments = comments.Skip(skip).Take(take).ToList();
