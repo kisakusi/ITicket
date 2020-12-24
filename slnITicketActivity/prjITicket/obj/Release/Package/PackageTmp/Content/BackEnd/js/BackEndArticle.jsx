@@ -1,16 +1,28 @@
-﻿function AjaxArticleList() {
+﻿let CurrentTimer = 0
+
+function AjaxArticleList() {
+    CurrentTimer = new Date().getTime()
     $('#isHandle').removeClass('d-none')
     $.ajax({
         url: '/BackEndArticle/ArticleList',
         type: 'post',
-        data: $('#ctrlForm').serialize(),
+        data: $('#ctrlForm').serialize() + `&CurrentTimer=${CurrentTimer}`,
         success: function (data) {
+            if (CurrentTimer > data[0].CurrentTimer) {
+                return
+            }
             if (data[0].ChangePage != 0) {
                 $('#fPageCurrent').val(data[0].ChangePage)
             }
+            $('#TotalSearch').text(data[0].TotalSearch)
             $('#ctrlHint').text($('#fKeyword').val() == '' ? ''
                 : $('#fKeyword').val().startsWith('author:') ? `查詢作者: ${$('#fKeyword').val().split(':')[1].trim()}`
-                : `關鍵字: ${$('#fKeyword').val()}`)
+                : `${$('#fSearchMode').val() === 'false' ? '完整關鍵字' : '模糊搜尋'}: ${$('#fKeyword').val()}`)
+            if ($('#fSearchMode').val() === 'false') {
+                $('#ctrlHint').addClass('text-success').removeClass('text-warning')
+            } else {
+                $('#ctrlHint').removeClass('text-success').addClass('text-warning')
+            }
             ReactDOM.render(<ArticleList data={data.slice(1)} />, document.querySelector('#listBody'))
             let maxpage = data[0].MaxPage
             let current = parseInt($('#fPageCurrent').val())
@@ -29,48 +41,64 @@ class ArticleDetail extends React.Component {
         let data = this.props.data
         return (
             <div className="row">
-                <div className={`${this.props.isArticle ? 'col-9 pl-3 pr-1 py-3' : 'col pl-3 pr-1 py-3'}`}>
-                    <div className="card text-body" style={{ height: '100%' }}>
-                        <div className="card-header">
-                            <h5>{data[0].MemberEmail.split('@')[0]} 的{this.props.isArticle ? '文章' : '回覆'}內容</h5>
+                <div className="col-8 pl-3 pr-1 py-3" style={{ height: `${window.innerHeight * 0.5}px` }}>
+                    <div style={{ paddingRight: '1px', height: '100%', overflowY: 'scroll' }}>
+                        <div className="card text-body" style={{ minHeight: this.props.isArticle ? '100%' : 'auto' }}>
+                            <div className="card-header">
+                                <h5>{data[0].MemberEmail} 的{this.props.isArticle ? '文章' : '回覆'}內容</h5>
+                            </div>
+                            <div className="card-body">
+                                {
+                                    this.props.isArticle &&
+                                    <h5>
+                                        <a href={`/Forum/forum_content?articleID=${data[0].ArticleID}`} target="_blank">
+                                            {data[0].ArticleTitle}
+                                        </a>
+                                    </h5>
+                                }
+                                {
+                                    !this.props.isArticle &&
+                                    <h5>
+                                        <a href={`/Forum/forum_content?articleID=${data[0].ReplyArticleID}`} target="_blank">
+                                            Re: {data[0].ReplyArticleTitle}
+                                        </a>
+                                    </h5>
+                                }
+                                <hr />
+                                <article id="articleView" className="mt-1" dangerouslySetInnerHTML={{ __html: data[0].XContent }}></article>
+                            </div>
                         </div>
-                        <div className="card-body">
-                            {
-                                this.props.isArticle &&
-                                <h3>
-                                    <a href={`/Forum/forum_content?articleID=${data[0].ArticleID}`} target="_blank">
-                                        {data[0].ArticleTitle}
-                                    </a>
-                                </h3>
-                            }
-                            {
-                                !this.props.isArticle &&
-                                <h4>
-                                    <a href={`/Forum/forum_content?articleID=${data[0].ReplyArticleID}`} target="_blank">
-                                        Re: {data[0].ReplyArticleTitle}
-                                    </a>
-                                </h4>
-                            }
-                            <article id="articleView" className="mt-1" dangerouslySetInnerHTML={{ __html: data[0].XContent }}></article>
-                        </div>
+                        {
+                            !this.props.isArticle &&
+                            <div className="card text-body mt-1">
+                                <div className="card-header">
+                                    <h5>原始文章內容</h5>
+                                </div>
+                                <div className="card-body">
+                                    <article id="articleView" className="mt-1" dangerouslySetInnerHTML={{ __html: data[0].ReplyArticleContent }}></article>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
-                <div className={`${this.props.isArticle ? 'col-3 pl-1 pr-2 py-3' : 'col pl-1 pr-2 py-3'}`}>
-                    <div className="card text-body" style={{ height: '100%' }}>
-                        <div className="card-header">
-                            <h5>檢舉人與理由</h5>
-                        </div>
-                        <div className="card-body">
-                            {data.slice(1).map(e =>
-                                <div>
-                                    <h6>#{data.indexOf(e)} 檢舉人: {e.ReportEmail.split('@')[0]}</h6>
-                                    <p className="text-danger">&nbsp;&nbsp;{e.ReportReason}</p>
-                                </div>
-                            )}
-                            {
-                                data.length == 1 &&
-                                <span className="text-secondary">{this.props.isArticle ? '文章' : '回覆'}沒有被檢舉</span>
-                            }
+                <div className="col-4 pl-1 pr-3 py-3" style={{ height: `${window.innerHeight * 0.5}px` }}>
+                    <div style={{ paddingRight: '1px', height: '100%', overflowY: 'scroll' }}>
+                        <div className="card text-body" style={{ minHeight: '100%' }}>
+                            <div className="card-header">
+                                <h5>檢舉人與理由</h5>
+                            </div>
+                            <div className="card-body">
+                                {data.slice(1).map(e =>
+                                    <div>
+                                        <h6>#{data.indexOf(e)} 檢舉人: {e.ReportEmail.split('@')[0]}</h6>
+                                        <p className="text-danger">&nbsp;&nbsp;{e.ReportReason}</p>
+                                    </div>
+                                )}
+                                {
+                                    data.length == 1 &&
+                                    <span className="text-secondary">{this.props.isArticle ? '文章' : '回覆'}沒有被檢舉</span>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -104,11 +132,9 @@ class ArticleList extends React.Component {
             },
             success: function (data) {
                 if (isArticle) {
-                    $('#AjaxBox>div').removeClass('modal-lg').addClass('modal-xl')
                     $('#SearchAuthor').html('<i class="fas fa-search mr-1"></i> 查詢作者所有文章')
                     $('#DeleteArticleOrReply').html('<i class="fas fa-skull-crossbones mr-1"></i> 我覺得不行 (刪除文章)')
                 } else {
-                    $('#AjaxBox>div').removeClass('modal-xl').addClass('modal-lg')
                     $('#SearchAuthor').html('<i class="fas fa-search mr-1"></i> 查詢作者所有回覆')
                     $('#DeleteArticleOrReply').html('<i class="fas fa-skull-crossbones mr-1"></i> 我覺得不行 (刪除回覆)')
                 }
@@ -159,11 +185,11 @@ class ArticleList extends React.Component {
                             <img src={`${e.ARxPicture}`} className="img-fluid img-thumbnail" onError={(x) => this.handleError(x.currentTarget)} />
                         </td>
                         <td className="pt-2 pb-1">
-                            <span dangerouslySetInnerHTML={{ __html: keyHighlight(e.ARxAuthor.split('@', 2)[0], fKeyword) }}></span>
+                            <span dangerouslySetInnerHTML={{ __html: keyHighlight(e.ARxAuthor.split('@', 2)[0], fKeyword, e.SearchMode) }}></span>
                             <br />
                             <sup className="text-secondary">&nbsp;&nbsp;&nbsp;@{e.ARxAuthor.split('@', 2)[1]}</sup>
                         </td>
-                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(`${e.IsArticle ? '' : 'Re: '}${e.ARxArticle}`, fKeyword) }}></td>
+                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(`${e.IsArticle ? '' : 'Re: '}${e.ARxArticle}`, fKeyword, e.SearchMode) }}></td>
                         <td className="pt-2 pb-1">{e.ARxDate.split(' ')[0]}&nbsp;&nbsp;&nbsp;{e.ARxDate.split(' ')[1]}</td>
                         <td className="pt-2 pb-1">{e.ARxReportCount}</td>
                     </tr>
@@ -198,6 +224,35 @@ $(function () {
         $('#fPageCurrent').val(1)
         $('#fPageSize').val(10)
         $('#pageAmount').prop('selectedIndex', 0)
+        AjaxArticleList()
+    })
+
+    // Basic Reset
+    $('#ctrlReset').css({
+        'outline': 'none !important',
+        'box-shadow': 'none'
+    }).on('click', function () {
+        $('#fPageCurrent').val(1)
+        $('#fPageSize').val(10)
+        $('#pageAmount').prop('selectedIndex', 0)
+        $('#searchbox').val('')
+        $('#fKeyword').val('')
+        $('#fSort').val(1)
+        $('#ctrlSort1').prop('checked', true)
+        $('#fSearchMode').val(false)
+        $('#ctrlSearchMode').prop('checked', false)
+        $('#ctrlCate').prop('selectedIndex', 0)
+        $('#ctrlDate').prop('selectedIndex', 0)
+        $('#ctrlReport').prop('selectedIndex', 0)
+        AjaxArticleList()
+    })
+
+    // Pro - SearchMode Change
+    $('#ctrlSearchMode').on('change', function () {
+        $('#fPageCurrent').val(1)
+        $('#fPageSize').val(10)
+        $('#pageAmount').prop('selectedIndex', 0)
+        $('#fSearchMode').val($(this).prop('checked'))
         AjaxArticleList()
     })
 

@@ -423,40 +423,73 @@ function keyInput() {
             break
         case '/BackEndMember/MemberList':
             $('#fSort').val(0)
-            MemberRoleInfoFont($('#fSort').val())
+            MemberSortFont($('#fSort').val())
             AjaxMemberList()
             break
     }
 }
 
-function keyHighlight(text, keyword) {
-    text = htmlSpecialChars(text)
-    if (keyword.length) {
-        let i = 0
-        let flag = true
-        const prefix = []
-        const suffix = []
-        while (i < text.length) {
-            if (text.toLowerCase().slice(i).search('&') === 0) {
-                flag = false
+function keyHighlight(text, keyword, mode) {
+    if (mode === false) {
+        text = htmlSpecialChars(text)
+        if (keyword.length) {
+            let i = 0
+            let flag = true
+            const prefix = []
+            const suffix = []
+            while (i < text.length) {
+                if (text.toLowerCase().slice(i).search('&') === 0) {
+                    flag = false
+                }
+                if (flag && text.toLowerCase().slice(i).search(keyword) === 0) {
+                    prefix.push(i)
+                    suffix.push(i + keyword.length)
+                    i += keyword.length
+                } else {
+                    i += 1
+                }
+                if (!flag && text.toLowerCase().slice(i).search(';') === 0) {
+                    flag = true
+                    i += 1
+                }
             }
-            if (flag && text.toLowerCase().slice(i).search(keyword) === 0) {
-                prefix.push(i)
-                suffix.push(i + keyword.length)
-                i += keyword.length
-            } else {
-                i += 1
-            }
-            if (!flag && text.toLowerCase().slice(i).search(';') === 0) {
-                flag = true
-                i += 1
+            while (prefix.length) {
+                let iS = suffix.pop()
+                text = `${text.slice(0, iS)}</span>${text.slice(iS)}`
+                let iP = prefix.pop()
+                text = `${text.slice(0, iP)}<span style="background-color: springgreen">${text.slice(iP)}`
             }
         }
-        while (prefix.length) {
-            let iS = suffix.pop()
-            text = `${text.slice(0, iS)}</span>${text.slice(iS)}`
-            let iP = prefix.pop()
-            text = `${text.slice(0, iP)}<span style="background-color: springgreen">${text.slice(iP)}`
+    } else {
+        if (keyword.length) {
+            let i = 0
+            let j = 0
+            let flag = true
+            const prefix = []
+            const suffix = []
+            while (i < text.length && j < keyword.length) {
+                if (text.toLowerCase().slice(i).search('&') === 0) {
+                    flag = false
+                }
+                if (flag && text.toLowerCase().slice(i).search(keyword[j]) === 0) {
+                    prefix.push(i)
+                    suffix.push(i+1)
+                    i += 1
+                    j += 1
+                } else {
+                    i += 1
+                }
+                if (!flag && text.toLowerCase().slice(i).search(';') === 0) {
+                    flag = true
+                    i += 1
+                }
+            }
+            while (prefix.length && j === keyword.length) {
+                let iS = suffix.pop()
+                text = `${text.slice(0, iS)}</span>${text.slice(iS)}`
+                let iP = prefix.pop()
+                text = `${text.slice(0, iP)}<span style="background-color: #ffc100">${text.slice(iP)}`
+            }
         }
     }
     return text
@@ -473,7 +506,7 @@ function htmlSpecialChars(text) {
     return text.replace(/[&<>"']/g, x => map[x]);
 }
 
-function MemberRoleInfoFont(value) {
+function MemberSortFont(value) {
     const fonts = [$('#listHead1 span'), $('#listHead2 span'), $('#listHead3 span'), $('#listHead4 span')]
     for (let font of fonts) {
         font.html('<i class="fas fa-sort"></i>').closest('th').css('color', 'black')

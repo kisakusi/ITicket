@@ -41,6 +41,7 @@
         <input type="hidden" id="fPageSize" name="PageSize" value="10">
         <input type="hidden" id="fKeyword" name="Keyword" value="">
         <input type="hidden" id="fSort" name="Sort" value="1">
+        <input type="hidden" id="fSearchMode" name="SearchMode" value="false">
     </form>
     <div id="isHandle" class="spinner-border text-warning align-middle d-none" role="status">
         <span class="sr-only">Loading...</span>
@@ -69,6 +70,10 @@
             <label class="form-check-label d-inline text-primary" for="ctrlSort2" style="cursor: pointer;">檢舉數排序</label>
         </div>
         <span id="ctrlHint" class="text-success mx-2"></span>
+        <button id="ctrlReset" class="btn btn-secondary btn-sm float-right mr-3 align-top">重設條件</button>
+        <label class="float-right mr-3" style="cursor: pointer">
+            <input id="ctrlSearchMode" type="checkbox" class="ml-2"> 模糊搜尋
+        </label>
     </div>
     <div class="card-body">
         <!-- row top -->
@@ -80,7 +85,7 @@
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
-                </select> 筆資料
+                </select> 筆資料, 共 <span id="TotalSearch"></span> 筆資料
             </div>
             <div class="col-8">
                 <nav id="pageTop" class="float-right"></nav>

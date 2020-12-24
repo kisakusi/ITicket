@@ -1,14 +1,19 @@
-﻿const CurrentPageDatas = []
+﻿let CurrentTimer = 0
+const CurrentPageDatas = []
 const BackEndMemberListCurrentPage = []
 const BackEndMemberListCollection = []
 
 function AjaxMemberList() {
+    CurrentTimer = new Date().getTime()
     $('#isHandle').removeClass('d-none')
     $.ajax({
         url: '/BackEndMember/MemberList',
         type: 'post',
-        data: $('#ctrlForm').serialize(),
+        data: $('#ctrlForm').serialize() + `&CurrentTimer=${CurrentTimer}`,
         success: function (data) {
+            if (CurrentTimer > data[0].CurrentTimer) {
+                return
+            }
             CurrentPageDatas.splice(0, CurrentPageDatas.length, ...data.slice(1))
             BackEndMemberListCurrentPage.splice(0, BackEndMemberListCurrentPage.length)
             for (let i of data.slice(1)) {
@@ -17,7 +22,13 @@ function AjaxMemberList() {
             if (data[0].ChangePage != 0) {
                 $('#fPageCurrent').val(data[0].ChangePage)
             }
-            $('#ctrlHint').text($('#fKeyword').val() == '' ? '' : `關鍵字: ${$('#fKeyword').val()}`)
+            $('#TotalSearch').text(data[0].TotalSearch)
+            $('#ctrlHint').text($('#fKeyword').val() == '' ? '' : `${$('#fSearchMode').val() === 'false' ? '完整關鍵字' : '模糊搜尋'}: ${$('#fKeyword').val()}`)
+            if ($('#fSearchMode').val() === 'false') {
+                $('#ctrlHint').addClass('text-success').removeClass('text-warning')
+            } else {
+                $('#ctrlHint').removeClass('text-success').addClass('text-warning')
+            }
             ReactDOM.render(<MemberList data={data.slice(1)} />, document.querySelector('#listBody'))
             let maxpage = data[0].MaxPage
             let current = parseInt($('#fPageCurrent').val())
@@ -32,7 +43,7 @@ function AjaxMemberList() {
 }
 
 class MemberList extends React.Component {
-    handleBoxClick = (id, x) => {
+    handleBoxClick = id => {
         let index = BackEndMemberListCollection.indexOf(id)
         if (index < 0) {
             BackEndMemberListCollection.push(id)
@@ -308,7 +319,7 @@ class MemberList extends React.Component {
                         style={{ backgroundColor: BackEndMemberListCollection.includes(e.MemberID) ? 'lightyellow' : 'white' }}
                     >
                         <td className="pt-2 pb-1 text-body" style={{ cursor: 'pointer' }}
-                            onClick={(x) => this.handleBoxClick(e.MemberID, x.currentTarget)}
+                            onClick={(x) => this.handleBoxClick(e.MemberID)}
                         >
                             {
                                 BackEndMemberListCollection.includes(e.MemberID) &&
@@ -322,13 +333,13 @@ class MemberList extends React.Component {
                         <td className="pt-2 pb-1">
                             <a href="javascript:"
                                 onClick={() => this.handleIdClick(e.MemberID, e.Reasons.length != 0)}
-                                dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberEmail.split('@', 2)[0], fKeyword) }}></a>
+                                dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberEmail.split('@', 2)[0], fKeyword, e.SearchMode) }}></a>
                             <br />
                             <sup className="text-secondary">&nbsp;&nbsp;&nbsp;@{e.MemberEmail.split('@', 2)[1]}</sup>
                         </td>
-                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberNickName, fKeyword) }}></td>
-                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberName, fKeyword) }}></td>
-                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberPhone||'', fKeyword) }}></td>
+                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberNickName, fKeyword, e.SearchMode) }}></td>
+                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberName, fKeyword, e.SearchMode) }}></td>
+                        <td className="pt-2 pb-1" dangerouslySetInnerHTML={{ __html: keyHighlight(e.MemberPhone || '', fKeyword, e.SearchMode) }}></td>
                         <td className="pt-2 pb-1">{e.MemberRoleName}
                             {
                                 e.Reasons.length != 0 &&
@@ -375,6 +386,18 @@ class MemberList extends React.Component {
     }
 }
 
+class SendMessageList extends React.Component {
+    render() {
+        return (
+            <React.Fragment>
+                {this.props.data.map(e => 
+                    <p className="text-success"><i class="far fa-bell"></i> {e.email}</p>
+                )}
+            </React.Fragment>
+        )
+    }
+}
+
 $(function () {
     // DOMContentLoaded
     AjaxMemberList()
@@ -400,7 +423,7 @@ $(function () {
         let i = parseInt(this.id.slice(-1))
         $('#fPageCurrent').val(1)
         $('#fSort').val($('#fSort').val() === `${i}a` ? `${i}d` : $('#fSort').val() === `${i}d` ? '0' : `${i}a`)
-        MemberRoleInfoFont($('#fSort').val())
+        MemberSortFont($('#fSort').val())
         AjaxMemberList()
     })
 
@@ -425,18 +448,52 @@ $(function () {
             .siblings().removeClass('btn-outline-success').removeClass('btn-outline-warning').removeClass('btn-outline-danger')
         $('#fRoleId').val(i)
         $('#fPageCurrent').val(1)
-        $('#fPageSize').val($('#pageAmount').val())
+        $('#fPageSize').val(10)
         $('#pageAmount').prop('selectedIndex', 0)
         $('#fSort').val(0)
-        MemberRoleInfoFont($('#fSort').val())
+        MemberSortFont($('#fSort').val())
         AjaxMemberList()
     })
 
     $('#ctrlVeri').on('change', function () {
         $('#fPageCurrent').val(1)
-        $('#fPageSize').val($('#pageAmount').val())
+        $('#fPageSize').val(10)
         $('#pageAmount').prop('selectedIndex', 0)
         $('#fVeri').val($(this).prop('checked'))
+        AjaxMemberList()
+    })
+
+    // Basic Reset
+    $('#ctrlReset').css({
+        'outline': 'none !important',
+        'box-shadow': 'none'
+    }).on('click', function () {
+        $('#fPageCurrent').val(1)
+        $('#fPageSize').val(10)
+        $('#pageAmount').prop('selectedIndex', 0)
+        $('#searchbox').val('')
+        $('#fKeyword').val('')
+        $('#fSort').val(0)
+        MemberSortFont($('#fSort').val())
+        $('#fRoleId').val(4)
+        $('#ctrlBtn4').addClass('btn-outline-success')
+        $('#ctrlBtn3, #ctrlBtn2, #ctrlBtn1').removeClass('btn-outline-warning')
+        $('#ctrlBtn0').removeClass('btn-outline-danger')
+        $('#fVeri').val(false)
+        $('#ctrlVeri').prop('checked', false)
+        $('#fSearchMode').val(false)
+        $('#ctrlSearchMode').prop('checked', false)
+        AjaxMemberList()
+    })
+
+    // Pro - SearchMode Change
+    $('#ctrlSearchMode').on('change', function () {
+        $('#fPageCurrent').val(1)
+        $('#fPageSize').val(10)
+        $('#pageAmount').prop('selectedIndex', 0)
+        $('#fSort').val(0)
+        MemberSortFont($('#fSort').val())
+        $('#fSearchMode').val($(this).prop('checked'))
         AjaxMemberList()
     })
 
@@ -472,30 +529,14 @@ $(function () {
                     BackEndMemberListCollection: BackEndMemberListCollection
                 }, 
                 success: function (data) {
-                    let text = ''
-                    for (let i of data) {
-                        text += `➢ ${i.email}\n`
-                        if ((data.indexOf(i) + 1) % 5 == 0) {
-                            text += '\n'
-                        }
-                    }
-                    swal({
-                        title: '一般系統通知',
-                        text: text,
-                        content: 'input',
-                        buttons: {
-                            cancel: '取消',
-                            confirm: '發送系統通知'
-                        },
-                        closeOnClickOutside: false,
-                        closeOnEsc: false,
-                    }).then(content => {
-                        if (content !== null) {
-                            let demo = false
-                            if (content.toLowerCase() === 'demoxmas') {
-                                content = 'iTicket 祝大家聖誕快樂'
-                                demo = true
-                            }
+                    ReactDOM.render(<SendMessageList data={data} />, document.querySelector('#MsgBoxTarget'))
+                    $('#MsgBox').modal({ show: true })
+                    $('#MsgConfirm').on('click', function () {
+                        if ($('#MsgBoxTextarea').val().trim() === '') {
+                            swal('無法執行', '請填寫系統通知', 'error', {
+                                button: false
+                            })
+                        } else {
                             swal('系統通知發送確認', `是否要發送系統通知給 ${data.length} 位會員？`, 'warning', {
                                 buttons: {
                                     cancel: '取消',
@@ -515,12 +556,13 @@ $(function () {
                                         type: 'post',
                                         data: {
                                             BackEndMemberListCollection: BackEndMemberListCollection,
-                                            message: content
+                                            message: $('#MsgBoxTextarea').val().trim()
                                         },
                                         success: function (result) {
-                                            swal('系統通知發送成功', !demo ? result : `${result}\n${content}`, 'success', {
+                                            swal('系統通知發送成功', result, 'success', {
                                                 button: false
                                             })
+                                            $('#MsgBoxTextarea').val('')
                                             BackEndMemberListCollection.splice(0, BackEndMemberListCollection.length)
                                             ReactDOM.render(<MemberList data={CurrentPageDatas} />, document.querySelector('#listBody'))
                                         },
@@ -531,6 +573,7 @@ $(function () {
                                             })
                                         }
                                     })
+                                    $('#MsgCancel').click()
                                 }
                             })
                         }
@@ -538,6 +581,30 @@ $(function () {
                 }
             })
         }
+    })
+
+    // AnotherAction - MemberDownload / SellerDownload
+    $('#ctrlDownload').on('click', function () {
+        swal('下載資料確認', '是否要下載資料', 'warning', {
+            buttons: {
+                cancel: '取消',
+                member: '下載所有會員資料',
+                seller: '下載所有商家資料',
+                confirm: false
+            }
+        }).then(x => {
+            if (x === 'member') {
+                window.open('/BackEndMember/MemberDownload')
+                swal('下載資料完成', '成功下載所有會員資料', 'success', {
+                    button: false,
+                })
+            } else if (x === 'seller') {
+                window.open('/BackEndMember/SellerDownload')
+                swal('下載資料完成', '成功下載所有商家資料', 'success', {
+                    button: false,
+                })
+            }
+        })
     })
     
     // AjaxBox - BanTaskAction
@@ -600,7 +667,7 @@ $(function () {
             }
         })
     })
-
+    
     // AjaxBox - UnBanTaskAction
     $('#UnBanTaskAction').on('click', function () {
         $.ajax({
@@ -646,5 +713,5 @@ $(function () {
                 })
             }
         })
-    })
+    })    
 })

@@ -114,13 +114,14 @@
                 
             if (value=="確定") {
                     deleteActivityFavourite(memberId, activityId);
-                    swal("刪除成功", {
-                        icon: "success",
-                    });
+                swal("刪除成功", {
+                    icon: "success",
+                }).then(() => {
                     //執行收藏refrash ajax
                     loadActivityFavouriteByMemberId(memberId);
                     //執行收藏圈圈數字ajax
                     changeActivityFavouriteByMemberId(memberId);
+                }); 
                 }
                 
             });
