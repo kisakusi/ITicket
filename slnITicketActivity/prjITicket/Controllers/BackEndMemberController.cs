@@ -317,10 +317,10 @@ namespace prjITicket.Controllers
                             </tr>
                         </thead>
                         <tbody>
-                            ${members}
+                            {members}
                         </tbody>
                     </table>";
-                byte[] bytes = Encoding.Default.GetBytes(memberTable);
+                byte[] bytes = Encoding.UTF8.GetBytes(memberTable);
                 return File(bytes, "application/vnd.ms-excel", "ITicket 會員資料.xls");
             }
             catch 
@@ -369,10 +369,10 @@ namespace prjITicket.Controllers
                             </tr>
                         </thead>
                         <tbody>
-                            ${sellers}
+                            {sellers}
                         </tbody>
                     </table>";
-                byte[] bytes = Encoding.Default.GetBytes(sellerTable);
+                byte[] bytes = Encoding.UTF8.GetBytes(sellerTable);
                 return File(bytes, "application/vnd.ms-excel", "ITicket 商家資料.xls");
             }
             catch

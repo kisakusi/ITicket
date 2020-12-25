@@ -316,6 +316,12 @@ namespace prjITicket.Controllers
                     db.Entry(emotionA).State = EntityState.Deleted;
                     db.SaveChanges();
                 }
+                List<Ad_Article_Activity> aads = db.Ad_Article_Activity.Where(x => x.ArticleID == m.BTxid).ToList();
+                foreach (Ad_Article_Activity aad in aads)
+                {
+                    db.Entry(aad).State = EntityState.Deleted;
+                    db.SaveChanges();
+                }
 
                 int[] repliesIDs = db.Reply.Where(x => x.ArticleID == m.BTxid).Select(x => x.ReplyID).ToArray();
                 foreach (int rid in repliesIDs)
